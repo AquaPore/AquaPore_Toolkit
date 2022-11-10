@@ -1,0 +1,2 @@
+﻿SiteName,Multisteps,Wof[mm],NseBest[-],Ccc[-],Wilmot[-],∑ΔSink[mm],∑ΔQ_Bot[mm],SwcRoots[mm],Global_WaterBalance[mm],Global_WaterBalance_NormPr[-],ΔT_Average[second],iNonConverge[count],Efficiency[count/Hour],ΔRunTimeHypix[second]
+TC5,1,0.0,-5.231751229221672,0.17197756195922384,-0.07554437511879468,0.0,103.13338464857001,1.5569157394560784,-7.219445996575757e-8,3.014191896951307e-8,5318.0,0.0,9.0,21.442
