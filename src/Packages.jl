@@ -29,6 +29,11 @@ function PACKAGES(Option_PackageUpdate)
 		PACKAGE_MANAGER("SpecialFunctions")
 		PACKAGE_MANAGER("Statistics")
 		PACKAGE_MANAGER("Tables")
+		PACKAGE_MANAGER("LinearAlgebra")
+		PACKAGE_MANAGER("Suppressor")
+		PACKAGE_MANAGER("Dates")
+		PACKAGE_MANAGER("Configurations")
+		PACKAGE_MANAGER("TOML")
  
 
 	if Option_PackageUpdate

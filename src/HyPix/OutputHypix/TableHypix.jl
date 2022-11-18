@@ -7,7 +7,7 @@ module tableHypix
    using Dates
    import CSV, Tables
    using Statistics
-   using DataFrames, CSV, Query, Statistics, Dates
+   using DataFrames, CSV,  Statistics, Dates
    export TABLE_HYPIX
 
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

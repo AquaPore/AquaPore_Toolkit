@@ -198,7 +198,7 @@ module paths
 				mkpath(path.smap2Hypix.Path_Smap2Hypix)
 
 		# =============================================================
-		#		PLOT SOILWATER
+		#		PLOT AQUAPORE
 		# =============================================================
 			Path_Soilwater_Plot = Path_Home * "/OUTPUT/SoilWater/" * SiteName_Soilwater * "/Plots/"
 
