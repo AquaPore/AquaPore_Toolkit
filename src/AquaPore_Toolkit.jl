@@ -227,7 +227,10 @@ module AquaPore_Toolkit
 
 				KₛModel = fill(0.0::Float64, NiZ)
 				if option.hydro.HydroModel⍰ == "Kosugi" && (option.run.KsModel || !(option.data.Kθ && "Ks" ∈ optim.ParamOpt))
-					printstyled("\n ----- START RUNNING Ks Model from θ(Ψ)  ----------------------------------------------- \n"; color=:green)
+					printstyled("\n ----- START RUNNING Ks Model from θ(Ψ)  ----------------------------------------------- \n"; color=:red)
+
+					printstyled("		Running KsModel= ", option.ksModel.KₛModel⍰, "\n" ; color=:green)
+
 
 					if option.run.Smap
 						hydro, KₛModel = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment, Ks_Impermeable=Ks_Impermeable)

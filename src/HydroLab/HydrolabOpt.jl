@@ -50,6 +50,9 @@ module hydrolabOpt
 				elseif ("θs" ∉ optim.ParamOpt) && !Flag_0sOpt # <>=<>=<>=<>=<>
 						hydro.θs[iZ] = θobs_Max
 						hydro.Φ[iZ] = hydro.θs[iZ] / param.hydro.Coeff_Φ_2_θs
+						
+						# Reinforcing θs > θr
+							hydro.θs[iZ] = max(hydro.θs[iZ], hydro.θr_Max[iZ] + 0.01)
 
 				elseif  ("θs" ∉ optim.ParamOpt) # <>=<>=<>=<>=<>
 					if hydro.Φ[iZ] *  param.hydro.Coeff_Φ_2_θs > θobs_Max + θϵ
@@ -59,6 +62,9 @@ module hydrolabOpt
 					else
 						hydro.θs[iZ] = max(hydro.Φ[iZ] - θϵ, θobs_Max + θϵ)
 					end # hydro.Φ[iZ] * 0.95 > θobs_Max + θϵ
+
+					# Reinforcing θs > θr
+						hydro.θs[iZ] = max(hydro.θs[iZ], hydro.θr_Max[iZ] + 0.01)
 				end
 				
 			# CORRECTING Ks  ~~~

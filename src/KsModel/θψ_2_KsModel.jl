@@ -5,6 +5,7 @@ module θψ2KsModel
 	import ..cst, ..distribution
 	import QuadGK
 	import SpecialFunctions: erfc, erfcinv
+	
 	export KSMODEL
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,7 +28,7 @@ module θψ2KsModel
 
 				# To save time
 					if GroupBool_Select[iZ]
-						KₛModel[iZ] = θΨ_2_KSMODEL(hydro, option, ipGroup[iZ], iZ,  KₛModel⍰, ksmodelτ; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[] )
+						KₛModel[iZ] = θΨ_2_KSMODEL(hydro, option, ipGroup[iZ], iZ, KₛModel⍰, ksmodelτ; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
 					end
 			end # if: hydro.Ks[iZ] > eps(10.0)
 
@@ -51,7 +52,7 @@ module θψ2KsModel
 					θsMacMat = (θsMacMat / (1.0 - RockFragment)) * (1.0 - RockFragment2)
 
 					θr = (θr / (1.0 - RockFragment)) * (1.0 - RockFragment2)
-				end
+				end # if RockFragment > RockFragment_Treshold
 
 
 				# Model traditional 1 =================================================================
@@ -85,7 +86,7 @@ module θψ2KsModel
 						T1Mac = 10.0 ^ (τ₁Max * τ₁Mac / (1.0 - τ₁Max * τ₁Mac))
 						T2Mac = 2.0 * (1.0 - τ₂ * τ₂Mac)
 						T3Mac = 1.0 / (1.0 - τ₃Mac)
-			
+
 					return KₛModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac), 0.0, Se_Max; rtol=Rtol)[1]
 
 				elseif option.ksModel.KₛModel⍰=="KsModel_New2" # Original + Tσ₁ <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
@@ -109,6 +110,8 @@ module θψ2KsModel
 					
 				end  # if: Model=="Model?"
 		end  # function: θΨ_2_KSMODEL 
+	# ===========================================================================================================================================================================
+	# ===========================================================================================================================================================================
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -212,7 +215,6 @@ module θψ2KsModel
 	#..................................................................
 
 
-
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : τMODEL_θsθr
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -232,5 +234,5 @@ module θψ2KsModel
 	# ------------------------------------------------------------------
 
 
-end  # module: module θψ2Ks
+end  # module: module θψ2KsModel
 # ............................................................

@@ -40,11 +40,18 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : σ_2_θr
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function σ_2_θr(hydro₂, iZ; α₁=17.5, α₂=4.0)
-			σ_η = (hydro₂.σ[iZ] - hydro₂.σ_Min[iZ]) / (hydro₂.σ_Max[iZ] - hydro₂.σ_Min[iZ]) 
-			
-		return (hydro₂.θr_Max[iZ] * (1.0 - exp(-α₁ * σ_η ^ α₂))) / (1.0 - exp(-α₁ * 1.0 ^ α₂))
-		end  # function: σ_2_θr
+		# function σ_2_θr(hydro₂, iZ; α₁=17.5, α₂=4.0)
+		# 	σ_η = (hydro₂.σ[iZ] - hydro₂.σ_Min[iZ]) / (hydro₂.σ_Max[iZ] - hydro₂.σ_Min[iZ]) 	
+		# return (hydro₂.θr_Max[iZ] * (1.0 - exp(-α₁ * σ_η ^ α₂))) / (1.0 - exp(-α₁ * 1.0 ^ α₂))
+		# end  # function: σ_2_θr
+
+   # α₁_Max =0.75
+	# α₁_Min =0.6
+			function σ_2_θr(hydro₂, iZ; α₁=0.7)
+				σ_η = (hydro₂.σ[iZ] - hydro₂.σ_Min[iZ]) / (hydro₂.σ_Max[iZ] - hydro₂.σ_Min[iZ]) 
+				
+				return hydro₂.θr_Max[iZ] * min(σ_η / α₁, 1.0)
+			end # function: σ_2_θr
 	
 end  # module: hydroRealation
 # ............................................................
