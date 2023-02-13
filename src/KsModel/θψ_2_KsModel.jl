@@ -107,7 +107,18 @@ module θψ2KsModel
 
 				elseif option.ksModel.KₛModel⍰=="KsModel_JJ" # Original + Tσ₁ <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 
-					return KₛModel = KΘMODEL_JJ(T1, T2, T3, T4, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, optionₘ, iZ, hydroParam; Ψ₁=0.0)
+					# Transformation matrix
+						T1 =  10.0 ^ (Tσ₁ / (Tσ₁ - 1.0))
+						T2 = 2.0 * (1.0 - τ₂)
+						T3 = 1.0 / (1.0 - τ₃)
+
+					# Transformation macro
+						T1Mac = 10.0 ^ (τ₁Max * τ₁Mac / (1.0 - τ₁Max * τ₁Mac))
+						T2Mac = 2.0 * (1.0 - τ₂ * τ₂Mac)
+						T3Mac = 1.0 / (1.0 - τ₃Mac)
+
+
+					return KₛModel = KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, optionₘ, iZ, hydroParam; Ψ₁=0.0)
 
 
 				else
@@ -149,7 +160,7 @@ module θψ2KsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSMODEL_JJ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KΘMODEL_JJ(T1, T2, T3, T4, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, optionₘ, iZ, hydroParam; Ψ₁=0.0)
+		function KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, optionₘ, iZ, hydroParam; Ψ₁=0.0)
 
 			# Se ===
 				if Ψ₁ > eps(100.0)
