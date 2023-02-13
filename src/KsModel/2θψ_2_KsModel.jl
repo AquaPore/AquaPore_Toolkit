@@ -2,7 +2,7 @@
 #		module: kunsatModel
 # =============================================================
 module θψ2KsModel
-	import ..cst, ..distribution, ..wrc
+	import ..cst, ..distribution
 	import QuadGK
 	import SpecialFunctions: erfc, erfcinv
 	
@@ -106,8 +106,6 @@ module θψ2KsModel
 					return KₛModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac), 0.0, Se_Max; rtol=Rtol)[1]
 
 				elseif option.ksModel.KₛModel⍰=="KsModel_JJ" # Original + Tσ₁ <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-
-					return KₛModel = KΘMODEL_JJ(T1, T2, T3, T4, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, optionₘ, iZ, hydroParam; Ψ₁=0.0)
 
 
 				else
