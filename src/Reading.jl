@@ -517,6 +517,7 @@ module reading
 			# The τ[1] = TopLayer and   τ[3] = SubLayer			
 			i = 1
 			for ipParamName in Param_Name
+
 				if occursin("_1", ipParamName)
 					ipParamName = replace(ipParamName, "_1" => "" )
 					iGroup = 1
@@ -529,10 +530,31 @@ module reading
 					Param_Name[i] = ipParamName
 					Flag_Top = false
 
+				elseif occursin("_3", ipParamName)
+					ipParamName = replace(ipParamName, "_3" => "" )
+					iGroup = 3
+					Param_Name[i] = ipParamName
+					Flag_Top = false
+
+				elseif occursin("_4", ipParamName)
+					ipParamName = replace(ipParamName, "_4" => "" )
+					iGroup = 4
+					Param_Name[i] = ipParamName
+					Flag_Top = false
+
+				elseif occursin("_5", ipParamName)
+					ipParamName = replace(ipParamName, "_5" => "" )
+					iGroup = 5
+					Param_Name[i] = ipParamName
+					Flag_Top = false
+
 				else
+
+								println(ipParamName)
 					iGroup = 1
 					Param_Name[i] = ipParamName
 					Flag_Top = true
+
 				end
 
 				# Getting the Vector values of the τ parameters
@@ -578,7 +600,7 @@ module reading
 			# Putting all the in mutable structure
 				optimKsmodel = OPTIMKS(Param_Name, ParamOpt_Min, ParamOpt_Max, ParamOpt, NparamOpt, Flag_Opt)
 
-			if Flag_Opt == true
+			if Flag_Opt == false
 				println("	=== === Optimizing the following τ parameters === === \n")
 				println("		KsModel=" , option.ksModel. KₛModel⍰)
 				println("		ksmodelτ=", Param_Name)
