@@ -528,6 +528,11 @@ module reading
 					iGroup = 2
 					Param_Name[i] = ipParamName
 					Flag_Top = false
+
+				else
+					iGroup = 1
+					Param_Name[i] = ipParamName
+					Flag_Top = true
 				end
 
 				# Getting the Vector values of the τ parameters
