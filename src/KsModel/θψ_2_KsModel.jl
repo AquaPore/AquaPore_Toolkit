@@ -40,7 +40,7 @@ module θψ2KsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KUNSAT_MODELS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function θΨ_2_KSMODEL(hydroParam, option, iGroup, iZ::Int64, KₛModel⍰, ksmodelτ; RockFragment=0.0, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], τ₁Max=ksmodelτ.τ₁Max[iGroup], τ₂=ksmodelτ.τ₂[iGroup], τ₃=ksmodelτ.τ₃[iGroup], τ₁ηMin=ksmodelτ.τ₁ηMin[iGroup], τ₅=ksmodelτ.τ₅[iGroup], τ₄=ksmodelτ.τ₄[iGroup], τ₁Mac=ksmodelτ.τ₁Mac[iGroup], τ₂Mac=ksmodelτ.τ₂Mac[iGroup], τ₃Mac=ksmodelτ.τ₃Mac[iGroup], RockFragment_Treshold=0.4, Rtol=1.0E-3, Se_Max=0.9999, Smap_ImpermClass=[], KsImpClass_Dict=[] )
+		function θΨ_2_KSMODEL(hydroParam, option, iGroup, iZ::Int64, KₛModel⍰, ksmodelτ; RockFragment=0.0, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], τ₁=ksmodelτ.τ₁[iGroup], τ₁Max=ksmodelτ.τ₁Max[iGroup], τ₂=ksmodelτ.τ₂[iGroup], τ₃=ksmodelτ.τ₃[iGroup], τ₁ηMin=ksmodelτ.τ₁ηMin[iGroup], τ₅=ksmodelτ.τ₅[iGroup], τ₄=ksmodelτ.τ₄[iGroup], τ₁Mac=ksmodelτ.τ₁Mac[iGroup], τ₂Mac=ksmodelτ.τ₂Mac[iGroup], τ₃Mac=ksmodelτ.τ₃Mac[iGroup], RockFragment_Treshold=0.4, Rtol=1.0E-3, Se_Max=0.9999, Smap_ImpermClass=[], KsImpClass_Dict=[] )
 
 			# Determine when Ks increases for increasing RockFragment	
 				if RockFragment > RockFragment_Treshold
@@ -95,7 +95,7 @@ module θψ2KsModel
 
 					# Transformation matrix
 						T1 =  10.0 ^ (Tσ₁ / (Tσ₁ - 1.0))
-						T2 = 2.0 * (1.0 - τ₂)
+						T2 = 4.0 * (1.0 - τ₂)
 						T3 = 1.0 / (1.0 - τ₃)
 
 					# Transformation macro
@@ -105,20 +105,25 @@ module θψ2KsModel
 			
 					return KₛModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac), 0.0, Se_Max; rtol=Rtol)[1]
 
-				elseif option.ksModel.KₛModel⍰=="KsModel_JJ" # Original + Tσ₁ <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
+
+				elseif option.ksModel.KₛModel⍰=="KsModel_JJ" # no integrals <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 
 					# Transformation matrix
-						T1 =  10.0 ^ (Tσ₁ / (Tσ₁ - 1.0))
-						T2 = 2.0 * (1.0 - τ₂)
-						T3 = 1.0 / (1.0 - τ₃)
+						T1 = 10.0 ^ (-τ₁ / (τ₁ - 1.0))
+
+						T2_Max = 4.0
+						T2_Min = 1.0
+						T2 = (T2_Min - T2_Max) * τ₂ + T2_Max
+
+						T3 = τ₃
 
 					# Transformation macro
-						T1Mac = 10.0 ^ (τ₁Max * τ₁Mac / (1.0 - τ₁Max * τ₁Mac))
-						T2Mac = 2.0 * (1.0 - τ₂ * τ₂Mac)
-						T3Mac = 1.0 / (1.0 - τ₃Mac)
+						T1Mac = 10.0 ^ (-τ₁Mac * τ₁/ (τ₁Mac * τ₁- 1.0)) # because  τ₁ > τ₁Mac
+						T2Mac = (T2_Min - T2_Max) * τ₂ * τ₂Mac + T2_Max # because  τ₂ > τ₂Mac
+						T3Mac = τ₃Mac * τ₃										# because  τ₃ > τ₃Mac
 
 
-					return KₛModel = KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, optionₘ, iZ, hydroParam; Ψ₁=0.0)
+					return KₛModel = KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, option.hydro, iZ, hydroParam; Ψ₁=0.0)
 
 
 				else

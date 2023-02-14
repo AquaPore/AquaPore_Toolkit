@@ -6,6 +6,7 @@ module ksModel
 	Base.@kwdef mutable struct KSMODELτ
 		τ₁Max     :: Vector{Float64}
 		τ₁ηMin    :: Vector{Float64}
+		τ₁        :: Vector{Float64}
 		τ₂        :: Vector{Float64}
 		τ₃        :: Vector{Float64}
 		τ₅        :: Vector{Float64}
@@ -14,6 +15,7 @@ module ksModel
 		τ₂Mac     :: Vector{Float64}
 		τ₃Mac     :: Vector{Float64}
 
+		τ₁_Min    :: Vector{Float64}
 		τ₁Max_Min :: Vector{Float64}
 		τ₂_Min    :: Vector{Float64}
 		τ₃_Min    :: Vector{Float64}
@@ -25,6 +27,7 @@ module ksModel
 		τ₂Mac_Min :: Vector{Float64}
 		τ₃Mac_Min :: Vector{Float64}
 		
+		τ₁_Max    :: Vector{Float64}
 		τ₁Max_Max :: Vector{Float64}
 		τ₂_Max    :: Vector{Float64}
 		τ₃_Max    :: Vector{Float64}
@@ -48,6 +51,7 @@ module ksModel
 		function STRUCT_KSMODEL(;Nτ_Layer=2::Int64)
          τ₁Max      = fill(0.0::Float64, Nτ_Layer)
          τ₁ηMin     = fill(0.0::Float64, Nτ_Layer)
+			τ₁         = fill(0.0::Float64, Nτ_Layer)
          τ₂         = fill(0.0::Float64, Nτ_Layer)
          τ₃         = fill(0.0::Float64, Nτ_Layer)
          τ₅         = fill(0.0::Float64, Nτ_Layer)
@@ -57,6 +61,7 @@ module ksModel
          τ₃Mac      = fill(0.0::Float64, Nτ_Layer)
 
          τ₁Max_Min  = fill(0.0::Float64, Nτ_Layer)
+			τ₁_Min     = fill(0.0::Float64, Nτ_Layer)
          τ₂_Min     = fill(0.0::Float64, Nτ_Layer)
          τ₃_Min     = fill(0.0::Float64, Nτ_Layer)
          τ₁ηMin_Min = fill(0.0::Float64, Nτ_Layer)
@@ -66,7 +71,8 @@ module ksModel
          τ₂Mac_Min  = fill(0.0::Float64, Nτ_Layer)
          τ₃Mac_Min  = fill(0.0::Float64, Nτ_Layer)
 			
-         τ₁Max_Max  = fill(0.0::Float64, Nτ_Layer)
+         τ₁_Max     = fill(0.0::Float64, Nτ_Layer)
+			τ₁Max_Max  = fill(0.0::Float64, Nτ_Layer)
          τ₂_Max     = fill(0.0::Float64, Nτ_Layer)
          τ₃_Max     = fill(0.0::Float64, Nτ_Layer)
          τ₁ηMin_Max = fill(0.0::Float64, Nτ_Layer)
@@ -81,7 +87,7 @@ module ksModel
          Wilmot_τ   = fill(0.0::Float64, Nτ_Layer)
          Ccc_τ      = fill(0.0::Float64, Nτ_Layer)
 
-			ksmodelτ = KSMODELτ(τ₁Max, τ₁ηMin, τ₂, τ₃, τ₅, τ₄, τ₁Mac, τ₂Mac, τ₃Mac, τ₁Max_Min,τ₁ηMin_Min, τ₂_Min, τ₃_Min,  τ₅_Min, τ₄_Min, τ₁Mac_Min, τ₂Mac_Min, τ₃Mac_Min, τ₁Max_Max, τ₁ηMin_Max, τ₂_Max, τ₃_Max, τ₅_Max, τ₄_Max, τ₁Mac_Max,τ₂Mac_Max, τ₃Mac_Max, Nse_τ, Rmse_τ, Wilmot_τ, Ccc_τ)
+			ksmodelτ = KSMODELτ(τ₁Max, τ₁ηMin, τ₁, τ₂, τ₃, τ₅, τ₄, τ₁Mac, τ₂Mac, τ₃Mac, τ₁_Min, τ₁Max_Min,τ₁ηMin_Min, τ₂_Min, τ₃_Min,  τ₅_Min, τ₄_Min, τ₁Mac_Min, τ₂Mac_Min, τ₃Mac_Min, τ₁_Max,τ₁Max_Max, τ₁ηMin_Max, τ₂_Max, τ₃_Max, τ₅_Max, τ₄_Max, τ₁Mac_Max,τ₂Mac_Max, τ₃Mac_Max, Nse_τ, Rmse_τ, Wilmot_τ, Ccc_τ)
 
 		return ksmodelτ 
 		end  # function: STRUCT_KSMODEL
