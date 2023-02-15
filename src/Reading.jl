@@ -549,8 +549,6 @@ module reading
 					Flag_Top = false
 
 				else
-
-								println(ipParamName)
 					iGroup = 1
 					Param_Name[i] = ipParamName
 					Flag_Top = true

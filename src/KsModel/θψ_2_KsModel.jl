@@ -107,27 +107,21 @@ module θψ2KsModel
 
 
 				elseif option.ksModel.KₛModel⍰=="KsModel_JJ" # no integrals <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-
 					# Transformation matrix
-						T1 = 10.0 ^ (-τ₁ / (τ₁ - 1.0))
+						T1 = 10.0 ^ (τ₁Mac * τ₁ / (τ₁Mac * τ₁ - 1.0))
 
-						T2_Max = 4.0
+						T2_Max = 3.0
 						T2_Min = 1.0
 						T2 = (T2_Min - T2_Max) * τ₂ + T2_Max
 
-						T3 = τ₃
+						T3 =   τ₃
 
 					# Transformation macro
-						T1Mac = 10.0 ^ (-τ₁Mac * τ₁/ (τ₁Mac * τ₁- 1.0)) # because  τ₁ > τ₁Mac
+						T1Mac = 10.0 ^ ( τ₁/ (τ₁ - 1.0)) # because  τ₁ > τ₁Mac
 						T2Mac = (T2_Min - T2_Max) * τ₂ * τ₂Mac + T2_Max # because  τ₂ > τ₂Mac
 						T3Mac = τ₃Mac * τ₃										# because  τ₃ > τ₃Mac
 
 					 KₛModel = KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, option.hydro, iZ, hydroParam; Ψ₁=0.0)
-
-					#  println(KₛModel)
-						T3Mac = τ₃Mac * τ₃										# because  τ₃ > τ₃Mac
-					#  println("τ₁=$τ₁ τ₂=$τ₂ τ₃=$τ₃ ")
-					#  println("τ₁Mac=$τ₁Mac τ₂Mac=$τ₂Mac τ₃Mac=$τ₃Mac")
 
 					 return KₛModel
 
@@ -180,7 +174,7 @@ module θψ2KsModel
 				end
 
 			# Matrix ====
-				Se_Mat = (θsMacMat - θr) / (θs - θr)
+				Se_Mat = (θsMacMat - θr)
 
 				Ks_Mat = T1 * cst.KunsatModel * π * (Se_Mat * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2) / 2.0)) ^ T3
 
@@ -188,7 +182,7 @@ module θψ2KsModel
 
 			# Macropore ===
 				if θs - θsMacMat > cst.ΔθsθsMacMat
-					Se_Mac = (θs - θsMacMat) / (θs - θr)
+					Se_Mac = (θs - θsMacMat)
 			
 					Ks_Mac = T1Mac * cst.KunsatModel * π * (Se_Mac * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2) / 2.0)) ^ T3Mac
 

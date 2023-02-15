@@ -123,7 +123,7 @@ module plot
 			Ks_Min = minimum([minimum(Ksₒᵦₛ), minimum(KₛModel)])
 			Ks_Max = maximum([maximum(Ksₒᵦₛ), maximum(KₛModel)])
 
-			Ks_Max = 0.099371778 # mm/s
+			# Ks_Max = 0.099371778 # mm/s
 			
 			CairoMakie.activate!()
 

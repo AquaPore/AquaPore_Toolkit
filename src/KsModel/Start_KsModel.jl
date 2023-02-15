@@ -52,8 +52,8 @@ module startKsModel
 				~ = STATISTICS_KSMODEL(hydro, iGroup_Opt, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel)
 			end  # if: optimKsmodel
 
-			if option.ksModel.Plot_KsModel && option.data.Kθ && "Ks" ∈ optim.ParamOpt
-				println(" === ALL SIMULATIONS === \n")
+			if option.ksModel.Plot_KsModel && option.data.Kθ && "Ks"∈ optim.ParamOpt
+				println(" 		=== ALL SIMULATIONS === \n")
 				NameSim = "All_"
 				plot.ksmodel.KSMODEL(KₛModel[1:NiZ], hydro.Ks[1:NiZ], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[1:NiZ], hydro.θsMacMat[1:NiZ], hydro.σ[1:NiZ], option)	
 			end
