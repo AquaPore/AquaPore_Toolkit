@@ -108,7 +108,7 @@ module θψ2KsModel
 
 				elseif option.ksModel.KₛModel⍰=="KsModel_JJ" # no integrals <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 					# Transformation matrix
-						T1 = 10.0 ^ (τ₁Mac * τ₁ / (τ₁Mac * τ₁ - 1.0))
+						T1 = 10.0 ^ (τ₁ / ( τ₁ - 1.0))
 
 						T2_Max = 3.0
 						T2_Min = 1.0
@@ -118,7 +118,7 @@ module θψ2KsModel
 
 					# Transformation macro
 						T1Mac = 10.0 ^ ( τ₁/ (τ₁ - 1.0)) # because  τ₁ > τ₁Mac
-						T2Mac = (T2_Min - T2_Max) * τ₂ * τ₂Mac + T2_Max # because  τ₂ > τ₂Mac
+						T2Mac = (T2_Min - T2_Max) * τ₂  * τ₂Mac + T2_Max # because  τ₂ > τ₂Mac
 						T3Mac = τ₃Mac * τ₃										# because  τ₃ > τ₃Mac
 
 					 KₛModel = KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, option.hydro, iZ, hydroParam; Ψ₁=0.0)
