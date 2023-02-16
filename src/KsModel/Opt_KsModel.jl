@@ -34,7 +34,7 @@ module optKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_KSMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OF_KSMODEL(GroupBool_Select::Vector{Bool}, hydro, iGroup_Opt, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], Unit="MmH", No_Log_Square⍰="Log", WilMot_Ccc⍰="Ccc", KsMinMax=0.005555556)
+		function OF_KSMODEL(GroupBool_Select::Vector{Bool}, hydro, iGroup_Opt, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], WilMot_Ccc⍰="Wilmot", KsMinMax=0.005555556)
 
 			# Deriving the optimal τ parameters from X
 				ksmodelτ = X_2_τ(iGroup_Opt, ksmodelτ, optimKsmodel, X)
@@ -70,19 +70,12 @@ module optKsModel
 
 			Ks_ObsTransformed = fill(0.0::Float64, NiZ)
 			Ks_SimTransformed = fill(0.0::Float64, NiZ)
-			for iZ=1:NiZ
-				if Unit == "MmS"
-					Ks_ObsTransformed[iZ] = hydro.Ks[iZ]
-					Ks_SimTransformed[iZ] = KₛModel[iZ]
 
-				elseif Unit == "MmH"
+			# CONVERT UNITS mms-> mm/h
+				for iZ=1:NiZ
 					Ks_ObsTransformed[iZ] = cst.MmS_2_MmH .* hydro.Ks[iZ]
 					Ks_SimTransformed[iZ] = cst.MmS_2_MmH .* KₛModel[iZ]
-
-				else
-					error("Unit = $Unit not available" )
-				end
-			end # for iZ=1:NiZ
+				end # for iZ=1:NiZ
 
 			if option.ksModel.Of_Split_KsSlowKsFast
 				Ks_ObsTransformed_Small = Ks_ObsTransformed[KsSmall_True[1:NiZ]]
@@ -92,7 +85,7 @@ module optKsModel
 				Ks_SimTransformed_Large = Ks_SimTransformed[KsLarge_True[1:NiZ]]
 			end
 
-			if No_Log_Square⍰ == "Log"
+			# LOG TRANSFORMATION
 				if option.ksModel.Of_Split_KsSlowKsFast
 					Ks_ObsTransformed_Large = log1p.(Ks_ObsTransformed_Large)
 					Ks_SimTransformed_Large = log1p.(Ks_SimTransformed_Large)
@@ -101,18 +94,6 @@ module optKsModel
 					Ks_ObsTransformed = log1p.(Ks_ObsTransformed)
 					Ks_SimTransformed = log1p.(Ks_SimTransformed)
 				end
-
-			elseif No_Log_Square⍰ == "Square"
-				if option.ksModel.Of_Split_KsSlowKsFast
-					Ks_ObsTransformed_Large = (Ks_ObsTransformed_Large) .^ 0.5
-					Ks_SimTransformed_Large = (Ks_SimTransformed_Large) .^ 0.5
-
-				else
-					Ks_ObsTransformed = (Ks_ObsTransformed) .^ 0.5
-					Ks_SimTransformed = (Ks_SimTransformed) .^ 0.5
-				end
-			end
-
 
 			if WilMot_Ccc⍰ == "Wilmot"
 				if option.ksModel.Of_Split_KsSlowKsFast

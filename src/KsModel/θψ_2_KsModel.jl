@@ -72,7 +72,6 @@ module θψ2KsModel
 				
 					return KₛModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac), 0.0, Se_Max; rtol=Rtol)[1]
 
-						
 				elseif option.ksModel.KₛModel⍰=="KsModel_New" # Original + Tσ₁ <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 					# Computting T1 as a function of σ
 					Tσ₁ = τMODEL_σ(hydroParam, iZ, τ₁Max * τ₁ηMin, τ₁Max, σ; Inverse=false, τ₄=τ₄)
@@ -108,18 +107,18 @@ module θψ2KsModel
 
 				elseif option.ksModel.KₛModel⍰=="KsModel_JJ" # no integrals <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 					# Transformation matrix
-						T1 = 10.0 ^ (τ₁ / ( τ₁ - 1.0))
+						T1 = 10.0 ^ (τ₁ / (τ₁ - 1.0))
 
 						T2_Max = 3.0
 						T2_Min = 1.0
 						T2 = (T2_Min - T2_Max) * τ₂ + T2_Max
 
-						T3 =   τ₃
+						T3 = τ₃
 
 					# Transformation macro
-						T1Mac = 10.0 ^ ( τ₁/ (τ₁ - 1.0)) # because  τ₁ > τ₁Mac
-						T2Mac = (T2_Min - T2_Max) * τ₂  * τ₂Mac + T2_Max # because  τ₂ > τ₂Mac
-						T3Mac = τ₃Mac * τ₃										# because  τ₃ > τ₃Mac
+						T1Mac = 10.0 ^ (τ₁Mac / (τ₁Mac - 1.0)) 
+						T2Mac = (T2_Min - T2_Max) * τ₂ * τ₂Mac + T2_Max # because  τ₂ > τ₂Mac
+						T3Mac = τ₃										# because  τ₃ > τ₃Mac
 
 					 KₛModel = KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, option.hydro, iZ, hydroParam; Ψ₁=0.0)
 
@@ -133,67 +132,61 @@ module θψ2KsModel
 	# ===========================================================================================================================================================================
 	# ===========================================================================================================================================================================
 
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : KSMODEL_TRADITIONAL
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac)
-
-			Kunsat_Matrix =  T1 * ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) ) ^ T2
-
-			Kunsat_Macro = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) ^ T2Mac 
-		return Kunsat = Kunsat_Matrix + Kunsat_Macro
-		end  # function: KS_MODEL
-	# ------------------------------------------------------------------
-
-	
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : KSMODEL_NEW
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL_NEW(Se, T1, T2, T3, T4, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac)
-			
-			Kunsat_Matrix = T1 *( ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) ) ^ T2) ^ T4
-
-			Kunsat_Macro = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) ^ T2Mac 
-		return Kunsat = Kunsat_Matrix + Kunsat_Macro
-		end  # function: KS_MODEL
-	# ------------------------------------------------------------------
-
-
-		
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSMODEL_JJ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, optionₘ, iZ, hydroParam; Ψ₁=0.0)
 
 			# Se ===
-				if Ψ₁ > eps(100.0)
-					Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydroParam)
-				else
-					Se = 1.0
-				end
+				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydroParam)
 
-			# Matrix ====
-				Se_Mat = (θsMacMat - θr)
-
-				Ks_Mat = T1 * cst.KunsatModel * π * (Se_Mat * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2) / 2.0)) ^ T3
+			# Matrix ====	
+				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2) / 2.0)) ^ T3
 
 				Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
 			# Macropore ===
-				if θs - θsMacMat > cst.ΔθsθsMacMat
-					Se_Mac = (θs - θsMacMat)
-			
-					Ks_Mac = T1Mac * cst.KunsatModel * π * (Se_Mac * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2) / 2.0)) ^ T3Mac
+				# if θs - θsMacMat > cst.ΔθsθsMacMat
+					Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2) / 2.0)) ^ T3Mac
 
-					Kunsat_Mac =  Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-				else
-					Kunsat_Mac = 0.0::Float64
-				end
+					Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+
+				# else
+				# 	Kunsat_Mac = 0.0::Float64
+				# end
 
 		return Kunsat_Mat + Kunsat_Mac
 		end  # function: KS_MODEL
 	# ------------------------------------------------------------------
+
+	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	# #		FUNCTION : KSMODEL_TRADITIONAL
+	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	# 	function KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac)
+
+	# 		Kunsat_Matrix =  T1 * ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) ) ^ T2
+
+	# 		Kunsat_Macro = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) ^ T2Mac 
+	# 	return Kunsat = Kunsat_Matrix + Kunsat_Macro
+	# 	end  # function: KS_MODEL
+	# # ------------------------------------------------------------------
+
+	
+	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	# #		FUNCTION : KSMODEL_NEW
+	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	# 	function KSMODEL_NEW(Se, T1, T2, T3, T4, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac)
+			
+	# 		Kunsat_Matrix = T1 *( ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) ) ^ T2) ^ T4
+
+	# 		Kunsat_Macro = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) ^ T2Mac 
+	# 	return Kunsat = Kunsat_Matrix + Kunsat_Macro
+	# 	end  # function: KS_MODEL
+	# # ------------------------------------------------------------------
+
+
+		
+	
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
