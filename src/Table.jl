@@ -190,10 +190,11 @@ module table
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KSMODEL_τ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function KSMODEL_τ(ksmodelτ, Path)
+			function KSMODEL_τ(ksmodelτ, Ngroup, Path)
 				println("    ~  $Path ~")
 
-				Matrix, FieldName_String = tool.readWrite.STRUCT_2_FIELDNAME(2, ksmodelτ)
+				Matrix, FieldName_String = tool.readWrite.STRUCT_2_FIELDNAME(Ngroup, ksmodelτ)
+				
 				X, Y = size(Matrix)
 				CSV.write(Path, Tables.table(round.(Matrix, digits=5)), writeheader=true, header=FieldName_String, bom=true)	
 			return nothing

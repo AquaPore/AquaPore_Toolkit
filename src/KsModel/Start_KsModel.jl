@@ -23,16 +23,15 @@ module startKsModel
 				for iGroup_Opt=1:N_Group
 					println("\n       === iGroup_Opt=$iGroup_Opt === \n")
 
-					# Is there parameters to be optimised in this group
+					# Quick fix
 					if optimKsmodel.NparamOpt[iGroup_Opt] ≥ 1
-
 						GroupBool_Select = GroupBool[1:NiZ, iGroup_Opt]
 
 						KₛModel = optKsModel.START_OPT_KSMODEL(GroupBool_Select, hydro, iGroup_Opt, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
 
 						ksmodelτ = STATISTICS_KSMODEL(hydro, iGroup_Opt, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel)
 
-						if option.ksModel.Plot_KsModel
+						if option.ksModel.Plot_KsModel && !option.ksModel.OptIndivSoil
 							NameSim = "σ_" * string(iGroup_Opt)
 
 							plot.ksmodel.KSMODEL(KₛModel[GroupBool_Select], hydro.Ks[GroupBool_Select], NameSim,path.plotSoilwater.Plot_KsModel, hydro.θr[GroupBool_Select], hydro.θsMacMat[GroupBool_Select], hydro.σ[GroupBool_Select], option)
@@ -40,6 +39,11 @@ module startKsModel
 
 					end # if optimKsmodel.NparamOpt[iGroup_Opt] ≥ 1
 				end # for iGroup_Opt=1:N_Group
+
+				if option.ksModel.Plot_KsModel && option.ksModel.OptIndivSoil
+					NameSim = "All_"
+					plot.ksmodel.KSMODEL(KₛModel[1:NiZ], hydro.Ks[1:NiZ], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[1:NiZ], hydro.θsMacMat[1:NiZ], hydro.σ[1:NiZ], option)	
+				end
 
 			# RUN KₛModel
 			else
@@ -77,7 +81,7 @@ module startKsModel
 					end
 				end
 		
-		return hydro, KₛModel
+		return hydro, KₛModel, N_Group
 		end  # function: START_KSMODEL
 	#..................................................................
 
@@ -86,24 +90,39 @@ module startKsModel
 	#		FUNCTION : GROUPING_KSMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function GROUPING_KSMODEL(hydro, N_Group, NiZ, option, param)
+
+			if option.ksModel.OptIndivSoil
+				N_Group = NiZ 
+				GroupBool = fill(false::Bool, NiZ, N_Group)
+			else
+				GroupBool = fill(true::Bool, NiZ, N_Group)
+			end
 			
          ipGroup   = fill(1::Int64, NiZ)
-         GroupBool = fill(true, NiZ, N_Group)
-
+         
 			# Selecting groups if required
 			if option.ksModel.Group
 				for iZ=1:NiZ
-					if hydro.σ[iZ] ≤ param.ksModel.σₛₚₗᵢₜ
-						ipGroup[iZ] = 1
-						GroupBool[iZ, 1] = true
-						GroupBool[iZ, 2] = false
+
+					if !(option.ksModel.OptIndivSoil)
+						if hydro.σ[iZ] ≤ param.ksModel.σₛₚₗᵢₜ
+							ipGroup[iZ] = 1
+							GroupBool[iZ, 1] = true
+							GroupBool[iZ, 2] = false
+						else
+							ipGroup[iZ] = 2
+							GroupBool[iZ, 1] = false
+							GroupBool[iZ, 2] = true
+						end  # if: hydro.
+
+						N_Group = 2
 					else
-						ipGroup[iZ] = 2
-						GroupBool[iZ, 1] = false
-						GroupBool[iZ, 2] = true
-					end  # if: hydro.  
+						GroupBool[iZ, iZ] = true
+						ipGroup[iZ] = iZ
+						N_Group = NiZ
+					end  
 				end # for iZ=1:NiZ
-				N_Group = 2
+				
 			else
 				N_Group = 1
 			end #  option.ksModel.Group

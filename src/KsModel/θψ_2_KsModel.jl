@@ -120,9 +120,7 @@ module θψ2KsModel
 						T2Mac = (T2_Min - T2_Max) * τ₂ * τ₂Mac + T2_Max # because  τ₂ > τ₂Mac
 						T3Mac = τ₃										# because  τ₃ > τ₃Mac
 
-					 KₛModel = KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, option.hydro, iZ, hydroParam; Ψ₁=0.0)
-
-					 return KₛModel
+					 return KₛModel = KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, option.hydro, iZ, hydroParam; Ψ₁=0.0)
 
 				else
 					error("option.ksModel.KₛModel⍰ = $(option.ksModel.KₛModel⍰) is not yet implemented try <KsModel_Traditional>; <KsModel_Tσ>; <KsModel_New>; <KsModel_NewSimplified> ")

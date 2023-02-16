@@ -458,7 +458,7 @@ module reading
          Flag_Opt     :: Bool
 		end
 
-		function KSMODEL_PARAM(ksmodelτ, option, Path)
+		function KSMODEL_PARAM(ksmodelτ, NiZ, option, Path)
 			# Read data
 				Data = CSV.File(Path, header=true)
 
@@ -508,10 +508,16 @@ module reading
 				end
 
 			# ====================================================
-            ParamOpt     = fill(""::String, (2, N_Opt))
-            ParamOpt_Min = fill(0.0::Float64, (2, N_Opt))
-            ParamOpt_Max = fill(0.0::Float64, (2, N_Opt))
-            NparamOpt    = fill(0::Int64, 2)
+            if option.ksModel.OptIndivSoil
+					N_Group = NiZ
+				else
+					N_Group = 2
+				end
+
+				ParamOpt     = fill(""::String, (N_Group, N_Opt))
+            ParamOpt_Min = fill(0.0::Float64, (N_Group, N_Opt))
+            ParamOpt_Max = fill(0.0::Float64, (N_Group, N_Opt))
+            NparamOpt    = fill(0::Int64, N_Group)
 
 			# For every parameter
 			# The τ[1] = TopLayer and   τ[3] = SubLayer			
@@ -594,6 +600,21 @@ module reading
 				end # if Flag_Opt
 			i += 1
 			end # for loop
+
+
+			# Special cases for when we option.ksModel.OptIndivSoil
+			if option.ksModel.OptIndivSoil
+				for iZ=1:NiZ 
+					NparamOpt[iZ]    = NparamOpt[1]
+
+					for iOpt=1:N_Opt
+						ParamOpt[iZ,iOpt]     = ParamOpt[1,iOpt]
+						ParamOpt_Min[iZ,iOpt] = ParamOpt_Min[1,iOpt]
+						ParamOpt_Max[iZ,iOpt] = ParamOpt_Max[1,iOpt]
+					end # for iOpt=1:N_Opt
+				end # for iZ=1:NiZ 
+			end  # if: option.ksModel.OptIndivSoil
+
 
 			# Putting all the in mutable structure
 				optimKsmodel = OPTIMKS(Param_Name, ParamOpt_Min, ParamOpt_Max, ParamOpt, NparamOpt, Flag_Opt)

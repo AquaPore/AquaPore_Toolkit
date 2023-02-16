@@ -141,9 +141,17 @@ module AquaPore_Toolkit
 				
 			# IF WE WANT TO DERIVE Ks FROM θ(Ψ)
 				if option.hydro.HydroModel⍰ == "Kosugi" && (option.run.KsModel || !(option.data.Kθ && "Ks" ∈ optim.ParamOpt))
-					ksmodelτ = ksModel.STRUCT_KSMODEL()
 
-					ksmodelτ, optimKsmodel = reading.KSMODEL_PARAM(ksmodelτ, option, path.inputGuiSoilwater.GUI_KsModel)
+					# Special case
+					if option.ksModel.OptIndivSoil
+						ksmodelτ = ksModel.STRUCT_KSMODEL(Nτ_Layer=NiZ)
+					else
+						ksmodelτ = ksModel.STRUCT_KSMODEL(Nτ_Layer=2)
+					end
+					
+
+					ksmodelτ, optimKsmodel = reading.KSMODEL_PARAM(ksmodelτ, NiZ, option, path.inputGuiSoilwater.GUI_KsModel)
+
 				end
 
 
@@ -233,19 +241,19 @@ module AquaPore_Toolkit
 
 
 					if option.run.Smap
-						hydro, KₛModel = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment, Ks_Impermeable=Ks_Impermeable)
+						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment, Ks_Impermeable=Ks_Impermeable)
 
 					elseif  (@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydro, KₛModel = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
+						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
 					
 					elseif (@isdefined RockFragment) && !(@isdefined IsTopsoil)	
-						hydro, KₛModel = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_RockFragment=true, RockFragment=RockFragment)
+						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_RockFragment=true, RockFragment=RockFragment)
 					
 					elseif !(@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydro, KₛModel = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, IsTopsoil=IsTopsoil)
+						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, IsTopsoil=IsTopsoil)
 					
 					elseif !(@isdefined RockFragment) && !(@isdefined IsTopsoil)
-						hydro, KₛModel = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel)
+						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel)
 
 					end # if: RockFragment && IsTopsoil
 
@@ -385,7 +393,7 @@ module AquaPore_Toolkit
 
 			if option.run.KsModel # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 				table.ksmodel.KSMODEL(hydro, IdSelect, KₛModel,  path.tableSoilwater.Table_KsModel)
-				table.ksmodel.KSMODEL_τ(ksmodelτ, path.tableSoilwater.Table_KsModel_τ)
+				table.ksmodel.KSMODEL_τ(ksmodelτ, N_Group, path.tableSoilwater.Table_KsModel_τ)
 			end  # if: option.run.KsModel
 
 			if option.run.Infiltration # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
