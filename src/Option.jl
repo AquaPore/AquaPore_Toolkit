@@ -46,11 +46,12 @@ module options
 	end
 
 	@option mutable struct KSMODEL
-		OptIndivSoil::Bool
-		Group::Bool
-		KₛModel⍰::String
-		Of_Split_KsSlowKsFast::Bool
-		Plot_KsModel::Bool
+      Group                 ::Bool
+      KₛModel⍰              ::String
+      Of_Split_KsSlowKsFast ::Bool
+      OptIndivSoil          ::Bool
+      Opt_Kθ                ::Bool
+      Plot_KsModel          ::Bool
 	end
 
 	@option mutable struct PSD

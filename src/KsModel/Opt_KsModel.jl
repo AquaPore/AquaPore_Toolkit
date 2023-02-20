@@ -2,20 +2,20 @@
 #		module: optKsModel
 # =============================================================
 module optKsModel
-	import ..stats, ..θψ2KsModel, ..cst
+	import ..cst, ..kunsat, ..stats, ..θψ2KsModel
 	import BlackBoxOptim
-	export START_OPT_KSMODEL
+	export START_OPT_KθMODEL
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : START_OPT_KSMODEL
+	#		FUNCTION : START_OPT_KθMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function START_OPT_KSMODEL(GroupBool_Select, hydro, iGroup_Opt, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
+		function START_OPT_KθMODEL(GroupBool_Select, hydro, iGroup_Opt, ipGroup, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
 				
 			# Deriving the feasible range of the τ parameters
 				SearchRange = SEARCHRANGE(iGroup_Opt, optimKsmodel)
 
 			# Optimisation algorithme, MaxFuncEvals=1000
-				Optimization = BlackBoxOptim.bboptimize(X -> OF_KSMODEL(GroupBool_Select, hydro, iGroup_Opt, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[]); SearchRange=SearchRange, NumDimensions=optimKsmodel.NparamOpt[iGroup_Opt], TraceMode=:silent)
+				Optimization = BlackBoxOptim.bboptimize(X -> OF_KθMODEL(GroupBool_Select, hydro, iGroup_Opt, ipGroup, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[]); SearchRange=SearchRange, NumDimensions=optimKsmodel.NparamOpt[iGroup_Opt], TraceMode=:silent)
 
 			# Deriving the optimal τ parameters from X
 				X = BlackBoxOptim.best_candidate(Optimization)
@@ -24,107 +24,58 @@ module optKsModel
 				ksmodelτ = X_2_τ(iGroup_Opt, ksmodelτ, optimKsmodel, X)
 
 			# Computing optimal KₛModel
-				KₛModel = θψ2KsModel.KSMODEL(GroupBool_Select, hydro, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], iGroup_Opt=iGroup_Opt)
+			for iZ=1:NiZ
+				KₛModel[iZ] = θψ2KsModel.KθMODEL(hydro, ipGroup, iZ, ksmodelτ, KₛModel, option, 0.0; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], iGroup_Opt=iGroup_Opt)
+			end
 
 		return KₛModel
-		end  # function: START_OPT_KSMODEL
+		end  # function: START_OPT_KθMODEL
 	# ------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : OF_KSMODEL
+	#		FUNCTION : OF_KθMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OF_KSMODEL(GroupBool_Select::Vector{Bool}, hydro, iGroup_Opt, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], WilMot_Ccc⍰="Ccc", KsMinMax=0.005555556)
+		function OF_KθMODEL(GroupBool_Select, hydro, iGroup_Opt, ipGroup, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], KsMinMax=0.005555556)
 
 			# Deriving the optimal τ parameters from X
 				ksmodelτ = X_2_τ(iGroup_Opt, ksmodelτ, optimKsmodel, X)
 
-			#	Compuring Ks model
-				KₛModel = θψ2KsModel.KSMODEL(GroupBool_Select, hydro, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
-
-			# Computing the Objective function ========================================================
-				Ks_ObsTransformed = fill(0.0::Float64, NiZ)
-				Ks_SimTransformed = fill(0.0::Float64, NiZ)
-			
-			# Determening when Ks < KsMinMax
-				if option.ksModel.Of_Split_KsSlowKsFast
-					KsSmall_True = fill(false, NiZ)
-					KsLarge_True = fill(false, NiZ)
-
-					for iZ=1:NiZ
-						if GroupBool_Select[iZ] # If we have selected the data
-							if hydro.Ks[iZ] ≥ KsMinMax
-								KsSmall_True[iZ] = false
-								KsLarge_True[iZ] = true
-							else
-								KsSmall_True[iZ] = true
-								KsLarge_True[iZ] = false
-							end # if hydro.Ks[iZ] ≥ KsMinMax
-						else
-							KsSmall_True[iZ] = false
-							KsLarge_True[iZ] = false
-						end # if GroupBool_Select[iZ]
-					end # for iZ=1:NiZ
-				end # if option.ksModel.Of_Split_KsSlowKsFast
-				#____________________________________
-
-			Ks_ObsTransformed = fill(0.0::Float64, NiZ)
-			Ks_SimTransformed = fill(0.0::Float64, NiZ)
-
-			# CONVERT UNITS mms-> mm/h
-				for iZ=1:NiZ
-					Ks_ObsTransformed[iZ] = cst.MmS_2_MmH .* hydro.Ks[iZ]
-					Ks_SimTransformed[iZ] = cst.MmS_2_MmH .* KₛModel[iZ]
-				end # for iZ=1:NiZ
-
-			if option.ksModel.Of_Split_KsSlowKsFast
-				Ks_ObsTransformed_Small = Ks_ObsTransformed[KsSmall_True[1:NiZ]]
-				Ks_SimTransformed_Small = Ks_SimTransformed[KsSmall_True[1:NiZ]]
-
-				Ks_ObsTransformed_Large = Ks_ObsTransformed[KsLarge_True[1:NiZ]]
-				Ks_SimTransformed_Large = Ks_SimTransformed[KsLarge_True[1:NiZ]]
-			end
-
-			# LOG TRANSFORMATION
-				if option.ksModel.Of_Split_KsSlowKsFast
-					Ks_ObsTransformed_Large = log1p.(Ks_ObsTransformed_Large)
-					Ks_SimTransformed_Large = log1p.(Ks_SimTransformed_Large)
-
+			# If optimising the whole K(Ψ)
+				if option.ksModel.Opt_Kθ
+					Ψ_Obs =  [0.0, 10.0, 20.0, 50.0, 100.0, 500.0, 1000.0, 2000.0, 3300.0, 4000.0, 5000.0,100_00.0, 500_00.0, 1000_00.0]::Vector{Float64} # mm
 				else
-					Ks_ObsTransformed = log1p.(Ks_ObsTransformed)
-					Ks_SimTransformed = log1p.(Ks_SimTransformed)
+					Ψ_Obs =  [0.0]::Vector{Float64} # mm
 				end
+				N_ΨObs = length(Ψ_Obs)
 
-			if WilMot_Ccc⍰ == "Wilmot"
-				if option.ksModel.Of_Split_KsSlowKsFast
-					Of_KsSmall = 1.0 - stats.NSE_WILMOT(Ks_ObsTransformed_Small, Ks_SimTransformed_Small)
-					Of_KsLarge = 1.0 - stats.NSE_WILMOT(Ks_ObsTransformed_Large , Ks_SimTransformed_Large)
+				Kθ_Log_Obs = fill(0.0::Float64, N_ΨObs)
+				Kθ_Log_Sim = fill(0.0::Float64, N_ΨObs)
 
-					Of_Ks = param.ksModel.WeightKsSlow * Of_KsSmall + (1 - param.ksModel.WeightKsSlow) * Of_KsLarge
+			# Computing K(Ψ)
+			Of_Kθ = 0.0
+			for iZ=1:NiZ
+			if GroupBool_Select[iZ]
+				for iΨ =1:N_ΨObs
+					# K(Ψ) simulated
+						Kθ_Sim = θψ2KsModel.KθMODEL(hydro, ipGroup, iZ, ksmodelτ, KₛModel, option, Ψ_Obs[iΨ]; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
 
-				else
-					Of_Ks = 1.0 - stats.NSE_WILMOT(Ks_ObsTransformed[GroupBool_Select] , Ks_SimTransformed[GroupBool_Select])
+						Kθ_Log_Sim[iΨ] = log1p(cst.MmS_2_MmH * Kθ_Sim[ipGroup[iZ]])
 
-				end
+					# K(Ψ) oberved
+						Kθ_Obs = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Obs[iΨ], iZ, hydro)
 
-			elseif  WilMot_Ccc⍰ == "Ccc"
-				if option.ksModel.Of_Split_KsSlowKsFast
-					Of_KsSmall = 1.0 - stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(Ks_ObsTransformed_Small , Ks_SimTransformed_Small)
+						Kθ_Log_Obs[iΨ] = log1p(cst.MmS_2_MmH * Kθ_Obs[ipGroup[iZ]])
 
-					Of_KsLarge = 1.0 - stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(Ks_ObsTransformed_Large , Ks_SimTransformed_Large)
-
-					Of_Ks = param.ksModel.WeightKsSlow * Of_KsSmall + (1 - param.ksModel.WeightKsSlow) * Of_KsLarge
-					
-				else
-					Of_Ks = 1.0 - stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(Ks_ObsTransformed[GroupBool_Select] , Ks_SimTransformed[GroupBool_Select])
-				end
-
-			else
-				error("WilMot_Ccc⍰ == $WilMot_Ccc⍰ not found")
-			end	
-		return Of_Ks
+				end # iΨ
+			end # if GroupBool_Select[iZ]
+			Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs , Kθ_Log_Sim)) / sum(GroupBool_Select[iZ])
+			end # iZ)
+		
+	
+		return Of_Kθ
 		end  # function: OF_KSMODELa
-		# --------------------------------------------------------------
+	# --------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -158,7 +109,6 @@ module optKsModel
 		return ksmodelτ
 		end  # function: PARAM
 	#..................................................................
-
 	
 end  # module: optKsModel
 # ========================================================================

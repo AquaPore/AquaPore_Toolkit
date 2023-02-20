@@ -231,29 +231,29 @@ module AquaPore_Toolkit
 
 
 		# _______________________ START: COMPUTE KS FROM Θ(Ψ) _______________________ 
-			# COMPUTE KS FROM Θ(Ψ)
 
 				KₛModel = fill(0.0::Float64, NiZ)
+
 				if option.hydro.HydroModel⍰ == "Kosugi" && (option.run.KsModel || !(option.data.Kθ && "Ks" ∈ optim.ParamOpt))
 					printstyled("\n ----- START RUNNING Ks Model from θ(Ψ)  ----------------------------------------------- \n"; color=:red)
 
 					printstyled("		Running KsModel= ", option.ksModel.KₛModel⍰, "\n" ; color=:green)
 
-
 					if option.run.Smap
-						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment, Ks_Impermeable=Ks_Impermeable)
+					# path.option.ModelName
+						hydro, KₛModel, N_Group = startKsModel.START_KθMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment, Ks_Impermeable=Ks_Impermeable)
 
 					elseif  (@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
+						hydro, KₛModel, N_Group = startKsModel.START_KθMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
 					
 					elseif (@isdefined RockFragment) && !(@isdefined IsTopsoil)	
-						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_RockFragment=true, RockFragment=RockFragment)
+						hydro, KₛModel, N_Group = startKsModel.START_KθMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_RockFragment=true, RockFragment=RockFragment)
 					
 					elseif !(@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, IsTopsoil=IsTopsoil)
+						hydro, KₛModel, N_Group = startKsModel.START_KθMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_IsTopsoil=true, IsTopsoil=IsTopsoil)
 					
 					elseif !(@isdefined RockFragment) && !(@isdefined IsTopsoil)
-						hydro, KₛModel, N_Group = startKsModel.START_KSMODEL(hydro, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel)
+						hydro, KₛModel, N_Group = startKsModel.START_KθMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path)
 
 					end # if: RockFragment && IsTopsoil
 
@@ -292,16 +292,16 @@ module AquaPore_Toolkit
 
 				printstyled("\n 	----- START RUNNING Ks Model from θ(Ψ)PSD  -----------------------------------------------"; color=:green)
 					if  (@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydroPsd, KₛModel = startKsModel.START_KSMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
+						hydroPsd, KₛModel = startKsModel.START_KθMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
 					
 					elseif (@isdefined RockFragment) && !(@isdefined IsTopsoil)	
-						hydroPsd, KₛModel = startKsModel.START_KSMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_RockFragment=true, RockFragment=RockFragment)
+						hydroPsd, KₛModel = startKsModel.START_KθMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_RockFragment=true, RockFragment=RockFragment)
 					
 					elseif !(@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydroPsd, KₛModel = startKsModel.START_KSMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, IsTopsoil=IsTopsoil)
+						hydroPsd, KₛModel = startKsModel.START_KθMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, IsTopsoil=IsTopsoil)
 					
 					elseif !(@isdefined RockFragment) && !(@isdefined IsTopsoil)
-						hydroPsd, KₛModel = startKsModel.START_KSMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel)
+						hydroPsd, KₛModel = startKsModel.START_KθMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel)
 					end # if: RockFragment && IsTopsoil
 				printstyled("\n 	----- END RUNNING Ks Model from θ(Ψ)PSD  ----------------------------------------------- \n"; color=:green)					
 			
