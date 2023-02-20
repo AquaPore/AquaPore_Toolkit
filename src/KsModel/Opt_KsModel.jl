@@ -26,7 +26,7 @@ module optKsModel
 			# Computing optimal KₛModel
 				KₛModel = θψ2KsModel.KSMODEL(GroupBool_Select, hydro, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], iGroup_Opt=iGroup_Opt)
 
-	return KₛModel
+		return KₛModel
 		end  # function: START_OPT_KSMODEL
 	# ------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ module optKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_KSMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OF_KSMODEL(GroupBool_Select::Vector{Bool}, hydro, iGroup_Opt, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], WilMot_Ccc⍰="Wilmot", KsMinMax=0.005555556)
+		function OF_KSMODEL(GroupBool_Select::Vector{Bool}, hydro, iGroup_Opt, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], WilMot_Ccc⍰="Ccc", KsMinMax=0.005555556)
 
 			# Deriving the optimal τ parameters from X
 				ksmodelτ = X_2_τ(iGroup_Opt, ksmodelτ, optimKsmodel, X)
@@ -134,7 +134,6 @@ module optKsModel
 		function SEARCHRANGE(iGroup_Opt, optimKsmodel)
 			ParamOpt_Min₂ = copy(optimKsmodel.ParamOpt_Min[iGroup_Opt, 1:optimKsmodel.NparamOpt[iGroup_Opt]])
 			ParamOpt_Max₂ = copy(optimKsmodel.ParamOpt_Max[iGroup_Opt, 1:optimKsmodel.NparamOpt[iGroup_Opt]])
-
 		return SearchRange = (collect(zip(Float64.(ParamOpt_Min₂), Float64.(ParamOpt_Max₂))))
 		end  # function: SEARCHRANGE
 	#..................................................................

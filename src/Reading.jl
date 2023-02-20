@@ -523,7 +523,6 @@ module reading
 			# The τ[1] = TopLayer and   τ[3] = SubLayer			
 			i = 1
 			for ipParamName in Param_Name
-
 				if occursin("_1", ipParamName)
 					ipParamName = replace(ipParamName, "_1" => "" )
 					iGroup = 1
@@ -567,6 +566,15 @@ module reading
 					# Storing the value
 					setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
 
+					# Repeating the value of the parameters
+					if option.ksModel.OptIndivSoil
+						for iZ=1:NiZ 
+							ParamValue_Vector[iZ] = Float64(ParamValue[1])
+							# Storing the value
+							setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
+						end
+					end
+
 				# Putting the minimum value in the parameter
 					ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Min"))
 					ParamValue_Vector[iGroup] = Float64(Param_Min[i])
@@ -601,7 +609,6 @@ module reading
 			i += 1
 			end # for loop
 
-
 			# Special cases for when we option.ksModel.OptIndivSoil
 			if option.ksModel.OptIndivSoil
 				for iZ=1:NiZ 
@@ -629,6 +636,7 @@ module reading
 				println("		Max_Value_τ = " , optimKsmodel.ParamOpt_Max)
 				println("	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === === \n")
 			end
+
 	return ksmodelτ, optimKsmodel
 	end  # function: KSMODEL_PARAM
 	# ............................................................

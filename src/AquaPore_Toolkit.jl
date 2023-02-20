@@ -257,7 +257,7 @@ module AquaPore_Toolkit
 
 					end # if: RockFragment && IsTopsoil
 
-					printstyled("\n ----- END RUNNING Ks Modelfrom θ(Ψ) -----------------------------------------------";color=:green)
+					printstyled("\n ----- END RUNNING Ks Modelfrom θ(Ψ) ----------------------------------------------- \n";color=:green)
 				end # if: option.hydro.HydroModel⍰ == :Kosugi
 		# ------------------------END:  COMPUTE KS FROM Θ(Ψ) -------------------------- 
 

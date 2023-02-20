@@ -116,9 +116,10 @@ module θψ2KsModel
 						T3 = τ₃
 
 					# Transformation macro
-						T1Mac = 10.0 ^ (τ₁Mac / (τ₁Mac - 1.0)) 
+						T1Mac= T1
+						# T1Mac = 10.0 ^ (τ₁Mac / (τ₁Mac - 1.0)) 
 						T2Mac = (T2_Min - T2_Max)  * τ₂Mac + T2_Max # because  τ₂ > τ₂Mac
-						T3Mac = τ₃										# because  τ₃ > τ₃Mac
+						T3Mac = τ₃Mac									# because  τ₃ > τ₃Mac
 
 					 return KₛModel = KΘMODEL_JJ(T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, option.hydro, iZ, hydroParam; Ψ₁=0.0)
 
@@ -148,10 +149,6 @@ module θψ2KsModel
 					Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2) / 2.0)) ^ T3Mac
 
 					Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-
-				# else
-				# 	Kunsat_Mac = 0.0::Float64
-				# end
 
 		return Kunsat_Mat + Kunsat_Mac
 		end  # function: KS_MODEL

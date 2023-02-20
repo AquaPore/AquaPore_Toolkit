@@ -17,10 +17,10 @@ module startKsModel
 			# GROUPING CLASSES
 				GroupBool, ipGroup, N_Group = GROUPING_KSMODEL(hydro, N_Group, NiZ, option, param)
 
-			# OPTIMISE KₛModel
 			# If there are τ parameters to be optimised
 			if sum(optimKsmodel.NparamOpt) ≥ 1 && option.data.Kθ && "Ks" ∈ optim.ParamOpt # For security
 				for iGroup_Opt=1:N_Group
+
 					println("\n       === iGroup_Opt=$iGroup_Opt === \n")
 
 					# Quick fix
@@ -29,13 +29,18 @@ module startKsModel
 
 						KₛModel = optKsModel.START_OPT_KSMODEL(GroupBool_Select, hydro, iGroup_Opt, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
 
-						ksmodelτ = STATISTICS_KSMODEL(hydro, iGroup_Opt, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel)
+						ksmodelτ = STATISTICS_KSMODEL(hydro,iGroup_Opt, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel, option)
 
-						if option.ksModel.Plot_KsModel && !option.ksModel.OptIndivSoil
+						if option.ksModel.Plot_KsModel && !(option.ksModel.OptIndivSoil)
 							NameSim = "σ_" * string(iGroup_Opt)
 
 							plot.ksmodel.KSMODEL(KₛModel[GroupBool_Select], hydro.Ks[GroupBool_Select], NameSim,path.plotSoilwater.Plot_KsModel, hydro.θr[GroupBool_Select], hydro.θsMacMat[GroupBool_Select], hydro.σ[GroupBool_Select], option)
 						end # if option.Plot
+
+						if option.ksModel.OptIndivSoil
+						
+
+						end
 
 					end # if optimKsmodel.NparamOpt[iGroup_Opt] ≥ 1
 				end # for iGroup_Opt=1:N_Group
@@ -57,7 +62,7 @@ module startKsModel
 			end  # if: optimKsmodel
 
 			if option.ksModel.Plot_KsModel && option.data.Kθ && "Ks"∈ optim.ParamOpt
-				println(" 		=== ALL SIMULATIONS === \n")
+				println("\n === ALL SIMULATIONS === \n")
 				NameSim = "All_"
 				plot.ksmodel.KSMODEL(KₛModel[1:NiZ], hydro.Ks[1:NiZ], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[1:NiZ], hydro.θsMacMat[1:NiZ], hydro.σ[1:NiZ], option)	
 			end
@@ -135,7 +140,7 @@ module startKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : STATISTICS_KSMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function STATISTICS_KSMODEL(hydro, iGroup_Opt, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel)
+		function STATISTICS_KSMODEL(hydro,  iGroup_Opt, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel, option)
 			# STATISTICS
 				ksmodelτ.Nse_τ[iGroup_Opt]    = stats.NSE(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
 				ksmodelτ.Rmse_τ[iGroup_Opt]   = stats.RMSE(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
@@ -143,16 +148,17 @@ module startKsModel
 				ksmodelτ.Ccc_τ[iGroup_Opt]    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
 
 			# PRINING RESULTS
-			if sum(optimKsmodel.NparamOpt) ≥ 1 
-				println("		 Nse_τ    =  $(ksmodelτ.Nse_τ)")
-				println("		 Rmse_τ   =  $(ksmodelτ.Rmse_τ)")
-				println("		 Wilmot_τ =  $(ksmodelτ.Wilmot_τ)")
-				println("		 Ccc_τ    =  $(ksmodelτ.Ccc_τ)")
-			end
+				if sum(optimKsmodel.NparamOpt) ≥ 1
+					println("		 Nse_τ    =  $(ksmodelτ.Nse_τ)")
+					println("		 Rmse_τ   =  $(ksmodelτ.Rmse_τ)")
+					println("		 Wilmot_τ =  $(ksmodelτ.Wilmot_τ)")
+					println("		 Ccc_τ    =  $(ksmodelτ.Ccc_τ)")
+				end
 
 				for iParam = 1:optimKsmodel.NparamOpt[iGroup_Opt]	
 					# Getting the current values of every layer of the hydro parameter of interest
 						vectParam = getfield(ksmodelτ, Symbol(optimKsmodel.ParamOpt[iGroup_Opt, iParam]))
+
 						println("		", Symbol(optimKsmodel.ParamOpt[iGroup_Opt, iParam]) , "=" ,vectParam)
 				end # for loop
 			
