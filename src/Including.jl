@@ -25,6 +25,7 @@ using Suppressor
 
       include("Optim/Optimize.jl")
       include("Table.jl")
+      include("Ksmodel/Struct_Ksmodel.jl")
       include("Reading.jl")
       include("Distribution.jl")
 
@@ -35,7 +36,6 @@ using Suppressor
       include("Plot.jl")
 
       include("Ksmodel/Start_KsModel.jl")
-      include("Ksmodel/Struct_Ksmodel.jl")
 
       include("Checking.jl")
       include("RockFragment/RockFragment.jl")

@@ -1,17 +1,17 @@
 # =============================================================
 #		module: kunsatModel jesus
 # =============================================================
-module θψ2KsModel
+module θψ_2_KsψModel
 	import ..cst, ..distribution, ..wrc
 	import QuadGK
 	import SpecialFunctions: erfc, erfcinv
 	
-	export KθMODEL
+	export KSΨMODEL_START
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : KS_MODEL
+	#		FUNCTION : KSΨMODEL_START
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KθMODEL(hydro, ipGroup, iZ, ksmodelτ, KθModel, option, Ψ₁; Flag_IsTopsoil=false, Flag_RockFragment=false, iGroup_Opt=1, IsTopsoil=[], RockFragment=[])
+		function KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, KθModel, option, Ψ₁; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
 
 			if Flag_RockFragment
 				RockFragment₁ = RockFragment[iZ]
@@ -25,109 +25,17 @@ module θψ2KsModel
 			# 	IsTopsoil₁ = 1	# Default value				
 			# end  # if: @isdefined IsTopsoil
 
+			KsΨmodel = TORTUOSITYMODELS(hydro, option, ipClass, iZ, ksmodelτ, Ψ₁; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
 
-			KθModel = θΨ_2_KθMODEL(hydro, option, ipGroup[iZ], iZ, ksmodelτ, Ψ₁; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
-
-		return KθModel
+		return KsΨmodel
 		end  # function: KS_MODEL
 	#..................................................................
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : KUNSAT_MODELS
+	#		FUNCTION : KsΨMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function θΨ_2_KθMODEL(hydro, option, ipGroup, iZ::Int64,ksmodelτ, Ψ₁; RockFragment=0.0, θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], Ks=hydro.Ks[iZ], τ₁=ksmodelτ.τ₁[ipGroup], τ₁Max=ksmodelτ.τ₁Max[ipGroup], τ₂=ksmodelτ.τ₂[ipGroup], τ₃=ksmodelτ.τ₃[ipGroup], τ₁ηMin=ksmodelτ.τ₁ηMin[ipGroup], τ₅=ksmodelτ.τ₅[ipGroup], τ₄=ksmodelτ.τ₄[ipGroup], τ₁Mac=ksmodelτ.τ₁Mac[ipGroup], τ₂Mac=ksmodelτ.τ₂Mac[ipGroup], τ₃Mac=ksmodelτ.τ₃Mac[ipGroup], RockFragment_Treshold=0.4, Rtol=1.0E-3, Se_Max=0.9999, Smap_ImpermClass=[], KsImpClass_Dict=[] )
-
-			# Determine when Ks increases for increasing RockFragment	
-				if RockFragment > RockFragment_Treshold
-
-					RockFragment2 = max(2.0 * RockFragment_Treshold - RockFragment, 0.0)
-
-					θs = (θs / (1.0 - RockFragment)) * (1.0 - RockFragment2)
-					
-					θsMacMat = (θsMacMat / (1.0 - RockFragment)) * (1.0 - RockFragment2)
-
-					θr = (θr / (1.0 - RockFragment)) * (1.0 - RockFragment2)
-				end # if RockFragment > RockFragment_Treshold
-
-
-				# Model traditional 1 =================================================================
-				"""Pollacco, J.A.P., Webb, T., McNeill, S., Hu, W., Carrick, S., Hewitt, A., Lilburne, L., 2017. Saturated hydraulic conductivity model computed from bimodal water retention curves for a range of New Zealand soils. Hydrol. Earth Syst. Sci. 21, 2725–2737. https://doi.org/10.5194/hess-21-2725-2017"""
-
-				if option.ksModel.KₛModel⍰ =="KsModel_Traditional" # Original <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-					# Transforming matrix
-						T1 =  10.0 ^ (τ₁Max / (τ₁Max - 1.0))
-						# T1 =  (10.0 ^ - (1.0 / (1.0 - τ₁ ))) / 0.1
-						T2 = 2.0 * (1.0 - τ₂)
-						T3 = 1.0 / (1.0 - τ₃)
-
-					# Transforming macro
-						T1Mac = 10.0 ^ (τ₁Max * τ₁Mac / (1.0 - τ₁Max * τ₁Mac))
-						T2Mac = 2.0 * (1.0 - τ₂ * τ₂Mac)
-						T3Mac = 1.0 / (1.0 - τ₃Mac)
-				
-					return KθModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac), 0.0, Se_Max; rtol=Rtol)[1]
-
-				elseif option.ksModel.KₛModel⍰=="KsModel_New" # Original + Tσ₁ <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-					# Computting T1 as a function of σ
-					Tσ₁ = τMODEL_σ(hydro, iZ, τ₁Max * τ₁ηMin, τ₁Max, σ; Inverse=false, τ₄=τ₄)
-
-					# Transformation matrix
-						T1 =  10.0 ^ (Tσ₁ / (Tσ₁ - 1.0))
-						T2 = 2.0 * (1.0 - τ₂)
-						T3 = 1.0 / (1.0 - τ₃)
-
-					# Transformation macro
-						T1Mac = 10.0 ^ (τ₁Max * τ₁Mac / (1.0 - τ₁Max * τ₁Mac))
-						T2Mac = 2.0 * (1.0 - τ₂ * τ₂Mac)
-						T3Mac = 1.0 / (1.0 - τ₃Mac)
-
-					return KθModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac), 0.0, Se_Max; rtol=Rtol)[1]
-
-				elseif option.ksModel.KₛModel⍰=="KsModel_New2" # Original + Tσ₁ <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-					# Computting T1 as a function of σ
-					Tσ₁ = τMODEL_σ2(hydro, iZ, τ₁Max * τ₁ηMin, τ₁Max, σ; τ₄=τ₄, σboundWater=τ₅)
-
-					# Transformation matrix
-						T1 =  10.0 ^ (Tσ₁ / (Tσ₁ - 1.0))
-						T2 = 4.0 * (1.0 - τ₂)
-						T3 = 1.0 / (1.0 - τ₃)
-
-					# Transformation macro
-						T1Mac = 10.0 ^ (τ₁Max * τ₁Mac / (1.0 - τ₁Max * τ₁Mac))
-						T2Mac = 2.0 * (1.0 - τ₂ * τ₂Mac)
-						T3Mac = 1.0 / (1.0 - τ₃Mac)
-			
-					return KθModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac), 0.0, Se_Max; rtol=Rtol)[1]
-
-
-				elseif option.ksModel.KₛModel⍰=="KsModel_JJ" # no integrals <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-					# Transformation matrix
-						T1 = 10.0 ^ (τ₁ / (τ₁ - 1.0))
-
-						T2_Min = 1.0; T2_Max = 3.0
-						T2 = (T2_Min - T2_Max) * τ₂ + T2_Max
-						T3 = τ₃
-
-					# Transformation macro
-						T1Mac = 10.0 ^ (τ₁Mac / (τ₁Mac - 1.0))
-						T2Mac = (T2_Min - T2_Max)  * τ₂Mac + T2_Max # because  τ₂ > τ₂Mac
-						T3Mac = τ₃Mac									# because  τ₃ > τ₃Mac
-
-					 return KθModel = KΘMODEL_JJ(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
-
-				else
-					error("option.ksModel.KₛModel⍰ = $(option.ksModel.KₛModel⍰) is not yet implemented try <KsModel_Traditional>; <KsModel_Tσ>; <KsModel_New>; <KsModel_NewSimplified> ")
-					
-				end  # if: Model=="Model?"
-		end  # function: θΨ_2_KθMODEL 
-	# ===========================================================================================================================================================================
-	# ===========================================================================================================================================================================
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : KSMODEL_JJ
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KΘMODEL_JJ(hydro, iZ, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+		function KsΨMODEL(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
 			# Se ===
 				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)
@@ -138,55 +46,88 @@ module θψ2KsModel
 				Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
 			# Macropore ===
-				# if θs - θsMacMat > cst.ΔθsθsMacMat
-					Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2) / 2.0)) ^ T3Mac
+				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2) / 2.0)) ^ T3Mac
 
-					Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-
-		return Kunsat_Mat + Kunsat_Mac
-		end  # function: KS_MODEL
+				Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+		return K_Ψ = Kunsat_Mat + Kunsat_Mac
+		end  # function: KsΨMODEL
 	# ------------------------------------------------------------------
 
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# #		FUNCTION : KSMODEL_TRADITIONAL
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# 	function KSMODEL_TRADITIONAL(Se, T1, T2, T3, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac)
 
-	# 		Kunsat_Matrix =  T1 * ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) ) ^ T2
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : KsΨMODEL_OLD
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		"""Pollacco, J.A.P., Webb, T., McNeill, S., Hu, W., Carrick, S., Hewitt, A., Lilburne, L., 2017. Saturated hydraulic conductivity model computed from bimodal water retention curves for a range of New Zealand soils. Hydrol. Earth Syst. Sci. 21, 2725–2737. https://doi.org/10.5194/hess-21-2725-2017"""
+		function KsΨMODEL_OLD(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
-	# 		Kunsat_Macro = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) ^ T2Mac 
-	# 	return Kunsat = Kunsat_Matrix + Kunsat_Macro
-	# 	end  # function: KS_MODEL
-	# # ------------------------------------------------------------------
+			# Ks Matrix ====	
+				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2) / 2.0)) ^ T3
 
-	
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# #		FUNCTION : KSMODEL_NEW
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# 	function KSMODEL_NEW(Se, T1, T2, T3, T4, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac)
+			# Ks Macropore ===
+				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2) / 2.0)) ^ T3Mac
 			
-	# 		Kunsat_Matrix = T1 *( ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) ) ^ T2) ^ T4
+			Ks = Ks_Mat + Ks_Mac 
+				
+			# K(Ψ)
+				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)	
 
-	# 		Kunsat_Macro = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) ^ T2Mac 
-	# 	return Kunsat = Kunsat_Matrix + Kunsat_Macro
-	# 	end  # function: KS_MODEL
-	# # ------------------------------------------------------------------
+				 Kr_Mat = (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
+				 Kr_Mac = (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
-		
-	
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : KSMODEL_NEWSIMPLIFIED
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL_NEWSIMPLIFIED(Se, T1, T2, T3, T1Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac)
-			Kunsat_Matrix =  T1 *( ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) )) ^ T2
-
-			Kunsat_Macro = T1Mac * ((θs - θsMacMat) ^ 2.0) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) 
-		return Kunsat = Kunsat_Matrix + Kunsat_Macro
-		end  # function: KS_MODEL
+		return K_Ψ =  Ks * √Se * (Kr_Mat + Kr_Mac) 
+		end  # function: KsΨMODEL_OLD
 	# ------------------------------------------------------------------
+
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : TORTUOSITYMODELS
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function TORTUOSITYMODELS(hydro, option, ipClass, iZ::Int64,ksmodelτ, Ψ₁; RockFragment=0.0, θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τ₁ᵦ=ksmodelτ.τ₁ᵦ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τ₂ᵦ=ksmodelτ.τ₂ᵦ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τ₃ᵦ=ksmodelτ.τ₃ᵦ[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τ₁ᵦMac=ksmodelτ.τ₁ᵦMac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τ₂ᵦMac=ksmodelτ.τ₂ᵦMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τ₃ᵦMac=ksmodelτ.τ₃ᵦMac, RockFragment_Treshold=0.4, Smap_ImpermClass=[], KsImpClass_Dict=[] )
+
+			# Determine when Ks increases for increasing RockFragment	
+				if RockFragment > RockFragment_Treshold
+					θr, θs, θsMacMat = ROCKCORRECTION(RockFragment, RockFragment_Treshold, θr, θs, θsMacMat)
+				end
+
+				# MODEL 1 ====			
+				if option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
+					# Transformation matrix
+						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+						T2_Min = 1.0; T2_Max = 3.0
+						T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
+						T3 = τ₃ₐ
+
+					# Transformation macro
+						T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
+						T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
+						T3Mac = τ₃ₐMac									
+					 return KsΨMODEL_OLD(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+
+				else
+					error("option.ksModel.KₛModel⍰ = $(option.ksModel.KₛModel⍰) is not yet implemented try <KsModel_Traditional>; <KsModel_Tσ>; <KsModel_New>; <KsModel_NewSimplified> ")
+					
+				end  # if: Model=="Model?"
+		end  # function: TORTUOSITYMODELS 
+
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : ROCKCORRECTION
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function ROCKCORRECTION(RockFragment, RockFragment_Treshold, θr, θs, θsMacMat)
+				RockFragment2 = max(2.0 * RockFragment_Treshold - RockFragment, 0.0)
+
+				θs = (θs / (1.0 - RockFragment)) * (1.0 - RockFragment2)
+				
+				θsMacMat = (θsMacMat / (1.0 - RockFragment)) * (1.0 - RockFragment2)
+
+				θr = (θr / (1.0 - RockFragment)) * (1.0 - RockFragment2)		
+		return θr, θs, θsMacMat
+		end  # function: ROCKCORRECTION
+	# ------------------------------------------------------------------
+
+	# =====================================================================================================================
+	# =====================================================================================================================
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -271,5 +212,5 @@ module θψ2KsModel
 	# ------------------------------------------------------------------
 
 
-end  # module: module θψ2KsModel
+end  # module θψ_2_KsψModel
 # ............................................................

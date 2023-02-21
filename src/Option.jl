@@ -46,7 +46,7 @@ module options
 	end
 
 	@option mutable struct KSMODEL
-      Group                 ::Bool
+      Class                 ::Bool
       KₛModel⍰              ::String
       Of_Split_KsSlowKsFast ::Bool
       OptIndivSoil          ::Bool

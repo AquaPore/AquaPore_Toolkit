@@ -6,39 +6,39 @@ include("θψ_2_KsModel.jl")
 include("Opt_KsModel.jl")
 
 module startKsModel
-	import ..θψ2KsModel, ..optKsModel, ..stats, ..plot
-	export START_KθMODEL
+	import ..optKsModel, ..plot, ..stats, ..θψ_2_KsψModel
+	export START_KSΨMODEL
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : START_KθMODEL
+	#		FUNCTION : START_KSΨMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function START_KθMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], Ks_Impermeable=[], ipLayer=1, N_Group=2)
+		function START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], Ks_Impermeable=[])
 
-			# GROUPING CLASSES
-				GroupBool, ipGroup, N_Group = GROUPING_KSMODEL(hydro, N_Group, NiZ, option, param)
+			# NUMBER OF CLASSES
+				ClassBool, N_Class = KSΨMODEL_CLASS(hydro, NiZ, option, param)
 
 			# If there are τ parameters to be optimised
 			if sum(optimKsmodel.NparamOpt) ≥ 1 && option.data.Kθ && "Ks" ∈ optim.ParamOpt # For security
-				for iGroup_Opt=1:N_Group
+				for ipClass=1:N_Class
 
-					println("\n       === iGroup_Opt=$iGroup_Opt === \n")
+					println("\n       === ipClass=$ipClass === \n")
 
 					# Quick fix
-					if optimKsmodel.NparamOpt[iGroup_Opt] ≥ 1
-						GroupBool_Select = GroupBool[1:NiZ, iGroup_Opt]
+					if optimKsmodel.NparamOpt[ipClass] ≥ 1
+						GroupBool_Select = ClassBool[1:NiZ, ipClass]
 
-						KₛModel = optKsModel.START_OPT_KθMODEL(GroupBool_Select, hydro, iGroup_Opt, ipGroup, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
+						KₛModel = optKsModel.START_OPT_KθMODEL(GroupBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
 
-						ksmodelτ = STATISTICS_KSMODEL(hydro,iGroup_Opt, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel, option)
+						ksmodelτ = STATISTICS_KSMODEL(hydro,ipClass, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel, option)
 
 						if option.ksModel.Plot_KsModel && !(option.ksModel.OptIndivSoil)
-							NameSim = "σ_" * string(iGroup_Opt)
+							NameSim = "σ_" * string(ipClass)
 
 							plot.ksmodel.KSMODEL(KₛModel[GroupBool_Select], hydro.Ks[GroupBool_Select], NameSim,path.plotSoilwater.Plot_KsModel, hydro.θr[GroupBool_Select], hydro.θsMacMat[GroupBool_Select], hydro.σ[GroupBool_Select], option)
 						end # if option.Plot
 
-					end # if optimKsmodel.NparamOpt[iGroup_Opt] ≥ 1
-				end # for iGroup_Opt=1:N_Group
+					end # if optimKsmodel.NparamOpt[ipClass] ≥ 1
+				end # for ipClass=1:N_Class
 
 				if option.ksModel.Plot_KsModel && option.ksModel.OptIndivSoil
 					NameSim = "All_"
@@ -49,11 +49,11 @@ module startKsModel
 			else
 				GroupBool_Select = fill(true, NiZ)
 
-				iGroup_Opt = 1
+				ipClass = 1
 
-				KₛModel = θψ2KsModel.KSMODEL(GroupBool_Select, hydro, ipGroup, KₛModel, ksmodelτ, NiZ::Int64, optim, optimKsmodel, option, param; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
+				KₛModel = θψ_2_KsψModel.KSMODEL(GroupBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ::Int64, optim, optimKsmodel, option, param; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
 
-				~ = STATISTICS_KSMODEL(hydro, iGroup_Opt, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel)
+				~ = STATISTICS_KSMODEL(hydro, ipClass, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel)
 			end  # if: optimKsmodel
 
 			if option.ksModel.Plot_KsModel && option.data.Kθ && "Ks"∈ optim.ParamOpt
@@ -81,53 +81,42 @@ module startKsModel
 					end
 				end
 		
-		return hydro, KₛModel, N_Group
-		end  # function: START_KθMODEL
+		return hydro, KₛModel, N_Class
+		end  # function: START_KSΨMODEL
 	#..................................................................
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : GROUPING_KSMODEL
+	#		FUNCTION : KSΨMODEL_CLASS 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function GROUPING_KSMODEL(hydro, N_Group, NiZ, option, param)
+		function KSΨMODEL_CLASS(hydro, NiZ, option, param)
 
 			if option.ksModel.OptIndivSoil
-				N_Group = NiZ 
-				GroupBool = fill(false::Bool, NiZ, N_Group)
-			else
-				GroupBool = fill(true::Bool, NiZ, N_Group)
-			end
-			
-         ipGroup   = fill(1::Int64, NiZ)
-         
-			# Selecting groups if required
-			if option.ksModel.Group
+				N_Class = NiZ 
+				ClassBool = fill(false::Bool, NiZ, N_Class)
 				for iZ=1:NiZ
+					ClassBool[iZ, iZ] = true
+				end
 
-					if !(option.ksModel.OptIndivSoil)
-						if hydro.σ[iZ] ≤ param.ksModel.σₛₚₗᵢₜ
-							ipGroup[iZ] = 1
-							GroupBool[iZ, 1] = true
-							GroupBool[iZ, 2] = false
-						else
-							ipGroup[iZ] = 2
-							GroupBool[iZ, 1] = false
-							GroupBool[iZ, 2] = true
-						end  # if: hydro.
+			elseif option.ksModel.Class
+				N_Class = length(param.ksModel.σηₛₚₗᵢₜ) - 1
+				ClassBool = fill(false::Bool, NiZ, N_Class)
 
-						N_Group = 2
-					else
-						GroupBool[iZ, iZ] = true
-						ipGroup[iZ] = iZ
-						N_Group = NiZ
-					end  
-				end # for iZ=1:NiZ
-				
+				for ipClass=1:N_Class, iZ=1:NiZ
+					σ_Min = param.ksModel.σηₛₚₗᵢₜ[ipClass] * (hydro.σ_Max[iZ] - hydro.σ_Min[iZ]) + hydro.σ_Min
+					σ_Max = param.ksModel.σηₛₚₗᵢₜ[ipClass+1] * (hydro.σ_Max[iZ] - hydro.σ_Min[iZ]) + hydro.σ_Min[iZ]
+
+					if σ_Min ≤ hydro.σ[iZ] < σ_Max
+						ClassBool[iZ, ipClass] = true
+					end
+				end
+
 			else
-				N_Group = 1
-			end #  option.ksModel.Group
+				N_Class = 1
+				ClassBool = fill(true::Bool, NiZ, N_Class) 
+			end
 				
-		return GroupBool, ipGroup, N_Group
+		return ClassBool, N_Class
 		end  # function: SELECTION
 	# ------------------------------------------------------------------
 		
@@ -135,12 +124,12 @@ module startKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : STATISTICS_KSMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function STATISTICS_KSMODEL(hydro,  iGroup_Opt, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel, option)
+		function STATISTICS_KSMODEL(hydro,  ipClass, GroupBool_Select, KₛModel, ksmodelτ, optimKsmodel, option)
 			# STATISTICS
-				ksmodelτ.Nse_τ[iGroup_Opt]    = stats.NSE(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
-				ksmodelτ.Rmse_τ[iGroup_Opt]   = stats.RMSE(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
-				ksmodelτ.Wilmot_τ[iGroup_Opt] = stats.NSE_WILMOT(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
-				ksmodelτ.Ccc_τ[iGroup_Opt]    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
+				ksmodelτ.Nse_τ[ipClass]    = stats.NSE(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
+				ksmodelτ.Rmse_τ[ipClass]   = stats.RMSE(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
+				ksmodelτ.Wilmot_τ[ipClass] = stats.NSE_WILMOT(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
+				ksmodelτ.Ccc_τ[ipClass]    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log1p.(hydro.Ks[GroupBool_Select]) , log1p.(KₛModel[GroupBool_Select]))
 
 			# PRINING RESULTS
 				if sum(optimKsmodel.NparamOpt) ≥ 1
@@ -150,17 +139,16 @@ module startKsModel
 					println("		 Ccc_τ    =  $(ksmodelτ.Ccc_τ)")
 				end
 
-				for iParam = 1:optimKsmodel.NparamOpt[iGroup_Opt]	
+				for iParam = 1:optimKsmodel.NparamOpt[ipClass]	
 					# Getting the current values of every layer of the hydro parameter of interest
-						vectParam = getfield(ksmodelτ, Symbol(optimKsmodel.ParamOpt[iGroup_Opt, iParam]))
+						vectParam = getfield(ksmodelτ, Symbol(optimKsmodel.ParamOpt[ipClass, iParam]))
 
-						println("		", Symbol(optimKsmodel.ParamOpt[iGroup_Opt, iParam]) , "=" ,vectParam)
+						println("		", Symbol(optimKsmodel.ParamOpt[ipClass, iParam]) , "=" ,vectParam)
 				end # for loop
 			
 		return ksmodelτ
 		end  # function: STATISTICS_KSMODEL
 	# ------------------------------------------------------------------
-
 
 end  # module: startKsModel
 # =====================================================================

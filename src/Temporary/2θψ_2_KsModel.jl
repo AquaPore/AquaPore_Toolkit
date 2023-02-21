@@ -1,7 +1,7 @@
 # =============================================================
 #		module: kunsatModel
 # =============================================================
-module θψ2KsModel
+module θψ_2_KsψModel
 	import ..cst, ..distribution
 	import QuadGK
 	import SpecialFunctions: erfc, erfcinv
@@ -11,7 +11,7 @@ module θψ2KsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KS_MODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL(GroupBool_Select, hydro, ipGroup, KₛModel, KₛModel⍰, ksmodelτ, NiZ::Int64, optim, optimKsmodel, option, param; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], iGroup_Opt=1)
+		function KSMODEL(GroupBool_Select, hydro, ipClass, KₛModel, KₛModel⍰, ksmodelτ, NiZ::Int64, optim, optimKsmodel, option, param; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], ipClass=1)
 
 			for iZ=1:NiZ
 				if Flag_RockFragment
@@ -28,7 +28,7 @@ module θψ2KsModel
 
 				# To save time
 					if GroupBool_Select[iZ]
-						KₛModel[iZ] = θΨ_2_KθMODEL(hydro, option, ipGroup[iZ], iZ, KₛModel⍰, ksmodelτ; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
+						KₛModel[iZ] = TORTUOSITYMODELS(hydro, option, ipClass[iZ], iZ, KₛModel⍰, ksmodelτ; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
 					end
 			end # if: hydro.Ks[iZ] > eps(10.0)
 
@@ -40,7 +40,7 @@ module θψ2KsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KUNSAT_MODELS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function θΨ_2_KθMODEL(hydroParam, option, iGroup, iZ::Int64, KₛModel⍰, ksmodelτ; RockFragment=0.0, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], τ₁Max=ksmodelτ.τ₁Max[iGroup], τ₂=ksmodelτ.τ₂[iGroup], τ₃=ksmodelτ.τ₃[iGroup], τ₁ηMin=ksmodelτ.τ₁ηMin[iGroup], τ₅=ksmodelτ.τ₅[iGroup], τ₄=ksmodelτ.τ₄[iGroup], τ₁Mac=ksmodelτ.τ₁Mac[iGroup], τ₂Mac=ksmodelτ.τ₂Mac[iGroup], τ₃Mac=ksmodelτ.τ₃Mac[iGroup], RockFragment_Treshold=0.4, Rtol=1.0E-3, Se_Max=0.9999, Smap_ImpermClass=[], KsImpClass_Dict=[] )
+		function TORTUOSITYMODELS(hydroParam, option, iGroup, iZ::Int64, KₛModel⍰, ksmodelτ; RockFragment=0.0, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], τ₁Max=ksmodelτ.τ₁Max[iGroup], τ₂=ksmodelτ.τ₂[iGroup], τ₃=ksmodelτ.τ₃[iGroup], τ₁ηMin=ksmodelτ.τ₁ηMin[iGroup], τ₅=ksmodelτ.τ₅[iGroup], τ₄=ksmodelτ.τ₄[iGroup], τ₁Mac=ksmodelτ.τ₁Mac[iGroup], τ₂Mac=ksmodelτ.τ₂Mac[iGroup], τ₃Mac=ksmodelτ.τ₃Mac[iGroup], RockFragment_Treshold=0.4, Rtol=1.0E-3, Se_Max=0.9999, Smap_ImpermClass=[], KsImpClass_Dict=[] )
 
 			# Determine when Ks increases for increasing RockFragment	
 				if RockFragment > RockFragment_Treshold
@@ -112,7 +112,7 @@ module θψ2KsModel
 					error("option.ksModel.KₛModel⍰ = $(option.ksModel.KₛModel⍰) is not yet implemented try <KsModel_Traditional>; <KsModel_Tσ>; <KsModel_New>; <KsModel_NewSimplified> ")
 					
 				end  # if: Model=="Model?"
-		end  # function: θΨ_2_KθMODEL 
+		end  # function: TORTUOSITYMODELS 
 	# ===========================================================================================================================================================================
 	# ===========================================================================================================================================================================
 
@@ -147,7 +147,7 @@ module θψ2KsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSMODEL_JJ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KΘMODEL_JJ(T1, T2, T3, T4, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, optionₘ, iZ, hydroParam; Ψ₁=0.0)
+		function KsΨMODEL(T1, T2, T3, T4, T1Mac, T2Mac, T3Mac, θs, θsMacMat, θr, σ, Ψm, σMac, ΨmMac, optionₘ, iZ, hydroParam; Ψ₁=0.0)
 
 			# Se ===
 				if Ψ₁ > eps(100.0)
@@ -273,5 +273,5 @@ module θψ2KsModel
 	# ------------------------------------------------------------------
 
 
-end  # module: module θψ2KsModel
+end  # module: module θψ_2_KsψModel
 # ............................................................
