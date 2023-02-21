@@ -103,7 +103,7 @@ module startKsModel
 				ClassBool = fill(false::Bool, NiZ, N_Class)
 
 				for ipClass=1:N_Class, iZ=1:NiZ
-					σ_Min = param.ksModel.σηₛₚₗᵢₜ[ipClass] * (hydro.σ_Max[iZ] - hydro.σ_Min[iZ]) + hydro.σ_Min
+					σ_Min = param.ksModel.σηₛₚₗᵢₜ[ipClass] * (hydro.σ_Max[iZ] - hydro.σ_Min[iZ]) + hydro.σ_Min[iZ]
 					σ_Max = param.ksModel.σηₛₚₗᵢₜ[ipClass+1] * (hydro.σ_Max[iZ] - hydro.σ_Min[iZ]) + hydro.σ_Min[iZ]
 
 					if σ_Min ≤ hydro.σ[iZ] < σ_Max
