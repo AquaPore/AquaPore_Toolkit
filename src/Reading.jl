@@ -512,6 +512,8 @@ module reading
 			   if option.ksModel.Class
 					N_Class = length(param.ksModel.σηₛₚₗᵢₜ) - 1
 					println("Spliting the data in $N_Class classes")
+				elseif option.ksModel.OptIndivSoil
+					N_Class = NiZ
 				else
 					N_Class = 1
 				end
@@ -531,7 +533,6 @@ module reading
 			# Looping for every parameter of the selected model
 			i = 1
 			 for ipParamName in Param_Name
-
 				if !(option.ksModel.Class) && !(occursin("_", ipParamName))
 						Param_Name[i] = ipParamName
 						iClass = 1
@@ -551,8 +552,7 @@ module reading
 						🎏skip = true
 					else
 						🎏skip = false
-					end
-					
+					end	
 				else
 					🎏skip = true
 				end
@@ -563,6 +563,14 @@ module reading
 					ParamValue_Vector[iClass] = Float64(ParamValue[i])
 					# Storing the value
 						setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
+						# Repeating the value of the parameters
+						if option.ksModel.OptIndivSoil
+							for iZ=1:NiZ 
+								ParamValue_Vector[iZ] = Float64(ParamValue[i])
+								# Storing the value
+								setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
+							end
+						end
 
 				# Putting the minimum value in the parameter
 					ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Min"))
@@ -592,6 +600,18 @@ module reading
 				end # !(🎏skip)
 			i += 1
 			end # for loop
+
+			# Special cases for when we option.ksModel.OptIndivSoil
+				if option.ksModel.OptIndivSoil
+					for iZ=1:NiZ 
+						NparamOpt[iZ] = NparamOpt[1]
+						for iOpt=1:N_Opt
+							ParamOpt[iZ,iOpt]     = ParamOpt[1,iOpt]
+							ParamOpt_Min[iZ,iOpt] = ParamOpt_Min[1,iOpt]
+							ParamOpt_Max[iZ,iOpt] = ParamOpt_Max[1,iOpt]
+						end # for iOpt=1:N_Opt
+					end # for iZ=1:NiZ 
+				end  # if: option.ksModel.OptIndivSoil
 
 			# Putting values into the mutable structure
 				optimKsmodel = OPTIMKS(Param_Name, ParamOpt_Min, ParamOpt_Max, ParamOpt, NparamOpt, Flag_Opt)

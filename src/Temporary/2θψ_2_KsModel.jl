@@ -11,7 +11,7 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KS_MODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL(GroupBool_Select, hydro, ipClass, KₛModel, KₛModel⍰, ksmodelτ, NiZ::Int64, optim, optimKsmodel, option, param; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], ipClass=1)
+		function KSMODEL(ClassBool_Select, hydro, ipClass, KₛModel, KₛModel⍰, ksmodelτ, NiZ::Int64, optim, optimKsmodel, option, param; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], ipClass=1)
 
 			for iZ=1:NiZ
 				if Flag_RockFragment
@@ -27,7 +27,7 @@ module θψ_2_KsψModel
 				# end  # if: @isdefined IsTopsoil
 
 				# To save time
-					if GroupBool_Select[iZ]
+					if ClassBool_Select[iZ]
 						KₛModel[iZ] = TORTUOSITYMODELS(hydro, option, ipClass[iZ], iZ, KₛModel⍰, ksmodelτ; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
 					end
 			end # if: hydro.Ks[iZ] > eps(10.0)

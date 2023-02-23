@@ -223,7 +223,7 @@ module AquaPore_Toolkit
 
 		# _______________________ START: COMPUTE KS FROM Θ(Ψ) _______________________ 
 
-			KₛModel = fill(0.0::Float64, NiZ)
+			KₛModel = fill(NaN::Float64, NiZ)
 
 			if option.hydro.HydroModel⍰ == "Kosugi" && (option.run.KsModel || !(option.data.Kθ && "Ks" ∈ optim.ParamOpt))
 				printstyled("\n ----- START RUNNING Ks Model from θ(Ψ)  ----------------------------------------------- \n"; color=:red)

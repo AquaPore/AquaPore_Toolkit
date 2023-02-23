@@ -11,7 +11,7 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSΨMODEL_START
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, KθModel, option, Ψ₁; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
+		function KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, option, Ψ₁; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
 
 			if Flag_RockFragment
 				RockFragment₁ = RockFragment[iZ]
@@ -25,9 +25,7 @@ module θψ_2_KsψModel
 			# 	IsTopsoil₁ = 1	# Default value				
 			# end  # if: @isdefined IsTopsoil
 
-			KsΨmodel = TORTUOSITYMODELS(hydro, option, ipClass, iZ, ksmodelτ, Ψ₁; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
-
-		return KsΨmodel
+			return KsΨmodel = TORTUOSITYMODELS(hydro, option, ipClass, iZ, ksmodelτ, Ψ₁; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
 		end  # function: KS_MODEL
 	#..................................................................
 
@@ -101,9 +99,42 @@ module θψ_2_KsψModel
 					# Transformation macro
 						T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
 						T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
-						T3Mac = τ₃ₐMac									
-					 return KsΨMODEL_OLD(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+						T3Mac = τ₃ₐMac							
+					 return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 
+				# MODEL 2 ====			
+				elseif option.ksModel.KₛModel⍰=="KsΨmodel_2" # ===
+				# Transformation matrix
+				   Func_τ₁ₐ = 2.0 * (τ₁ₐ - τ₁ₐ*τ₁ᵦ * (θsMacMat-θr))
+					T1 = 10.0 ^ (Func_τ₁ₐ  / (Func_τ₁ₐ  - 1.0))
+					T2_Min = 1.0; T2_Max = 3.0
+					T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
+					T3 = τ₃ₐ
+
+				# Transformation macro
+					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
+					T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
+					T3Mac = τ₃ₐMac
+					T3Mac = τ₃ₐ									
+					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+
+				# MODEL 3 ====			
+				elseif option.ksModel.KₛModel⍰=="KsΨmodel_3" # ===
+					# Transformation matrix
+						Func_τ₁ₐ =   2.0 * (τ₁ₐ - τ₁ₐ*τ₁ᵦ * (θsMacMat-θr))
+						T1 = 10.0 ^ (Func_τ₁ₐ  / (Func_τ₁ₐ  - 1.0))
+						T2_Min = 1.0; T2_Max = 3.0
+						T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
+						T3 = τ₃ₐ
+
+					# Transformation macro
+						Func_τ₁ₐMac =   2.0 * (τ₁ₐMac - τ₁ₐMac*τ₁ᵦMac * (θs - θsMacMat))
+						T1Mac = 10.0 ^ (Func_τ₁ₐMac / (Func_τ₁ₐMac - 1.0))
+						T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
+						T3Mac = τ₃ₐMac
+						T3Mac = τ₃ₐ									
+						return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+	
 				else
 					error("option.ksModel.KₛModel⍰ = $(option.ksModel.KₛModel⍰) is not yet implemented try <KsModel_Traditional>; <KsModel_Tσ>; <KsModel_New>; <KsModel_NewSimplified> ")
 					

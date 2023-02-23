@@ -9,13 +9,13 @@ module optKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : START_OPT_KθMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function START_OPT_KθMODEL(GroupBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
+		function START_OPT_KθMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
 				
 			# Deriving the feasible range of the τ parameters
 				SearchRange = SEARCHRANGE(ipClass, optimKsmodel)
 
 			# Optimisation algorithme, MaxFuncEvals=1000
-				Optimization = BlackBoxOptim.bboptimize(X -> OF_KθMODEL(GroupBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[]); SearchRange=SearchRange, NumDimensions=optimKsmodel.NparamOpt[ipClass], TraceMode=:silent)
+				Optimization = BlackBoxOptim.bboptimize(X -> OF_KθMODEL(ClassBool_Select, hydro, ipClass, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[]); SearchRange=SearchRange, NumDimensions=optimKsmodel.NparamOpt[ipClass], TraceMode=:silent)
 
 			# Deriving the optimal τ parameters from X
 				X = BlackBoxOptim.best_candidate(Optimization)
@@ -25,7 +25,9 @@ module optKsModel
 
 			# Computing optimal KₛModel
 			for iZ=1:NiZ
-				KₛModel[iZ] = θψ_2_KsψModel.KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, KₛModel, option, 0.0; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
+				if ClassBool_Select[iZ]
+					KₛModel[iZ] = θψ_2_KsψModel.KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, option, 0.0; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
+				end
 			end
 
 		return KₛModel
@@ -36,7 +38,7 @@ module optKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_KθMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OF_KθMODEL(GroupBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], KsMinMax=0.005555556)
+		function OF_KθMODEL(ClassBool_Select, hydro, ipClass, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], KsMinMax=0.005555556)
 
 			# Deriving the optimal τ parameters from X
 				ksmodelτ = X_2_τ(ipClass, ksmodelτ, optimKsmodel, X)
@@ -55,10 +57,10 @@ module optKsModel
 			# Computing K(Ψ)
 			Of_Kθ = 0.0
 			for iZ=1:NiZ
-			if GroupBool_Select[iZ]
+			if ClassBool_Select[iZ]
 				for iΨ =1:N_ΨObs
 					# K(Ψ) simulated
-						Kθ_Sim = θψ_2_KsψModel.KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, KₛModel, option, Ψ_Obs[iΨ]; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
+						Kθ_Sim = θψ_2_KsψModel.KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, option, Ψ_Obs[iΨ]; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
 
 						Kθ_Log_Sim[iΨ] = log1p(cst.MmS_2_MmH * Kθ_Sim)
 
@@ -68,9 +70,11 @@ module optKsModel
 						Kθ_Log_Obs[iΨ] = log1p(cst.MmS_2_MmH * Kθ_Obs)
 
 				end # iΨ
-			end # if GroupBool_Select[iZ]
-			Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs , Kθ_Log_Sim)) / sum(GroupBool_Select[iZ])
+			end # if ClassBool_Select[iZ]
+			Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs , Kθ_Log_Sim)) 
 			end # iZ)
+
+			Of_Kθ /= sum(ClassBool_Select)
 		
 		return Of_Kθ
 		end  # function: OF_KSMODELa
