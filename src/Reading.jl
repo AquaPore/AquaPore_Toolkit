@@ -473,6 +473,9 @@ module reading
 				end
 			end # for i=1:Ndata
 
+			if isempty(iSelectModel)
+				error("$(option.ksModel.KₛModel⍰) does not exist in GUI_KsModel.csv")
+			end
 			# Reading names of the parameters
 				Param_Name = convert(Vector{String}, Tables.getcolumn(Data, :ParamName))
 					# Selecing rows of the model of interest
@@ -619,7 +622,7 @@ module reading
 			if Flag_Opt
 				println("\n	=== === Optimizing the following τ parameters === ===")
 				println("		KsModel=" , option.ksModel.KₛModel⍰)
-				println("		ksmodelτ=", Param_Name)
+				# println("		ksmodelτ=", Param_Name)
 				println("		NparamOpt_τ=" , optimKsmodel.NparamOpt)
 				println("		ParamOpt_τ= " ,  optimKsmodel.ParamOpt)
 				println("		Min_Value_τ= " , optimKsmodel.ParamOpt_Min)

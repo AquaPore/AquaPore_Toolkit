@@ -88,8 +88,22 @@ module θψ_2_KsψModel
 					θr, θs, θsMacMat = ROCKCORRECTION(RockFragment, RockFragment_Treshold, θr, θs, θsMacMat)
 				end
 
+				# MODEL 0 ====			
+				if option.ksModel.KₛModel⍰=="KsΨmodel_0" # ===
+					# Transformation matrix
+						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+						T2_Min = 1.0; T2_Max = 3.0
+						T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
+						T3 = τ₃ₐ
+
+					# Transformation macro
+						T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
+						T2Mac = (T2_Min - T2_Max)  * τ₂ₐ + T2_Max
+						T3Mac = τ₃ₐ					
+					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+
 				# MODEL 1 ====			
-				if option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
+				elseif option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
 					# Transformation matrix
 						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
 						T2_Min = 1.0; T2_Max = 3.0

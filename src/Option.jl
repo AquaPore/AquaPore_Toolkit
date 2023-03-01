@@ -48,7 +48,6 @@ module options
 	@option mutable struct KSMODEL
       Class                 ::Bool
       KₛModel⍰              ::String
-      Of_Split_KsSlowKsFast ::Bool
       OptIndivSoil          ::Bool
       Opt_Kθ                ::Bool
       Plot_KsModel          ::Bool

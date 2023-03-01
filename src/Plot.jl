@@ -127,10 +127,10 @@ module plot
 			
 			CairoMakie.activate!()
 
-			Fig = Figure(resolution = (2500, 1000),  font="Sans", fontsize=20, xgridstyle=:dash, ygridstyle=:dash, xtickalign=1, ytickalign=1)
+			Fig = Figure(resolution = (2500, 1000),  font="Sans", xgridstyle=:dash, ygridstyle=:dash, xtickalign=1, ytickalign=1, titlesize=50, fontsize=25, xlabelsize=10, ylabelsize=25, labelsize=25)
 					
 			#  == Plot_θ_Ψ  == 
-				Axis1 = Axis(Fig[1,1], title="KsModel_" * NameSim, titlesize=25, xlabel="ln (1 + Ks_Obs) [mm hour⁻¹ ]", ylabel="ln (1 + KsModel_Sim) [mm hour⁻¹ ]", xlabelsize=25,  ylabelsize=25, xticksize=20,  yticksize=20)
+				Axis1 = Axis(Fig[1,1], title="KsModel_" * NameSim, titlesize=25, xlabel="ln (1 + Ks_Obs) [mm hour⁻¹]", ylabel="ln (1 + KsModel_Sim) [mm hour⁻¹ ]", xlabelsize=25,  ylabelsize=25, xticksize=20,  yticksize=20)
 
 				xlims!(Axis1, log1p.(0.0), log1p.(Ks_Max * cst.MmS_2_MmH))
 				ylims!(Axis1, log1p.(0.0), log1p.(Ks_Max * cst.MmS_2_MmH))
@@ -141,9 +141,9 @@ module plot
 
 				ΔΘsMacΘr = θsMacMatₒᵦₛ .-  θrₒᵦₛ
 
-				Fig_Ks = scatter!(Fig[1,1], log1p.(Ksₒᵦₛ .* cst.MmS_2_MmH), log1p.(KₛModel .* cst.MmS_2_MmH), color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker =:circle)
+				Fig_Ks = scatter!(Fig[1,1], log1p.(Ksₒᵦₛ .* cst.MmS_2_MmH), log1p.(KₛModel .* cst.MmS_2_MmH), color=σₒᵦₛ, markersize=150.0*ΔΘsMacΘr, marker =:circle)
 
-				Colorbar(Fig[1, 2], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)), colormap =:viridis, label="σ[-]", vertical = true)
+				Colorbar(Fig[1, 2], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =:viridis, label="σ[-]", vertical = true)
 
 				Line = range(log1p(Ks_Min.* cst.MmS_2_MmH), stop=log1p(Ks_Max.* cst.MmS_2_MmH), length=10) 
 

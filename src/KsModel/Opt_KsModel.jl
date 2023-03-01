@@ -45,9 +45,9 @@ module optKsModel
 
 			# If optimising the whole K(Ψ)
 				if option.ksModel.Opt_Kθ
-					Ψ_Obs =  [0.0, 10.0, 20.0, 50.0, 100.0, 500.0, 1000.0, 2000.0, 3300.0, 4000.0, 5000.0,100_00.0, 500_00.0, 1000_00.0]::Vector{Float64} # mm
+					Ψ_Obs = param.ksModel.Ψ_Obs
 				else
-					Ψ_Obs =  [0.0]::Vector{Float64} # mm
+					Ψ_Obs = [0.0]::Vector{Float64} # mm
 				end
 				N_ΨObs = length(Ψ_Obs)
 
@@ -69,14 +69,11 @@ module optKsModel
 
 						Kθ_Log_Obs[iΨ] = log1p(cst.MmS_2_MmH * Kθ_Obs)
 
+						Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs , Kθ_Log_Sim))
 				end # iΨ
 			end # if ClassBool_Select[iZ]
-			Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs , Kθ_Log_Sim)) 
-			end # iZ)
-
-			Of_Kθ /= sum(ClassBool_Select)
-		
-		return Of_Kθ
+			end # iZ)		
+		return Of_Kθ 
 		end  # function: OF_KSMODELa
 	# --------------------------------------------------------------
 

@@ -13,24 +13,21 @@ module startKsModel
 	#		FUNCTION : START_KSΨMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[], Ks_Impermeable=[])
-
 			# NUMBER OF CLASSES
 			ClassBool, ClassBool_All, N_Class = KSΨMODEL_CLASS(hydro, NiZ, option, param)
 
 			# PERFORM OPTIMISATION OF KsModel ====
 			if sum(optimKsmodel.NparamOpt) ≥ 1 && option.data.Kθ && "Ks" ∈ optim.ParamOpt # For security
 				for ipClass=1:N_Class
+					ClassBool_Select = ClassBool[1:NiZ, ipClass]
 
-					if optimKsmodel.NparamOpt[ipClass] ≥ 1
+					if sum(ClassBool[1:NiZ, ipClass]) ≥ 1 && optimKsmodel.NparamOpt[ipClass] ≥ 1
 
 						println("\n       === ipClass=$ipClass === \n")
-						ClassBool_Select = ClassBool[1:NiZ, ipClass]
-
+						
 						KₛModel = optKsModel.START_OPT_KθMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
 
-						if !(option.ksModel.OptIndivSoil)
-							ksmodelτ = STATISTICS_KSMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, optimKsmodel, option)
-						end
+						ksmodelτ = STATISTICS_KSMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, optimKsmodel, option)
 
 						# All data
 						if option.ksModel.Class && option.ksModel.Plot_KsModel
@@ -38,13 +35,16 @@ module startKsModel
 				
 							plot.ksmodel.KSMODEL(KₛModel[ClassBool_Select], hydro.Ks[ClassBool_Select], NameSim,path.plotSoilwater.Plot_KsModel, hydro.θr[ClassBool_Select], hydro.θsMacMat[ClassBool_Select], hydro.σ[ClassBool_Select], option)
 						end # if option.ksModel.Class && option.ksModel.Plot_KsModel
+					else
+						println("\n       === Skipping ipClass=$ipClass === \n")
 					end # if optimKsmodel.NparamOpt[ipClass] ≥ 1
 				end # for ipClass=1:N_Class
 
 
-				if option.ksModel.Class
-					ksmodelτ = STATISTICS_KSMODEL(ClassBool_All, hydro, 0, KₛModel, ksmodelτ, optimKsmodel, option; 🎏allClass=true)
-				end
+				# Final statistic of all combined Ks data
+					if option.ksModel.OptIndivSoil || option.ksModel.Class
+						ksmodelτ = STATISTICS_KSMODEL(ClassBool_All, hydro, 0, KₛModel, ksmodelτ, optimKsmodel, option)
+					end
 
 				# PLOTTING ALL SOILS
 				if option.ksModel.Plot_KsModel
@@ -62,10 +62,9 @@ module startKsModel
 							KₛModel[iZ] = θψ_2_KsψModel.KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, option, 0.0; Flag_IsTopsoil=false,Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
 						end
 					end # for ipClass=1:N_Class, 
-				end #iZ=1:NiZ
-
+				end #ifor ipClass=1:N_Class
 				#Statistics
-					ksmodelτ = STATISTICS_KSMODEL(ClassBool_All, hydro, 0, KₛModel, ksmodelτ, optimKsmodel, option; 🎏allClass=true)
+					ksmodelτ = STATISTICS_KSMODEL(ClassBool_All, hydro, 0, KₛModel, ksmodelτ, optimKsmodel, option)
 
 				# PLOTTING ALL SOILS
 				if option.ksModel.Plot_KsModel
@@ -137,40 +136,38 @@ module startKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : STATISTICS_KSMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function STATISTICS_KSMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, optimKsmodel, option; 🎏allClass=false)
+		function STATISTICS_KSMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, optimKsmodel, option)
 			# STATISTICS
             Nse_τ₀    = stats.NSE(log1p.(hydro.Ks[ClassBool_Select]) , log1p.(KₛModel[ClassBool_Select]))
             Rmse_τ₀   = stats.RMSE(log1p.(hydro.Ks[ClassBool_Select]) , log1p.(KₛModel[ClassBool_Select]))
             Wilmot_τ₀ = stats.NSE_WILMOT(log1p.(hydro.Ks[ClassBool_Select]) , log1p.(KₛModel[ClassBool_Select]))
             Ccc_τ₀    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log1p.(hydro.Ks[ClassBool_Select]) , log1p.(KₛModel[ClassBool_Select]))
 
-				if !(🎏allClass)
-               ksmodelτ.Nse_τ[ipClass]    = Nse_τ₀
-               ksmodelτ.Rmse_τ[ipClass]   = Rmse_τ₀
-               ksmodelτ.Wilmot_τ[ipClass] = Wilmot_τ₀
-               ksmodelτ.Ccc_τ[ipClass]    = Ccc_τ₀
-				end  # if: !(🎏allClass)
-
-				if 🎏allClass
+				if ipClass == 0
 					println("\n       === Statistics all data === \n")
 				end
+
 			# PRINING RESULTS
-				if hydro.Ks[1] > 1
+				if hydro.Ks[1] > 0.0
 					println("		 Nse_τ    =  $(Nse_τ₀)")
 					println("		 Rmse_τ   =  $(Rmse_τ₀)")
 					println("		 Wilmot_τ =  $(Wilmot_τ₀)")
 					println("		 Ccc_τ    =  $(Ccc_τ₀) \n")
 				end
-
-				if !(🎏allClass)
+				
+			if ipClass > 0
 				for iParam = 1:optimKsmodel.NparamOpt[ipClass]	
 					# Getting the current values of every layer of the hydro parameter of interest
 						vectParam = getfield(ksmodelτ, Symbol(optimKsmodel.ParamOpt[ipClass, iParam]))
 
-						println("		", Symbol(optimKsmodel.ParamOpt[ipClass, iParam]) , "=" ,vectParam)
+						println("		", Symbol(optimKsmodel.ParamOpt[ipClass, iParam]) , "=" ,vectParam[ipClass])
 				end # for loop
-				end # 🎏allClass
-			
+
+				ksmodelτ.Nse_τ[ipClass]    = Nse_τ₀
+				ksmodelτ.Rmse_τ[ipClass]   = Rmse_τ₀
+				ksmodelτ.Wilmot_τ[ipClass] = Wilmot_τ₀
+				ksmodelτ.Ccc_τ[ipClass]    = Ccc_τ₀
+			end	
 		return ksmodelτ
 		end  # function: STATISTICS_KSMODEL
 	# ------------------------------------------------------------------
