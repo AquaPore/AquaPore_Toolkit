@@ -96,7 +96,7 @@ module optKsModel
 		function X_2_τ(ipClass, ksmodelτ, optimKsmodel, X)
 			for iParam = 1:optimKsmodel.NparamOpt[ipClass]
 				Paramₐ = X[iParam]
-				
+
 				# Getting the current values of every layer of the hydro parameter of interest
 					vectParam = getfield(ksmodelτ, Symbol(optimKsmodel.ParamOpt[ipClass, iParam]))
 

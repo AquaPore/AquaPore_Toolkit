@@ -9,7 +9,7 @@ module plot
 	# =============================================================
 	module lab
 		import ...cst, ...kunsat, ...wrc
-		using CairoMakie
+		using CairoMakie, ColorSchemes
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : HYDROPARAM
@@ -119,42 +119,74 @@ module plot
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KSMODEL
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL(KₛModel, Ksₒᵦₛ, NameSim::String, Path::String, θrₒᵦₛ, θsMacMatₒᵦₛ, σₒᵦₛ, option)
-			Ks_Min = minimum([minimum(Ksₒᵦₛ), minimum(KₛModel)])
-			Ks_Max = maximum([maximum(Ksₒᵦₛ), maximum(KₛModel)])
+		function KSMODEL(KₛModel, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, Ksₒᵦₛ, NameSim::String, Path::String, θrₒᵦₛ, θsMacMatₒᵦₛ, σₒᵦₛ, option)
 
-			# Ks_Max = 0.099371778 # mm/s
-			
-			CairoMakie.activate!()
+			ColourMap = :plasma # :plasma, :ice, :viridis, :plasma
 
-			Fig = Figure(resolution = (2500, 1000),  font="Sans", xgridstyle=:dash, ygridstyle=:dash, xtickalign=1, ytickalign=1, titlesize=50, fontsize=25, xlabelsize=10, ylabelsize=25, labelsize=25)
-					
-			#  == Plot_θ_Ψ  == 
-				Axis1 = Axis(Fig[1,1], title="KsModel_" * NameSim, titlesize=25, xlabel="ln (1 + Ks_Obs) [mm hour⁻¹]", ylabel="ln (1 + KsModel_Sim) [mm hour⁻¹ ]", xlabelsize=25,  ylabelsize=25, xticksize=20,  yticksize=20)
+			CairoMakie.activate!(type = "svg")
+			Fig = Figure(font="Sans", xgridstyle=:dash, ygridstyle=:dash, xtickalign=1, ytickalign=1, titlesize=50, fontsize=30, ticksize=50)
+				# Dimensions of figure
+				Height= 1000
+				Width = 1000
 
-				xlims!(Axis1, log1p.(0.0), log1p.(Ks_Max * cst.MmS_2_MmH))
-				ylims!(Axis1, log1p.(0.0), log1p.(Ks_Max * cst.MmS_2_MmH))
+			# PLOTTING KS
+			Axis_Ks = Axis(Fig[1,1], width= Width, height=Height, aspect = 1, title="KsModel_" * NameSim, xlabel=L"$Ks _{Obs}$ $[mm$ $hour^{-1}]$", ylabel=L"$Ks _{Sim}$ $[mm$ $hour^{-1}]$", xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
 
-				KsTicks = expm1.(range(log1p(0.0), stop=log1p(Ks_Max * cst.MmS_2_MmH), length=10)) 
-				Axis1.xticks = (log1p.(KsTicks), string.( floor.(KsTicks, digits=1)))
-				Axis1.yticks = (log1p.(KsTicks), string.( floor.(KsTicks, digits=1)))
+            Ksₒᵦₛ   = Ksₒᵦₛ .* cst.MmS_2_MmH
+            KₛModel = KₛModel .* cst.MmS_2_MmH
+
+            Ks_Min = minimum([minimum(Ksₒᵦₛ), minimum(KₛModel)])
+            Ks_Max = maximum([maximum(Ksₒᵦₛ), maximum(KₛModel)])
+				# Ks_Max = 0.099371778 # mm/s
+				
+				xlims!(Axis_Ks, 0.0, Ks_Max)
+				ylims!(Axis_Ks, 0.0, Ks_Max)
+
+				KsTicks = (range(0.0, stop=Ks_Max, length=10)) 
+				Axis_Ks.xticks = [0, 1, 10, 50, 100, 200, 300, 400, 500] 
+				# (KsTicks, string.( floor.(KsTicks, digits=1)))
+				# Axis_Ks.yticks = (KsTicks, string.(floor.(KsTicks, digits=1)))
+				Axis_Ks.yticks = [0, 1, 10, 50, 100, 200, 300, 400, 500] 
+				Axis_Ks.xticklabelrotation = π/3
 
 				ΔΘsMacΘr = θsMacMatₒᵦₛ .-  θrₒᵦₛ
 
-				Fig_Ks = scatter!(Fig[1,1], log1p.(Ksₒᵦₛ .* cst.MmS_2_MmH), log1p.(KₛModel .* cst.MmS_2_MmH), color=σₒᵦₛ, markersize=150.0*ΔΘsMacΘr, marker =:circle)
-
-				Colorbar(Fig[1, 2], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =:viridis, label="σ[-]", vertical = true)
-
-				Line = range(log1p(Ks_Min.* cst.MmS_2_MmH), stop=log1p(Ks_Max.* cst.MmS_2_MmH), length=10) 
-
-				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:blue)
+				Fig_Ks = scatter!(Fig[1,1], Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=150.0*ΔΘsMacΘr, marker=:circle, colormap =ColourMap, strokecolor=:black)
+				Line = range(0.0, stop=Ks_Max, length=10) 
+				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:blue, linestyle =:dash, linewidth=3)
 
 				# Leg1 = Colorbar(Fig, Fig_Ks, label = "Theta", ticklabelsize = 14, labelpadding = 5, width = 10)
-				
-				trim!(Fig.layout)
 
-			Fig[1, 1] = Axis1
-   		# Fig[1, 2] = Leg1
+			# PLOTTING K₁₀ₖₚₐ
+				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, title="KsModel_" * NameSim, xlabel=L"$K10Kpa _{Obs}$ $[mm$ $hour^{-1}]$", ylabel=L"$K10Kpa _{Sim}$ $[mm$ $hour^{-1}]$", xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
+
+				KΨ_Obs₁₀ₖₚₐ = KΨ_Obs₁₀ₖₚₐ .* cst.MmS_2_MmH
+				KΨ_Sim₁₀ₖₚₐ = KΨ_Sim₁₀ₖₚₐ .* cst.MmS_2_MmH
+
+				# KΨ_Obs₁₀ₖₚₐ_Min = minimum([minimum(KΨ_Sim₁₀ₖₚₐ), minimum(KΨ_Obs₁₀ₖₚₐ)])
+				KΨ_Sim₁₀ₖₚₐ_Max = maximum([maximum(KΨ_Sim₁₀ₖₚₐ), maximum(KΨ_Obs₁₀ₖₚₐ)])
+
+				KΨ_Sim₁₀ₖₚₐ_Max = 5.0
+
+				xlims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
+				ylims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
+
+				Axis_KΨ.xticks = [0, 1, 2, 3, 4, 5] 
+				Axis_KΨ.yticks = [0, 1, 2, 3, 4, 5] 
+
+				Fig_KΨ = scatter!(Fig[1,2], KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, color=σₒᵦₛ, markersize=150.0*ΔΘsMacΘr, marker =:circle, colormap=ColourMap, strokecolor=:black)
+
+				Line = range(0.0, stop=Ks_Max, length=10) 
+				Fig_Ks = lines!(Fig[1,2], Line, Line, color=:blue, linestyle =:dash, linewidth=3)
+					
+			# Colour bas
+				Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical = true, labelsize=50) # :thermal, :ice, :viridis, :plasma
+				
+			# Final adjustments
+				resize_to_layout!(Fig)
+				trim!(Fig.layout)
+				colgap!(Fig.layout, 20)
+				rowgap!(Fig.layout, 20)
 
 			Pathₛ = Path * "_" * NameSim * ".svg" 
 

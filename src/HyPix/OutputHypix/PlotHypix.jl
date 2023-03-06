@@ -204,7 +204,7 @@ module plotHypix
 			
 			# PLOTTING
 			# , resolution = (3000, 2500)
-				Fig = Figure( font="Sans", titlesize=50, fontsize=25, xlabelsize=10, ylabelsize=25, labelsize=25)
+				Fig = Figure(font="Sans", titlesize=50, fontsize=25, xlabelsize=10, ylabelsize=25, labelsize=25)
 			
 			# Plot Climate -------------------------------------------------	
 			iSubplot = 0
@@ -218,7 +218,7 @@ module plotHypix
 
 					Axis1.xticks = (∑T_Reduced2[1:iGood], string.(Date_Reduced2[1:iGood]))
 
-					xlims!(Axis1, ∑T_Reduced[1], ∑T_Reduced[Nit_Reduced])
+					xlims!(Axis1, ∑T_Reduced[1], ∑T_Reduced[Nit_Reduced]) 
 					# ylims!(Axis1)
 	
 					Label3= L" $\Delta PrTop$"

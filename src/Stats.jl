@@ -109,7 +109,7 @@ module stats
          Meanₒᵦₛ          = Statistics.mean(Obs)
          Meanₛᵢₘ          = Statistics.mean(Sim)
 
-		Ccc = 1.0 - (2.0 * PersonCorelation * σₒᵦₛ * σₛᵢₘ) / (σₒᵦₛ ^ 2.0 +  σₛᵢₘ ^ 2.0 + (Meanₒᵦₛ - Meanₛᵢₘ) ^ 2.0)
+			Ccc = 1.0 - (2.0 * PersonCorelation * σₒᵦₛ * σₛᵢₘ) / (σₒᵦₛ ^ 2.0 +  σₛᵢₘ ^ 2.0 + (Meanₒᵦₛ - Meanₛᵢₘ) ^ 2.0)
 
 		return max(Ccc, 0.0)
 		end  # function: BestConcordanceCorrelationCoeficient

@@ -513,8 +513,8 @@ module reading
 			#CLASSES ========================
 			# Number of classes of subdividing the data    
 			   if option.ksModel.Class
-					N_Class = length(param.ksModel.σηₛₚₗᵢₜ) - 1
-					println("Spliting the data in $N_Class classes")
+					N_Class = length(param.ksModel.σₛₚₗᵢₜ) - 1
+					println("				Spliting the data in $N_Class classes")
 				elseif option.ksModel.OptIndivSoil
 					N_Class = NiZ
 				else
@@ -629,7 +629,6 @@ module reading
 				println("		Max_Value_τ = " , optimKsmodel.ParamOpt_Max)
 				println("	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === === \n")
 			end
-
 	return ksmodelτ, optimKsmodel
 	end  # function: KSΨMODEL_PARAM
 	# ............................................................

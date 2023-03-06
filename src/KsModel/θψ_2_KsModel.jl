@@ -69,9 +69,9 @@ module θψ_2_KsψModel
 			# K(Ψ)
 				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)	
 
-				 Kr_Mat = (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
+				Kr_Mat = (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
-				 Kr_Mac = (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+				Kr_Mac = (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
 		return K_Ψ =  Ks * √Se * (Kr_Mat + Kr_Mac) 
 		end  # function: KsΨMODEL_OLD
@@ -88,22 +88,8 @@ module θψ_2_KsψModel
 					θr, θs, θsMacMat = ROCKCORRECTION(RockFragment, RockFragment_Treshold, θr, θs, θsMacMat)
 				end
 
-				# MODEL 0 ====			
-				if option.ksModel.KₛModel⍰=="KsΨmodel_0" # ===
-					# Transformation matrix
-						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
-						T2_Min = 1.0; T2_Max = 3.0
-						T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
-						T3 = τ₃ₐ
-
-					# Transformation macro
-						T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
-						T2Mac = (T2_Min - T2_Max)  * τ₂ₐ + T2_Max
-						T3Mac = τ₃ₐ					
-					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
-
 				# MODEL 1 ====			
-				elseif option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
+				if option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
 					# Transformation matrix
 						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
 						T2_Min = 1.0; T2_Max = 3.0
@@ -112,15 +98,46 @@ module θψ_2_KsψModel
 
 					# Transformation macro
 						T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
-						T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
+						T2Mac = (T2_Min - T2_Max) * τ₂ₐMac + T2_Max
 						T3Mac = τ₃ₐMac							
-					 return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+					 
+					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 
 				# MODEL 2 ====			
 				elseif option.ksModel.KₛModel⍰=="KsΨmodel_2" # ===
-				# Transformation matrix
-				   Func_τ₁ₐ = 2.0 * (τ₁ₐ - τ₁ₐ*τ₁ᵦ * (θsMacMat-θr))
-					T1 = 10.0 ^ (Func_τ₁ₐ  / (Func_τ₁ₐ  - 1.0))
+					# Transformation matrix
+					T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+					T2_Min = 1.0; T2_Max = 3.0
+					T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
+					T3 = τ₃ₐ
+
+				# Transformation macro
+					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
+					T2Mac = (T2_Min - T2_Max) * τ₂ₐMac + T2_Max
+					T3Mac = τ₃ₐMac							
+			 
+			return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+
+				# MODEL 3 ====			
+				elseif option.ksModel.KₛModel⍰=="KsΨmodel_3" # ===
+					# Transformation matrix
+					# Function to correct for clay
+					X1 = τ₁ᵦ
+					Y1 = 1.0
+					X2 = 1.0
+					Y2 = τ₂ᵦ	
+					A  = (Y2 - Y1) / (X2 - X1)
+					B  = Y1 - X1 * A
+					ση = σ_2_ση(hydro, iZ, σ)
+					# Func_T1 = max( (A * (ση ^ 2) + B), 0.0)
+					# Func_T1 = τMODEL_σ(hydro, iZ,  τ₁ᵦ, τ₂ᵦ, σ; Inverse=true, τ₄=1.0)
+
+					Func_T1 = 1
+					T1 = 10.0 ^ ( Func_T1 * (τ₁ₐ / (τ₁ₐ - 1.0)))
+					# Func_T1 = 0.1698 * σ + 0.3449						
+					# T1 = 10.0 ^ ( Func_T1 / (Func_T1 - 1.0))
+
+					# T1 = 10.0 ^ (Func_T1a / (Func_T1a - 1.0))
 					T2_Min = 1.0; T2_Max = 3.0
 					T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
 					T3 = τ₃ₐ
@@ -128,27 +145,51 @@ module θψ_2_KsψModel
 				# Transformation macro
 					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
 					T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
-					T3Mac = τ₃ₐMac
-					T3Mac = τ₃ₐ									
+					T3Mac = τ₃ₐMac								
 					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+				
 
-				# MODEL 3 ====			
-				elseif option.ksModel.KₛModel⍰=="KsΨmodel_3" # ===
-					# Transformation matrix
-						Func_τ₁ₐ =   2.0 * (τ₁ₐ - τ₁ₐ*τ₁ᵦ * (θsMacMat-θr))
-						T1 = 10.0 ^ (Func_τ₁ₐ  / (Func_τ₁ₐ  - 1.0))
-						T2_Min = 1.0; T2_Max = 3.0
-						T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
-						T3 = τ₃ₐ
+						# MODEL 2 ====			
+				elseif option.ksModel.KₛModel⍰=="KsΨmodel_4" # ===
 
-					# Transformation macro
-						Func_τ₁ₐMac =   2.0 * (τ₁ₐMac - τ₁ₐMac*τ₁ᵦMac * (θs - θsMacMat))
-						T1Mac = 10.0 ^ (Func_τ₁ₐMac / (Func_τ₁ₐMac - 1.0))
-						T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
-						T3Mac = τ₃ₐMac
-						T3Mac = τ₃ₐ									
-						return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 	
+					# Func_T1 = τMODEL_σ(hydro, iZ,  τ₁ᵦ, τ₂ᵦ, σ; Inverse=true, τ₄=1.0)
+
+					# Func_T1 = 1
+					# T1 = 10.0 ^ ( Func_T1 * (τ₁ₐ / (τ₁ₐ - 1.0)))
+					# Func_T1 = min(max(0.3231 * σ - 0.0276, 0.0), 0.99)
+
+					# if σ > 2.5
+					# 	# Func_T1 = 1.0 - max(min(τ₁ₐ * log(Ψm) * σ + τ₁ᵦ, 1.0), 0.001)
+						# Func_T1 = 1.0 - max(min(τ₁ₐ * log(Ψm), 1.0), 0.001)
+						ση = σ_2_ση(hydro, iZ, σ)
+						Func_T1 =  τMODEL_σ(hydro, iZ, τ₁ₐ, τ₁ᵦ, σ; Inverse=false, τ₄=2.0)
+					# else
+					# 	Func_T1 =  τ₁ᵦ
+					# end			
+								
+					T1 = 10.0 ^ ( Func_T1 / (Func_T1 - 1.0))
+
+					# T1 = 10.0 ^ (Func_T1a / (Func_T1a - 1.0))
+					T2_Min = 1.0; T2_Max = 3.0
+					T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
+
+					# Function to correct for clay
+						X1 = 0
+						Y1 = 1.0
+						X2 = 1.0
+						Y2 = 1.0	
+						A  = (Y2 - Y1) / (X2 - X1)
+						B  = Y1 - X1 * A
+
+					T3 = τMODEL_σ(hydro, iZ, τ₃ₐ, τ₃ᵦ, σ; Inverse=false, τ₄=2.0)
+
+				# Transformation macro
+					T1Mac =  (10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0)))
+					T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
+					T3Mac = τ₃ₐMac								
+					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+				
 				else
 					error("option.ksModel.KₛModel⍰ = $(option.ksModel.KₛModel⍰) is not yet implemented try <KsModel_Traditional>; <KsModel_Tσ>; <KsModel_New>; <KsModel_NewSimplified> ")
 					

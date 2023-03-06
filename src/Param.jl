@@ -26,7 +26,7 @@ module params
 	end
 
 	@option mutable struct KSMODEL
-		σηₛₚₗᵢₜ::Vector{Float64}
+		σₛₚₗᵢₜ::Vector{Float64}
 		WeightKsSlow::Float64
 		Ψ_Obs::Vector{Float64}
 	end

@@ -9,8 +9,9 @@
       const KunsatModel    = 9595.085098 # [mm⁻¹ s ⁻¹]
 
       const Kθ_Min         = 1.0E-14 # [mm s-1] mimimum K(θ) value
-      const MmS_2_CmH      = 3600. / 10.0
+      const MmS_2_CmH      = 360.
       const MmS_2_MmH      = 3600.0
+      const MmS_2_MmDay    = 86400.0
       const Mm_2_Cm        = 0.1
       const Mm_2_kPa       = 0.01
       const Mm_2_kPa_Exact = 1.0 / 101.97162
