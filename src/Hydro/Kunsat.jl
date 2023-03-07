@@ -145,12 +145,12 @@ module kunsat
 				KsMat = Ks * (θsMacMat - θr) / (θs - θr)			
 				Kunsat_Mat =  KsMat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
-				if θs - θsMacMat > cst.ΔθsθsMacMat 
+				# if θs - θsMacMat > cst.ΔθsθsMacMat 
 					KsMac = Ks * (θs - θsMacMat) / (θs - θr)
 					Kunsat_Mac =  KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-				else
-					Kunsat_Mac = 0.0::Float64
-				end
+				# else
+				# 	Kunsat_Mac = 0.0::Float64
+				# end
 
 			return Kunsat_Mat + Kunsat_Mac
 			end # function Ψ_2_KUNSAT

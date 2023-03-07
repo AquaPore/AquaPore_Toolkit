@@ -124,7 +124,7 @@ module plot
 			ColourMap = :plasma # :plasma, :ice, :viridis, :plasma
 
 			CairoMakie.activate!(type = "svg")
-			Fig = Figure(font="Sans", xgridstyle=:dash, ygridstyle=:dash, xtickalign=1, ytickalign=1, titlesize=50, fontsize=30, ticksize=50)
+			Fig = Figure(font="Sans", xgridstyle=:dash, ygridstyle=:dash, xtickalign=1, ytickalign=1, titlesize=50, fontsize=40, ticksize=50)
 				# Dimensions of figure
 				Height= 1000
 				Width = 1000
@@ -166,7 +166,7 @@ module plot
 				# KΨ_Obs₁₀ₖₚₐ_Min = minimum([minimum(KΨ_Sim₁₀ₖₚₐ), minimum(KΨ_Obs₁₀ₖₚₐ)])
 				KΨ_Sim₁₀ₖₚₐ_Max = maximum([maximum(KΨ_Sim₁₀ₖₚₐ), maximum(KΨ_Obs₁₀ₖₚₐ)])
 
-				KΨ_Sim₁₀ₖₚₐ_Max = 5.0
+				# KΨ_Sim₁₀ₖₚₐ_Max = 5.0
 
 				xlims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
 				ylims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)

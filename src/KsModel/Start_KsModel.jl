@@ -20,7 +20,7 @@ module startKsModel
 				KΨ_Obs₁₀ₖₚₐ = fill(0.0::Float64, NiZ)
 				KΨ_Sim₁₀ₖₚₐ = fill(0.0::Float64, NiZ)
 				for iZ=1:NiZ
-					KΨ_Obs₁₀ₖₚₐ[iZ] = kunsat.Ψ_2_KUNSAT(option.hydro, 10_00.0, iZ, hydro)
+					KΨ_Obs₁₀ₖₚₐ[iZ] = kunsat.Ψ_2_KUNSAT(option.hydro, 1000.0, iZ, hydro)
 				end
 
 			# PERFORM OPTIMISATION OF KsModel ====
@@ -34,27 +34,28 @@ module startKsModel
 						
 						KₛModel = optKsModel.START_OPT_KθMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
 
-						for iZ=1:NiZ
-							KΨ_Sim₁₀ₖₚₐ[iZ] = θψ_2_KsψModel.KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, option, 10_00.0; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
-						end
-
 						ksmodelτ = STATISTICS_KSMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, optimKsmodel, option)
+
+						# Computing KΨ_Sim₁₀ₖₚₐ
+						for iZ=1:NiZ
+							if ClassBool_Select[iZ]
+								KΨ_Sim₁₀ₖₚₐ[iZ] = θψ_2_KsψModel.KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, option, 1000.0; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
+							end
+						end
 
 						# All data
 						if option.ksModel.Class && option.ksModel.Plot_KsModel
-							NameSim = "Class σ_" * string(ipClass)
-				
+							NameSim = "Class σ_" * string(ipClass)			
 							plot.ksmodel.KSMODEL(KₛModel[ClassBool_Select], KΨ_Obs₁₀ₖₚₐ[ClassBool_Select], KΨ_Sim₁₀ₖₚₐ[ClassBool_Select], hydro.Ks[ClassBool_Select], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[ClassBool_Select], hydro.θsMacMat[ClassBool_Select], hydro.σ[ClassBool_Select], option)
-
 						end # if option.ksModel.Class && option.ksModel.Plot_KsModel
 					else
 						println("\n       === Skipping ipClass=$ipClass === \n")
 					end # if optimKsmodel.NparamOpt[ipClass] ≥ 1
 				end # for ipClass=1:N_Class
 
-
 				# Final statistic of all combined Ks data
 					if option.ksModel.OptIndivSoil || option.ksModel.Class
+						
 						ksmodelτ = STATISTICS_KSMODEL(ClassBool_All, hydro, 0, KₛModel, ksmodelτ, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, optimKsmodel, option)
 					end
 

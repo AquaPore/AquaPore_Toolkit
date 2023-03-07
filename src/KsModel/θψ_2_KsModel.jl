@@ -39,17 +39,18 @@ module θψ_2_KsψModel
 				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)
 
 			# Matrix ====	
-				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2) / 2.0)) ^ T3
+				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
 
 				Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
 			# Macropore ===
-				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2) / 2.0)) ^ T3Mac
+				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
 				Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 		return K_Ψ = Kunsat_Mat + Kunsat_Mac
 		end  # function: KsΨMODEL
 	# ------------------------------------------------------------------
+
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,21 +60,23 @@ module θψ_2_KsψModel
 		function KsΨMODEL_OLD(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
 			# Ks Matrix ====	
-				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2) / 2.0)) ^ T3
+				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
 
 			# Ks Macropore ===
-				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2) / 2.0)) ^ T3Mac
+				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 			
 			Ks = Ks_Mat + Ks_Mac 
 				
 			# K(Ψ)
 				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)	
 
-				Kr_Mat = (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
+				KsMat = Ks * (θsMacMat - θr) / (θs - θr)
+				Kr_Mat =  KsMat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
-				Kr_Mac = (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+				KsMac = Ks * (θs - θsMacMat) / (θs - θr)
+				Kr_Mac = KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
-		return K_Ψ =  Ks * √Se * (Kr_Mat + Kr_Mac) 
+		return K_Ψ =  Ks * (Kr_Mat + Kr_Mac) 
 		end  # function: KsΨMODEL_OLD
 	# ------------------------------------------------------------------
 
@@ -91,23 +94,42 @@ module θψ_2_KsψModel
 				# MODEL 1 ====			
 				if option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
 					# Transformation matrix
-						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
-						T2_Min = 1.0; T2_Max = 3.0
-						T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
-						T3 = τ₃ₐ
+					# Transformation matrix
+					T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+					T2_Min = 1.0; T2_Max = 3.0
+					T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
+					T3 = τ₃ₐ
 
-					# Transformation macro
-						T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
-						T2Mac = (T2_Min - T2_Max) * τ₂ₐMac + T2_Max
-						T3Mac = τ₃ₐMac							
-					 
+				# Transformation macro
+					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
+					T2Mac = (T2_Min - T2_Max) * τ₂ₐMac + T2_Max
+					T3Mac = τ₃ₐMac				
 					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 
 				# MODEL 2 ====			
 				elseif option.ksModel.KₛModel⍰=="KsΨmodel_2" # ===
 					# Transformation matrix
-					T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
-					T2_Min = 1.0; T2_Max = 3.0
+
+					X1 = 1.8
+					Y1 = τ₁ₐ 
+					X2 = 3.7
+					Y2 = τ₁ᵦ * τ₁ₐ
+					A  = (Y2 - Y1) / (X2 - X1)
+					B  = Y1 - X1 * A
+
+					T1_𝔣 = max(min(A * σ + B, τ₁ₐ), 0.0)
+
+
+					# X1 = 1.8
+					# Y1 = τ₁ₐ 
+					# X2 = 3.7
+					# Y2 = τ₁ᵦ * τ₁ₐ
+					# A  = (Y2 - Y1) / (X2 - X1)
+					# B  = Y1 - X1 * A
+
+
+					T1 = 10.0 ^ (T1_𝔣 / (T1_𝔣 - 1.0))
+					T2_Min = 1.0; T2_Max = 4.0
 					T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
 					T3 = τ₃ₐ
 
@@ -146,7 +168,7 @@ module θψ_2_KsψModel
 					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
 					T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
 					T3Mac = τ₃ₐMac								
-					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+					return KsΨMODEL_OLD(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 				
 
 						# MODEL 2 ====			
