@@ -130,25 +130,24 @@ module plot
 				Width = 1000
 
 			# PLOTTING KS
-			Axis_Ks = Axis(Fig[1,1], width= Width, height=Height, aspect = 1, title="KsModel_" * NameSim, xlabel=L"$Ks _{Obs}$ $[mm$ $hour^{-1}]$", ylabel=L"$Ks _{Sim}$ $[mm$ $hour^{-1}]$", xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
+			Axis_Ks = Axis(Fig[1,1], width= Width, height=Height, aspect = 1, title="KsModel_" * NameSim, xlabel=L"$Ks _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$Ks _{Sim}$ $[mm$ $day^{-1}]$", xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
 
-            Ksₒᵦₛ   = Ksₒᵦₛ .* cst.MmS_2_MmH
-            KₛModel = KₛModel .* cst.MmS_2_MmH
+            Ksₒᵦₛ   = Ksₒᵦₛ .* cst.MmS_2_MmDay
+            KₛModel = KₛModel .* cst.MmS_2_MmDay
 
             Ks_Min = minimum([minimum(Ksₒᵦₛ), minimum(KₛModel)])
             Ks_Max = maximum([maximum(Ksₒᵦₛ), maximum(KₛModel)])
 
-				Ks_Max =300.0
 				# Ks_Max = 0.099371778 # mm/s
 				
-				xlims!(Axis_Ks, 0.0, Ks_Max)
-				ylims!(Axis_Ks, 0.0, Ks_Max)
+				xlims!(Axis_Ks, Ks_Min, Ks_Max)
+				ylims!(Axis_Ks, Ks_Min, Ks_Max)
 
 				KsTicks = (range(0.0, stop=Ks_Max, length=10)) 
-				Axis_Ks.xticks = [0, 1, 10, 50, 100, 200, 300, 400, 500] 
+				Axis_Ks.xticks = [10, 25, 50, 100, 200, 400, 800, 1600, 3200, 6400] 
 				# (KsTicks, string.( floor.(KsTicks, digits=1)))
 				# Axis_Ks.yticks = (KsTicks, string.(floor.(KsTicks, digits=1)))
-				Axis_Ks.yticks = [0, 1, 10, 50, 100, 200, 300, 400, 500] 
+				Axis_Ks.yticks =  [10, 25, 50, 100, 200, 400, 800, 1600, 3200, 6400] 
 				Axis_Ks.xticklabelrotation = π/3
 
 				ΔΘsMacΘr = θsMacMatₒᵦₛ .-  θrₒᵦₛ
@@ -160,21 +159,26 @@ module plot
 				# Leg1 = Colorbar(Fig, Fig_Ks, label = "Theta", ticklabelsize = 14, labelpadding = 5, width = 10)
 
 			# PLOTTING K₁₀ₖₚₐ
-				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, title="KsModel_" * NameSim, xlabel=L"$K10 _{Obs}$ $[mm$ $hour^{-1}]$", ylabel=L"$K10 _{Sim}$ $[mm$ $hour^{-1}]$", xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
+				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, title="KsModel_" * NameSim, xlabel=L"$K10 _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$K10 _{Sim}$ $[mm$ $day^{-1}]$", xlabelsize=50, ylabelsize=50, xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10,)
 
-				KΨ_Obs₁₀ₖₚₐ = KΨ_Obs₁₀ₖₚₐ .* cst.MmS_2_MmH
-				KΨ_Sim₁₀ₖₚₐ = KΨ_Sim₁₀ₖₚₐ .* cst.MmS_2_MmH
+				# 
+
+				KΨ_Obs₁₀ₖₚₐ = KΨ_Obs₁₀ₖₚₐ .* cst.MmS_2_MmDay
+				KΨ_Sim₁₀ₖₚₐ = KΨ_Sim₁₀ₖₚₐ .* cst.MmS_2_MmDay
 
 				# KΨ_Obs₁₀ₖₚₐ_Min = minimum([minimum(KΨ_Sim₁₀ₖₚₐ), minimum(KΨ_Obs₁₀ₖₚₐ)])
 				KΨ_Sim₁₀ₖₚₐ_Max = maximum([maximum(KΨ_Sim₁₀ₖₚₐ), maximum(KΨ_Obs₁₀ₖₚₐ)])
 
-				KΨ_Sim₁₀ₖₚₐ_Max = 1.0
+				# KΨ_Sim₁₀ₖₚₐ_Max = 1.0
 
 				xlims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
 				ylims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
 
-				Axis_KΨ.xticks = [0, 1, 2, 3, 4, 5] 
-				Axis_KΨ.yticks = [0, 1, 2, 3, 4, 5] 
+				Axis_KΨ.xticks = [0, 1, 5, 10, 25, 50, 100] 
+				Axis_KΨ.yticks = [0, 1, 5, 10, 25, 50, 100] 
+
+				Axis_KΨ.xticklabelrotation = π/3
+
 
 				Fig_KΨ = scatter!(Fig[1,2], KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker =:circle, colormap=ColourMap, strokecolor=:black, strokewidth = 1)
 
