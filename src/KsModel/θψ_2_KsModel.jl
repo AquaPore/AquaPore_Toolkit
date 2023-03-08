@@ -103,35 +103,55 @@ module θψ_2_KsψModel
 				# Transformation macro
 					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
 					T2Mac = (T2_Min - T2_Max) * τ₂ₐMac + T2_Max
-					T3Mac = τ₃ₐMac				
-					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+					T3Mac = τ₃ₐMac	
+
+				return KsΨMODEL_OLD(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 
 				# MODEL 2 ====			
 				elseif option.ksModel.KₛModel⍰=="KsΨmodel_2" # ===
 					# Transformation matrix
 
-					X1 = 1.8
-					Y1 = τ₁ₐ 
-					X2 = 3.7
-					Y2 = τ₁ᵦ * τ₁ₐ
-					A  = (Y2 - Y1) / (X2 - X1)
-					B  = Y1 - X1 * A
+					# CLAY MODEL 
+						# Reducing with σ
+							σclay = 2.3 # 2.3
 
-					T1_𝔣 = max(min(A * σ + B, τ₁ₐ), 0.0)
+							X_σ₁ = 0
+							Y_σ₁ = 1.0 
+							X_σ₂ = 3.7 - σclay
+							Y_σ₂ = τ₁ᵦ
+							α  = (Y_σ₂ - Y_σ₁) / (X_σ₂ - X_σ₁)
+							B  = Y_σ₁ - X_σ₁ * α 
 
+						Tσ = max(min(α * (σ - σclay) + B, 1.0), Y_σ₂)
 
-					# X1 = 1.8
-					# Y1 = τ₁ₐ 
-					# X2 = 3.7
-					# Y2 = τ₁ᵦ * τ₁ₐ
-					# A  = (Y2 - Y1) / (X2 - X1)
-					# B  = Y1 - X1 * A
+						# Reducing with θs - θr
+							X_θs₁ = 0.0
+							Y_θs₁ = 1.0
+							X_θs₂ = 0.6
+							Y_θs₂ = 0.0
+							α = (Y_θs₂ - Y_θs₁) / (X_θs₂  - X_θs₁)
+							Β  = Y_θs₁ - X_θs₁ * α
 
+							TθsMacMat = max(min(α * (θsMacMat - θr) + Β, 1.0), Y_θs₂)
+						
+						# T1 TORTUSOSITY MODEL
+							T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+							if σ ≥ σclay 
+								if (θsMacMat - θr) ≥ 0.25
+									T1 = T1 * TθsMacMat ^ τ₂ₐ
+								end
+							end
+				
+					# Tortuosity T2
+						T2_Min = 1.0; T2_Max = 3.0
+						T2 = ((T2_Min - T2_Max) * τ₂ₐ + T2_Max)
 
-					T1 = 10.0 ^ (T1_𝔣 / (T1_𝔣 - 1.0))
-					T2_Min = 1.0; T2_Max = 4.0
-					T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
-					T3 = τ₃ₐ
+						if σ ≥ σclay 					
+							T2 = T2 * Tσ 
+						end
+
+					# Tortuosity T3
+						T3 = τ₃ₐ
 
 				# Transformation macro
 					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
@@ -147,7 +167,7 @@ module θψ_2_KsψModel
 					X1 = τ₁ᵦ
 					Y1 = 1.0
 					X2 = 1.0
-					Y2 = τ₂ᵦ	
+					Y2 = τ₁ᵦ	
 					A  = (Y2 - Y1) / (X2 - X1)
 					B  = Y1 - X1 * A
 					ση = σ_2_ση(hydro, iZ, σ)
@@ -314,8 +334,8 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : σ_2_ση
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function σ_2_ση(hydro, iZ, σ)
-			return ση = (σ - hydro.σ_Min[iZ]) / (hydro.σ_Max[iZ] - hydro.σ_Min[iZ])
+		function σ_2_ση(Xσ)
+			return ση = (Xσ - 0.75) / (3.5 - 0.75)
 		end  # function: σ_2_ση
 	# ------------------------------------------------------------------
 

@@ -137,6 +137,8 @@ module plot
 
             Ks_Min = minimum([minimum(Ksₒᵦₛ), minimum(KₛModel)])
             Ks_Max = maximum([maximum(Ksₒᵦₛ), maximum(KₛModel)])
+
+				Ks_Max =300.0
 				# Ks_Max = 0.099371778 # mm/s
 				
 				xlims!(Axis_Ks, 0.0, Ks_Max)
@@ -151,14 +153,14 @@ module plot
 
 				ΔΘsMacΘr = θsMacMatₒᵦₛ .-  θrₒᵦₛ
 
-				Fig_Ks = scatter!(Fig[1,1], Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=150.0*ΔΘsMacΘr, marker=:circle, colormap =ColourMap, strokecolor=:black)
+				Fig_Ks = scatter!(Fig[1,1], Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker=:circle, colormap =ColourMap, strokecolor=:black, strokewidth = 1)
 				Line = range(0.0, stop=Ks_Max, length=10) 
 				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:blue, linestyle =:dash, linewidth=3)
 
 				# Leg1 = Colorbar(Fig, Fig_Ks, label = "Theta", ticklabelsize = 14, labelpadding = 5, width = 10)
 
 			# PLOTTING K₁₀ₖₚₐ
-				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, title="KsModel_" * NameSim, xlabel=L"$K10Kpa _{Obs}$ $[mm$ $hour^{-1}]$", ylabel=L"$K10Kpa _{Sim}$ $[mm$ $hour^{-1}]$", xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
+				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, title="KsModel_" * NameSim, xlabel=L"$K10 _{Obs}$ $[mm$ $hour^{-1}]$", ylabel=L"$K10 _{Sim}$ $[mm$ $hour^{-1}]$", xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
 
 				KΨ_Obs₁₀ₖₚₐ = KΨ_Obs₁₀ₖₚₐ .* cst.MmS_2_MmH
 				KΨ_Sim₁₀ₖₚₐ = KΨ_Sim₁₀ₖₚₐ .* cst.MmS_2_MmH
@@ -166,7 +168,7 @@ module plot
 				# KΨ_Obs₁₀ₖₚₐ_Min = minimum([minimum(KΨ_Sim₁₀ₖₚₐ), minimum(KΨ_Obs₁₀ₖₚₐ)])
 				KΨ_Sim₁₀ₖₚₐ_Max = maximum([maximum(KΨ_Sim₁₀ₖₚₐ), maximum(KΨ_Obs₁₀ₖₚₐ)])
 
-				# KΨ_Sim₁₀ₖₚₐ_Max = 5.0
+				KΨ_Sim₁₀ₖₚₐ_Max = 1.0
 
 				xlims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
 				ylims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
@@ -174,7 +176,7 @@ module plot
 				Axis_KΨ.xticks = [0, 1, 2, 3, 4, 5] 
 				Axis_KΨ.yticks = [0, 1, 2, 3, 4, 5] 
 
-				Fig_KΨ = scatter!(Fig[1,2], KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, color=σₒᵦₛ, markersize=150.0*ΔΘsMacΘr, marker =:circle, colormap=ColourMap, strokecolor=:black)
+				Fig_KΨ = scatter!(Fig[1,2], KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker =:circle, colormap=ColourMap, strokecolor=:black, strokewidth = 1)
 
 				Line = range(0.0, stop=Ks_Max, length=10) 
 				Fig_Ks = lines!(Fig[1,2], Line, Line, color=:blue, linestyle =:dash, linewidth=3)
