@@ -2,7 +2,7 @@
 #		module: kunsatModel jesus
 # =============================================================
 module θψ_2_KsψModel
-	import ..cst, ..distribution, ..wrc
+	import ..cst, ..distribution, ..wrc, ..kunsat
 	import QuadGK
 	import SpecialFunctions: erfc, erfcinv
 	
@@ -52,33 +52,18 @@ module θψ_2_KsψModel
 	# ------------------------------------------------------------------
 
 
-
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : KsΨMODEL_OLD
+	#		FUNCTION : KSMODEL_TRADITIONAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		"""Pollacco, J.A.P., Webb, T., McNeill, S., Hu, W., Carrick, S., Hewitt, A., Lilburne, L., 2017. Saturated hydraulic conductivity model computed from bimodal water retention curves for a range of New Zealand soils. Hydrol. Earth Syst. Sci. 21, 2725–2737. https://doi.org/10.5194/hess-21-2725-2017"""
-		function KsΨMODEL_OLD(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
+	function KSMODEL_TRADITIONAL(Se, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψm, ΨmMac)
 
-			# Ks Matrix ====	
-				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
+		Kunsat_Mat =  T1 * ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) ) ^ T2
 
-			# Ks Macropore ===
-				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
-			
-			Ks = Ks_Mat + Ks_Mac 
-				
-			# K(Ψ)
-				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)	
+		Kunsat_Mac = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) ^ T2Mac 
+	return KsModel = Kunsat_Mat + Kunsat_Mac
+	end  # function: KS_MODEL
+# ------------------------------------------------------------------
 
-				KsMat = Ks * (θsMacMat - θr) / (θs - θr)
-				Kr_Mat =  KsMat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
-
-				KsMac = Ks * (θs - θsMacMat) / (θs - θr)
-				Kr_Mac = KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-
-		return K_Ψ =  Ks * (Kr_Mat + Kr_Mac) 
-		end  # function: KsΨMODEL_OLD
-	# ------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -91,77 +76,122 @@ module θψ_2_KsψModel
 					θr, θs, θsMacMat = ROCKCORRECTION(RockFragment, RockFragment_Treshold, θr, θs, θsMacMat)
 				end
 
-				# MODEL 1 ====			
-				if option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
-					# Transformation matrix
-					# Transformation matrix
-					T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+				
+			# MODEL 1 ====	
+			if option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
+					# Transforming matrix
+				T1 =  10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+				# T1 =  (10.0 ^ - (1.0 / (1.0 - τ₁ ))) / 0.1
+				T2 = 2.0 * (1.0 - τ₂ₐ)
+				T3 = 1.0 / (1.0 - τ₃ₐ)
+
+			# Transforming macro
+				T1Mac = 10.0 ^ (τ₁ₐ * τ₁ₐMac / (1.0 - τ₁ₐ * τ₁ₐMac))
+				T2Mac = 2.0 * (1.0 - τ₁ₐ * τ₁ₐMac)
+				T3Mac = 1.0 / (1.0 - τ₃ₐMac)
+		
+			# Ks model
+				KₛModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψm, ΨmMac), 0.0, 0.9999, rtol=1.0E-3)[1]
+
+				return Kunsat = KₛModel * kunsat.kg.Ψ_2_KUNSAT(option.hydro, Ψ₁, iZ, hydro) / hydro.Ks[iZ]
+				
+		# MODEL 2 ====			
+		# elseif option.ksModel.KₛModel⍰=="KsΨmodel_2" # ===
+			
+		# 	# Tortuosity T1
+		# 		T1 = 10.0 ^ (τ₁ₐ * τ₁ₐMac/ (τ₁ₐ * τ₁ₐMac - 1.0))
+				
+		# 	# Tortuosity T2
+		# 		T2_Max = 4.0
+		# 		T2 = (1.0 - T2_Max) * τ₂ₐ * τ₂ₐMac + T2_Max
+
+		# 	# Tortuosity T3
+		# 		T3_Max = 2.0
+		# 		T3 = (T3_Max - 1.0) * τ₃ₐ * τ₃ₐMac + 1.0 
+
+		# # Transformation macro
+		# 	T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
+		# 	T2Mac = (1.0 - T2_Max) * τ₂ₐMac + T2_Max
+		# 	T3Mac = (T3_Max - 1.0) * τ₃ₐMac + 1.0 						
+		
+		# return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)	
+	
+	elseif option.ksModel.KₛModel⍰=="KsΨmodel_2" # ===
+				
+		# Tortuosity T1
+			T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ  - 1.0))
+			
+		# Tortuosity T2
+			T2_Max = 4.0
+			T2 = (1.0 - T2_Max) * τ₂ₐ + T2_Max
+
+		# Tortuosity T3
+			T3_Max = 2.0
+			T3 = (T3_Max - 1.0) * τ₃ₐ + 1.0 
+
+	# Transformation macro
+		T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
+		T2Mac = (1.0 - T2_Max) * τ₂ₐMac + T2_Max
+		T3Mac = (T3_Max - 1.0) * τ₃ₐMac + 1.0 						
+
+	return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)		
+			
+
+			# MODEL 2 ====			
+			elseif option.ksModel.KₛModel⍰=="KsΨmodel_3" # ===
+				# Transformation matrix
+
+				# CLAY MODEL 
+					# Reducing with σ
+						σclay = 2.3 # 2.3
+
+						X_σ₁ = 0
+						Y_σ₁ = 1.0 
+						X_σ₂ = 3.7 - σclay
+						Y_σ₂ = τ₁ᵦ
+						α  = (Y_σ₂ - Y_σ₁) / (X_σ₂ - X_σ₁)
+						B  = Y_σ₁ - X_σ₁ * α 
+
+					Tσ = max(min(α * (σ - σclay) + B, 1.0), Y_σ₂)
+
+					# Reducing with θs - θr
+						X_θs₁ = 0.0
+						Y_θs₁ = 1.0
+						X_θs₂ = 0.6
+						Y_θs₂ = 0.0
+						α = (Y_θs₂ - Y_θs₁) / (X_θs₂  - X_θs₁)
+						Β  = Y_θs₁ - X_θs₁ * α
+
+						TθsMacMat = max(min(α * (θsMacMat - θr) + Β, 1.0), Y_θs₂)
+					
+					# T1 TORTUSOSITY MODEL
+						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+						if σ ≥ σclay 
+							if (θsMacMat - θr) ≥ 0.25
+								T1 = T1 * TθsMacMat ^ τ₂ₐ
+							end
+						end
+			
+				# Tortuosity T2
 					T2_Min = 1.0; T2_Max = 3.0
-					T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
+					T2 = ((T2_Min - T2_Max) * τ₂ₐ + T2_Max)
+
+					if σ ≥ σclay 					
+						T2 = T2 * Tσ 
+					end
+
+				# Tortuosity T3
 					T3 = τ₃ₐ
 
-				# Transformation macro
-					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
-					T2Mac = (T2_Min - T2_Max) * τ₂ₐMac + T2_Max
-					T3Mac = τ₃ₐMac	
-
-				return KsΨMODEL_OLD(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
-
-				# MODEL 2 ====			
-				elseif option.ksModel.KₛModel⍰=="KsΨmodel_2" # ===
-					# Transformation matrix
-
-					# CLAY MODEL 
-						# Reducing with σ
-							σclay = 2.3 # 2.3
-
-							X_σ₁ = 0
-							Y_σ₁ = 1.0 
-							X_σ₂ = 3.7 - σclay
-							Y_σ₂ = τ₁ᵦ
-							α  = (Y_σ₂ - Y_σ₁) / (X_σ₂ - X_σ₁)
-							B  = Y_σ₁ - X_σ₁ * α 
-
-						Tσ = max(min(α * (σ - σclay) + B, 1.0), Y_σ₂)
-
-						# Reducing with θs - θr
-							X_θs₁ = 0.0
-							Y_θs₁ = 1.0
-							X_θs₂ = 0.6
-							Y_θs₂ = 0.0
-							α = (Y_θs₂ - Y_θs₁) / (X_θs₂  - X_θs₁)
-							Β  = Y_θs₁ - X_θs₁ * α
-
-							TθsMacMat = max(min(α * (θsMacMat - θr) + Β, 1.0), Y_θs₂)
-						
-						# T1 TORTUSOSITY MODEL
-							T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
-							if σ ≥ σclay 
-								if (θsMacMat - θr) ≥ 0.25
-									T1 = T1 * TθsMacMat ^ τ₂ₐ
-								end
-							end
-				
-					# Tortuosity T2
-						T2_Min = 1.0; T2_Max = 3.0
-						T2 = ((T2_Min - T2_Max) * τ₂ₐ + T2_Max)
-
-						if σ ≥ σclay 					
-							T2 = T2 * Tσ 
-						end
-
-					# Tortuosity T3
-						T3 = τ₃ₐ
-
-				# Transformation macro
-					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
-					T2Mac = (T2_Min - T2_Max) * τ₂ₐMac + T2_Max
-					T3Mac = τ₃ₐMac							
-			 
-			return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+			# Transformation macro
+				T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
+				T2Mac = (T2_Min - T2_Max) * τ₂ₐMac + T2_Max
+				T3Mac = τ₃ₐMac							
+			
+		return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 
 				# MODEL 3 ====			
-				elseif option.ksModel.KₛModel⍰=="KsΨmodel_3" # ===
+				elseif option.ksModel.KₛModel⍰=="KsΨmodel_4" # ===
 					# Transformation matrix
 					# Function to correct for clay
 					X1 = τ₁ᵦ

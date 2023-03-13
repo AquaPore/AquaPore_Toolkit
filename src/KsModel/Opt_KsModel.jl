@@ -42,13 +42,9 @@ module optKsModel
 
 			# Deriving the optimal τ parameters from X
 				ksmodelτ = X_2_τ(ipClass, ksmodelτ, optimKsmodel, X)
-
-			# If optimising the whole K(Ψ)
-				if option.ksModel.Opt_Kθ
-					Ψ_Obs = param.ksModel.Ψ_Obs
-				else
-					Ψ_Obs = [0.0]::Vector{Float64} # mm
-				end
+				
+				Ψ_Obs = param.ksModel.Ψ_Obs
+				
 				N_ΨObs = length(Ψ_Obs)
 
 				Kθ_Log_Obs = fill(0.0::Float64, N_ΨObs)

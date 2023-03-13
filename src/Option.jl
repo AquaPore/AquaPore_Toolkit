@@ -49,7 +49,6 @@ module options
       Class                 ::Bool
       KₛModel⍰              ::String
       OptIndivSoil          ::Bool
-      Opt_Kθ                ::Bool
       Plot_KsModel          ::Bool
 	end
 
