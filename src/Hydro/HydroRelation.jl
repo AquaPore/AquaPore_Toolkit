@@ -17,8 +17,7 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : σ_2_θr
-	#		Old
+	#		FUNCTION : σ_Ψm_
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0)
 			if (option₂.σ_2_Ψm⍰ == "Constrained")
@@ -29,7 +28,7 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE
 				hydro₂.Ψm[iZ] = tool.norm.∇NORM_2_PARAMETER(hydro₂.Ψm[iZ], Ψm_Min, Ψm_Max)
 
 			elseif (option₂.σ_2_Ψm⍰ == "UniqueRelationship") # <>=<>=<>=<>=<>
-				hydro₂.Ψm[iZ] = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], (√param.ΨmacMat +  param.ΨmacMat)*0.5, hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ]; Pσ=Pσ)
+				hydro₂.Ψm[iZ] = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], (√param.ΨmacMat + param.ΨmacMat) *0.5, hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ]; Pσ=Pσ)
 
 			end #option.infilt.σ_2_Ψm⍰
 
@@ -46,8 +45,8 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE
 		# return (hydro₂.θr_Max[iZ] * (1.0 - exp(-α₁ * σ_η ^ α₂))) / (1.0 - exp(-α₁ * 1.0 ^ α₂))
 		# end  # function: σ_2_θr
 
-   # α₁_Max =0.75
-	# α₁_Min =0.6
+			# α₁_Max =0.75
+			# α₁_Min =0.6
 			# function σ_2_θr0(hydro₂, iZ; α₁=0.7)
 			# 	σ_η = (hydro₂.σ[iZ] - hydro₂.σ_Min[iZ]) / (hydro₂.σ_Max[iZ] - hydro₂.σ_Min[iZ]) 
 				
@@ -64,4 +63,3 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE
 			end # function: σ_2_θr
 
 end  # module: hydroRealation
-# ............................................................

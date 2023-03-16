@@ -64,8 +64,8 @@ module optKsModel
 						Kθ_Obs = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Obs[iΨ], iZ, hydro)
 						Kθ_Log_Obs[iΨ] = log(Kθ_Obs)
 				end # iΨ
-				# Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs]))
-				Of_Kθ = Of_Kθ +  stats.RMSE_CONCORDANCE_CORELATION_COEFICIENT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])
+				Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs]))
+				# Of_Kθ = Of_Kθ +  stats.RMSE_CONCORDANCE_CORELATION_COEFICIENT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])
 
 			end # if ClassBool_Select[iZ]
 			end # iZ)		

@@ -130,7 +130,7 @@ module plot
 				Width = 1000
 
 			# PLOTTING KS
-			Axis_Ks = Axis(Fig[1,1], width= Width, height=Height, aspect = 1, title="KsModel_" * NameSim, xlabel=L"$Ks _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$Ks _{Sim}$ $[mm$ $day^{-1}]$", xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
+			Axis_Ks = Axis(Fig[1,1], width= Width, height=Height, aspect = 1, title= option.ksModel.KₛModel⍰, xlabel=L"$Ks _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$Ks _{Sim}$ $[mm$ $day^{-1}]$", xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
 
             Ksₒᵦₛ   = Ksₒᵦₛ .* cst.MmS_2_MmDay
             KₛModel = KₛModel .* cst.MmS_2_MmDay
@@ -159,7 +159,7 @@ module plot
 				# Leg1 = Colorbar(Fig, Fig_Ks, label = "Theta", ticklabelsize = 14, labelpadding = 5, width = 10)
 
 			# PLOTTING K₁₀ₖₚₐ
-				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, title="KsModel_" * NameSim, xlabel=L"$K10 _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$K10 _{Sim}$ $[mm$ $day^{-1}]$", xlabelsize=50, ylabelsize=50, xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10,)
+				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, xlabel=L"$K10 _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$K10 _{Sim}$ $[mm$ $day^{-1}]$", xlabelsize=50, ylabelsize=50, xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10,)
 
 				# 
 
@@ -186,7 +186,7 @@ module plot
 				Fig_Ks = lines!(Fig[1,2], Line, Line, color=:blue, linestyle =:dash, linewidth=3)
 					
 			# Colour bas
-				Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical = true, labelsize=50) # :thermal, :ice, :viridis, :plasma
+				Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical = true, labelsize=50, width=30, ticksize =10, ticklabelsize = 14, labelpadding = 5) # :thermal, :ice, :viridis, :plasma
 				
 			# Final adjustments
 				resize_to_layout!(Fig)
