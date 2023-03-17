@@ -124,13 +124,13 @@ module plot
 			ColourMap = :plasma # :plasma, :ice, :viridis, :plasma
 
 			CairoMakie.activate!(type = "svg")
-			Fig = Figure(font="Sans", xgridstyle=:dash, ygridstyle=:dash, xtickalign=1, ytickalign=1, titlesize=50, fontsize=40, ticksize=50)
+			Fig = Figure(font="Sans", xtickalign=1, ytickalign=1, titlesize=60, fontsize=45, ticksize=40)
 				# Dimensions of figure
 				Height= 1000
 				Width = 1000
 
 			# PLOTTING KS
-			Axis_Ks = Axis(Fig[1,1], width= Width, height=Height, aspect = 1, title= option.ksModel.KₛModel⍰, xlabel=L"$Ks _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$Ks _{Sim}$ $[mm$ $day^{-1}]$", xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xlabelsize=50, ylabelsize=50)
+			Axis_Ks = Axis(Fig[1,1], width= Width, height=Height, aspect = 1, xlabel=L"$Ks _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$Ks _{Sim}$ $[mm$ $day^{-1}]$", xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xlabelsize=45, ylabelsize=45)
 
             Ksₒᵦₛ   = Ksₒᵦₛ .* cst.MmS_2_MmDay
             KₛModel = KₛModel .* cst.MmS_2_MmDay
@@ -154,14 +154,13 @@ module plot
 
 				Fig_Ks = scatter!(Fig[1,1], Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker=:circle, colormap =ColourMap, strokecolor=:black, strokewidth = 1)
 				Line = range(0.0, stop=Ks_Max, length=10) 
-				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:blue, linestyle =:dash, linewidth=3)
+				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:grey, linestyle = :dash, linewidth=5)
 
 				# Leg1 = Colorbar(Fig, Fig_Ks, label = "Theta", ticklabelsize = 14, labelpadding = 5, width = 10)
 
 			# PLOTTING K₁₀ₖₚₐ
-				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, xlabel=L"$K10 _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$K10 _{Sim}$ $[mm$ $day^{-1}]$", xlabelsize=50, ylabelsize=50, xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10,)
+				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, xlabel=L"$K10 _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$K10 _{Sim}$ $[mm$ $day^{-1}]$", xlabelsize=45, ylabelsize=45, xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10,)
 
-				# 
 
 				KΨ_Obs₁₀ₖₚₐ = KΨ_Obs₁₀ₖₚₐ .* cst.MmS_2_MmDay
 				KΨ_Sim₁₀ₖₚₐ = KΨ_Sim₁₀ₖₚₐ .* cst.MmS_2_MmDay
@@ -174,8 +173,8 @@ module plot
 				xlims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
 				ylims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
 
-				Axis_KΨ.xticks = [0, 1, 5, 10, 25, 50, 100] 
-				Axis_KΨ.yticks = [0, 1, 5, 10, 25, 50, 100] 
+				Axis_KΨ.xticks = [0, 1, 2, 4, 8, 16, 32, 64] 
+				Axis_KΨ.yticks = [0, 1, 2, 4, 8, 16, 32, 64] 
 
 				Axis_KΨ.xticklabelrotation = π/3
 
@@ -183,12 +182,14 @@ module plot
 				Fig_KΨ = scatter!(Fig[1,2], KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker =:circle, colormap=ColourMap, strokecolor=:black, strokewidth = 1)
 
 				Line = range(0.0, stop=Ks_Max, length=10) 
-				Fig_Ks = lines!(Fig[1,2], Line, Line, color=:blue, linestyle =:dash, linewidth=3)
+				Fig_Ks = lines!(Fig[1,2], Line, Line, color=:grey, linestyle = :dash, linewidth=5)
 					
 			# Colour bas
-				Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical = true, labelsize=50, width=30, ticksize =10, ticklabelsize = 14, labelpadding = 5) # :thermal, :ice, :viridis, :plasma
+				Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical = true, labelsize=45, width=30, ticksize =10, ticklabelsize = 35, labelpadding = 5) # :thermal, :ice, :viridis, :plasma
 				
 			# Final adjustments
+				Label(Fig[1, 1:2, Top()], option.ksModel.KₛModel⍰, valign =:bottom, font =:bold, padding = (0, 0, 15, 0))
+
 				resize_to_layout!(Fig)
 				trim!(Fig.layout)
 				colgap!(Fig.layout, 20)

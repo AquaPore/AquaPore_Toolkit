@@ -29,7 +29,6 @@ module optKsModel
 					KₛModel[iZ] = θψ_2_KsψModel.KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, option, 0.0; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
 				end
 			end
-
 		return KₛModel
 		end  # function: START_OPT_KθMODEL
 	# ------------------------------------------------------------------
@@ -43,8 +42,7 @@ module optKsModel
 			# Deriving the optimal τ parameters from X
 				ksmodelτ = X_2_τ(ipClass, ksmodelτ, optimKsmodel, X)
 				
-				Ψ_Obs = param.ksModel.Ψ_Obs
-				
+				Ψ_Obs = param.ksModel.Ψ_Obs		
 				N_ΨObs = length(Ψ_Obs)
 
 				Kθ_Log_Obs = fill(0.0::Float64, N_ΨObs)
@@ -63,12 +61,15 @@ module optKsModel
 					# K(Ψ) oberved
 						Kθ_Obs = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Obs[iΨ], iZ, hydro)
 						Kθ_Log_Obs[iΨ] = log(Kθ_Obs)
-				end # iΨ
-				Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs]))
-				# Of_Kθ = Of_Kθ +  stats.RMSE_CONCORDANCE_CORELATION_COEFICIENT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])
+				end # for iΨ =1:N_ΨObs
 
+				if option.ksModel.Of_KₛModel⍰ == "Wilmot"
+					Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs]))
+				else
+					Of_Kθ = Of_Kθ + stats.RMSE_CONCORDANCE_CORELATION_COEFICIENT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])
+				end
 			end # if ClassBool_Select[iZ]
-			end # iZ)		
+			end # for iZ=1:NiZ		
 		return Of_Kθ 
 		end  # function: OF_KSMODELa
 	# --------------------------------------------------------------

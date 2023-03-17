@@ -62,7 +62,7 @@ module θψ_2_KsψModel
 				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)
 
 			# Matrix ====	
-				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) ^ Tclay) *  (((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
+				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) ^ (Tclay / T3) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
 
 				Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
@@ -100,7 +100,6 @@ module θψ_2_KsψModel
 					θr, θs, θsMacMat = ROCKCORRECTION(RockFragment, RockFragment_Treshold, θr, θs, θsMacMat)
 				end
 
-				
 			# MODEL 1 ====
 			# Original model	
 			if option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
@@ -146,29 +145,9 @@ module θψ_2_KsψModel
 			return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 				
 	
-			elseif option.ksModel.KₛModel⍰=="KsΨmodel_2b" # ===				
-				# Tortuosity T1
-					T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ  - 1.0))
-					
-				# Tortuosity T2
-					T2_Max = 3.0
-					T2 = (1.0 - T2_Max) * τ₂ₐ + T2_Max
-
-				# Tortuosity T3
-					T3_Max = 2.0
-					T3 = (T3_Max - 1.0) * τ₃ₐ + 1.0 
-
-			# Transformation macro
-				T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
-				T2Mac = (1.0 - T2_Max) * τ₂ₐMac + T2_Max
-				T3Mac = (T3_Max - 1.0) * τ₃ₐMac + 1.0 						
-
-			return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)		
-			
 			# MODEL 3 ====	
 			# Rekationship between macro and matrix
 			elseif option.ksModel.KₛModel⍰=="KsΨmodel_3"
-
 				# CLAY FUNCTION
 					# Correlation between clay particle and Ψ
 						Ψ_Clay =  160000.0 * ( ( (cst.Y  / 0.002) - (cst.Y / 0.5) ) / ((cst.Y  / 0.001) - (cst.Y  / 0.5)) ) ^ 2.0
@@ -176,39 +155,27 @@ module θψ_2_KsψModel
 					# Rough modelling % of clay [0-1]
 						Clay = wrc.Ψ_2_SeDual(option.hydro, Ψ_Clay, iZ, hydro)
 
-					# Reducing with Tortuosity with clay
-						# X_Clay₁ = τ₁ᵦ
-						# Y_Clay₁ = 1.0 
-						# X_Clay₂ = 1.0
-						# Y_Clay₂ = τ₂ᵦ
-						# α = (Y_Clay₂ - Y_Clay₁) / (X_Clay₂  - X_Clay₁)
-						# Β  = Y_Clay₁ - X_Clay₁ * α
-
-						# Tclay₀ = min(max(α * Clay + Β,  Y_Clay₂), Y_Clay₁)
-
 						X_Clay₁ =  τ₁ᵦ
 						Tclay_Max = τ₂ᵦ
 						Tclay_Min = 1.0
 
-						Clayₙ = (max(Clay - X_Clay₁ , 0.0) / (1.0 - X_Clay₁)) 
+						Clayₙ = (max(Clay - X_Clay₁, 0.0) / (1.0 - X_Clay₁)) 
 
+						Tclay = (Tclay_Max - Tclay_Min) * sin(Clayₙ * π * 0.5 ) + Tclay_Min		
 						# Tclay = (Tclay_Max - Tclay_Min) * Clayₙ + Tclay_Min
-#
-						Tclay = (Tclay_Max - Tclay_Min) * sin( Clayₙ * π * 0.5 ) + Tclay_Min
-
 						# Tclay = (Tclay_Max - Tclay_Min) * (sin( Clayₙ * π - π * 0.5 ) + 1.0) / 2.0 + Tclay_Min
 	
-					# MATRIX 
-						T2_Max = 4.0; T3_Max = 3.0
+				# MATRIX 
+						T2_Max = 1.0; T3_Max = 2.0
 					# Tortuosity T1
-						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+						T1 =  10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
 						# T1 = 10.0 ^ - (1.0 / (Tclay₀ * τ₁ₐ) -1.0)
 						
 					# Tortuosity T2
-						T2 = T2_Max * (1.0 - τ₂ₐ)
+						T2 = T2_Max * (1.0 - τ₂ₐ) 
 
 					# Tortuosity T3	
-						T3 = T3_Max * (1.0 - τ₃ₐ)			
+						T3 = T3_Max * (1.0 - τ₃ₐ)
 
 				# MACRO
 					# Tortuosity T1Mac
@@ -222,9 +189,7 @@ module θψ_2_KsψModel
 							
 				return  KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)		
 			
-
-			
-			elseif option.ksModel.KₛModel⍰=="KsΨmodel_3b" # ===
+			elseif option.ksModel.KₛModel⍰=="KsΨmodel_4" # ===
 				# Transformation matrix
 
 				# CLAY MODEL 
@@ -277,7 +242,7 @@ module θψ_2_KsψModel
 		return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 
 				# MODEL 3 ====			
-				elseif option.ksModel.KₛModel⍰=="KsΨmodel_4" # ===
+				elseif option.ksModel.KₛModel⍰=="KsΨmodel_5" # ===
 					# Transformation matrix
 					# Function to correct for clay
 					X1 = τ₁ᵦ
@@ -286,7 +251,7 @@ module θψ_2_KsψModel
 					Y2 = τ₁ᵦ	
 					A  = (Y2 - Y1) / (X2 - X1)
 					B  = Y1 - X1 * A
-					ση = σ_2_ση(hydro, iZ, σ)
+					ση = σ_2_ση(hydro.σ[iZ])
 					# Func_T1 = max( (A * (ση ^ 2) + B), 0.0)
 					# Func_T1 = τMODEL_σ(hydro, iZ,  τ₁ᵦ, τ₂ᵦ, σ; Inverse=true, τ₄=1.0)
 
@@ -302,48 +267,6 @@ module θψ_2_KsψModel
 
 				# Transformation macro
 					T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
-					T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
-					T3Mac = τ₃ₐMac								
-					return KsΨMODEL_OLD(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
-				
-
-						# MODEL 2 ====			
-				elseif option.ksModel.KₛModel⍰=="KsΨmodel_4" # ===
-
-	
-					# Func_T1 = τMODEL_σ(hydro, iZ,  τ₁ᵦ, τ₂ᵦ, σ; Inverse=true, τ₄=1.0)
-
-					# Func_T1 = 1
-					# T1 = 10.0 ^ ( Func_T1 * (τ₁ₐ / (τ₁ₐ - 1.0)))
-					# Func_T1 = min(max(0.3231 * σ - 0.0276, 0.0), 0.99)
-
-					# if σ > 2.5
-					# 	# Func_T1 = 1.0 - max(min(τ₁ₐ * log(Ψm) * σ + τ₁ᵦ, 1.0), 0.001)
-						# Func_T1 = 1.0 - max(min(τ₁ₐ * log(Ψm), 1.0), 0.001)
-						ση = σ_2_ση(hydro, iZ, σ)
-						Func_T1 =  τMODEL_σ(hydro, iZ, τ₁ₐ, τ₁ᵦ, σ; Inverse=false, τ₄=2.0)
-					# else
-					# 	Func_T1 =  τ₁ᵦ
-					# end			
-								
-					T1 = 10.0 ^ ( Func_T1 / (Func_T1 - 1.0))
-
-					# T1 = 10.0 ^ (Func_T1a / (Func_T1a - 1.0))
-					T2_Min = 1.0; T2_Max = 3.0
-					T2 = (T2_Min - T2_Max) * τ₂ₐ + T2_Max
-
-					# Function to correct for clay
-						X1 = 0
-						Y1 = 1.0
-						X2 = 1.0
-						Y2 = 1.0	
-						A  = (Y2 - Y1) / (X2 - X1)
-						B  = Y1 - X1 * A
-
-					T3 = τMODEL_σ(hydro, iZ, τ₃ₐ, τ₃ᵦ, σ; Inverse=false, τ₄=2.0)
-
-				# Transformation macro
-					T1Mac =  (10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0)))
 					T2Mac = (T2_Min - T2_Max)  * τ₂ₐMac + T2_Max
 					T3Mac = τ₃ₐMac								
 					return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
@@ -416,7 +339,7 @@ module θψ_2_KsψModel
 	#		FUNCTION : τMODEL_σ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function τMODEL_σ(hydro, iZ,  Pₘᵢₙ, Pₘₐₓ, σ; Inverse=false, τ₄=0.5)
-			ση = σ_2_ση(hydro, iZ, σ)
+			ση = σ_2_ση(hydro.σ[iZ])
 			if Inverse
 				return τ = (1.0 - ση) ^ τ₄  * (Pₘₐₓ - Pₘᵢₙ) + Pₘᵢₙ
 			else

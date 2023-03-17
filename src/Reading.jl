@@ -514,9 +514,11 @@ module reading
 			# Number of classes of subdividing the data    
 			   if option.ksModel.Class
 					N_Class = length(param.ksModel.σₛₚₗᵢₜ) - 1
-					println("				Spliting the data in $N_Class classes")
+					println("						Spliting the data in $N_Class classes")
+
 				elseif option.ksModel.OptIndivSoil
 					N_Class = NiZ
+
 				else
 					N_Class = 1
 				end

@@ -29,12 +29,9 @@ module startKsModel
 					ClassBool_Select = ClassBool[1:NiZ, ipClass]
 
 					if sum(ClassBool[1:NiZ, ipClass]) ≥ 1 && optimKsmodel.NparamOpt[ipClass] ≥ 1
-
 						println("\n       === ipClass=$ipClass === \n")
 						
 						KₛModel = optKsModel.START_OPT_KθMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
-
-						ksmodelτ = STATISTICS_KSMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, optimKsmodel, option)
 
 						# Computing KΨ_Sim₁₀ₖₚₐ
 						for iZ=1:NiZ
@@ -42,6 +39,8 @@ module startKsModel
 								KΨ_Sim₁₀ₖₚₐ[iZ] = θψ_2_KsψModel.KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, option, 1000.0; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
 							end
 						end
+
+						ksmodelτ = STATISTICS_KSMODEL(ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, optimKsmodel, option)
 
 						# All data
 						if option.ksModel.Class && option.ksModel.Plot_KsModel
@@ -54,10 +53,9 @@ module startKsModel
 				end # for ipClass=1:N_Class
 
 				# Final statistic of all combined Ks data
-					if option.ksModel.OptIndivSoil || option.ksModel.Class
-						
-						ksmodelτ = STATISTICS_KSMODEL(ClassBool_All, hydro, 0, KₛModel, ksmodelτ, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, optimKsmodel, option)
-					end
+				if option.ksModel.OptIndivSoil || option.ksModel.Class					
+					ksmodelτ = STATISTICS_KSMODEL(ClassBool_All, hydro, 0, KₛModel, ksmodelτ, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, optimKsmodel, option)
+				end
 
 				# PLOTTING ALL SOILS
 				if option.ksModel.Plot_KsModel
@@ -117,7 +115,6 @@ module startKsModel
 	#		FUNCTION : KSΨMODEL_CLASS 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function KSΨMODEL_CLASS(hydro, NiZ, option, param)
-
 			ClassBool_All = fill(true::Bool, NiZ)
 
 			if option.ksModel.OptIndivSoil
@@ -159,12 +156,16 @@ module startKsModel
 					Nse_τ₀    = stats.NSE(log1p.(hydro.Ks[ClassBool]) , log1p.(KₛModel[ClassBool]))
 					Rmse_τ₀   = stats.RMSE(log1p.(hydro.Ks[ClassBool]) , log1p.(KₛModel[ClassBool]))
 					Wilmot_τ₀ = stats.NSE_WILMOT(log1p.(hydro.Ks[ClassBool]) , log1p.(KₛModel[ClassBool]))
-					Ccc_τ₀    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log1p.(hydro.Ks[ClassBool]) , log1p.(KₛModel[ClassBool]))
+					Ccc_τ₀    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log1p.(hydro.Ks[ClassBool]), log1p.(KₛModel[ClassBool]))
 
 				# For observed and simulated K(Ψ₁₀ₖₚₐ)
 					Nse_KΨ₁₀ₖₚₐ    = stats.NSE(log1p.(KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log1p.(KΨ_Sim₁₀ₖₚₐ[ClassBool]))
 					Rmse_KΨ₁₀ₖₚₐ   = stats.RMSE(log1p.(KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log1p.(KΨ_Sim₁₀ₖₚₐ[ClassBool]))
 					Wilmot_KΨ₁₀ₖₚₐ = stats.NSE_WILMOT(log1p.(KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log1p.(KΨ_Sim₁₀ₖₚₐ[ClassBool]))
+
+					# println(log1p.(KΨ_Obs₁₀ₖₚₐ[ClassBool]))
+					# println("  ")
+					# println(log1p.(KΨ_Sim₁₀ₖₚₐ[ClassBool]))
 					Ccc_KΨ₁₀ₖₚₐ    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log1p.(KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log1p.(KΨ_Sim₁₀ₖₚₐ[ClassBool]))
 
 				if ipClass == 0

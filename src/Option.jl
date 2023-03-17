@@ -48,6 +48,7 @@ module options
 	@option mutable struct KSMODEL
       Class                 ::Bool
       KₛModel⍰              ::String
+		Of_KₛModel⍰           ::String
       OptIndivSoil          ::Bool
       Plot_KsModel          ::Bool
 	end
