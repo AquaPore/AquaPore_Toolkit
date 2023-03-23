@@ -30,50 +30,63 @@ module θψ_2_KsψModel
 	#..................................................................
 
 
+	
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KsΨMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function KsΨMODEL(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
 			# Se ===
-				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)
+
+				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
+
+			# if θs - θsMacMat > cst.ΔθsθsMacMat
+				θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
+
+
+				Se_Mat = (θ_Mat- θr) / (θs - θr) 
+
+				Se_Mac = θ_Mac / (θs - θr)
+
+				# Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)
+
+				# Se_Mat = θ_Mat / (θsMacMat - θr) 
+				# Se_Mac = θ_Mac / (θs - θsMacMat)
 
 			# Matrix ====	
 				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
 
-				Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
+				Kunsat_Mat = Ks_Mat * √Se_Mat * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
 			# Macropore ===
 				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
-				Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+				Kunsat_Mac = Ks_Mac * √Se_Mac * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 		return K_Ψ = Kunsat_Mat + Kunsat_Mac
 		end  # function: KsΨMODEL
-	# ------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 
-	
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KsΨMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function KsΨMODEL_CLAY(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
-				# Se ===
-				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)
+			# Se ===
+			Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)
 
-			# Matrix ====	
-				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) ^ (Tclay / T3) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
+		# Matrix ====	
+			Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) ^ (Tclay / T3) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
 
-				Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
+			Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
-			# Macropore ===
-				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
+		# Macropore ===
+			Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
-				Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-		return K_Ψ = Kunsat_Mat + Kunsat_Mac
-		end  # function: KsΨMODEL
-# ------------------------------------------------------------------
-
+			Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+	return K_Ψ = Kunsat_Mat + Kunsat_Mac
+	end  # function: KsΨMODEL
+	# ------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,7 +106,7 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : TORTUOSITYMODELS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function TORTUOSITYMODELS(hydro, option, ipClass, iZ::Int64,ksmodelτ, Ψ₁; RockFragment=0.0, θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τ₁ᵦ=ksmodelτ.τ₁ᵦ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τ₂ᵦ=ksmodelτ.τ₂ᵦ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τ₃ᵦ=ksmodelτ.τ₃ᵦ[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τ₁ᵦMac=ksmodelτ.τ₁ᵦMac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τ₂ᵦMac=ksmodelτ.τ₂ᵦMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τ₃ᵦMac=ksmodelτ.τ₃ᵦMac, RockFragment_Treshold=0.4, Smap_ImpermClass=[], KsImpClass_Dict=[] )
+		function TORTUOSITYMODELS(hydro, option, ipClass, iZ::Int64,ksmodelτ, Ψ₁; RockFragment=0.0, θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τclay=ksmodelτ.τclay[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τ₂ᵦ=ksmodelτ.τ₂ᵦ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τ₃ᵦ=ksmodelτ.τ₃ᵦ[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τclayMac=ksmodelτ.τclayMac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τ₂ᵦMac=ksmodelτ.τ₂ᵦMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τ₃ᵦMac=ksmodelτ.τ₃ᵦMac, RockFragment_Treshold=0.4, Smap_ImpermClass=[], KsImpClass_Dict=[] )
 
 			# Determine when Ks increases for increasing RockFragment	
 				if RockFragment > RockFragment_Treshold
@@ -155,17 +168,16 @@ module θψ_2_KsψModel
 					# Rough modelling % of clay [0-1]
 						Clay = wrc.Ψ_2_SeDual(option.hydro, Ψ_Clay, iZ, hydro)
 
-						X_Clay₁ =  τ₁ᵦ
-						Tclay_Min = 0.0
+						X_Clay₁ =  τclay # τclay
+						Tclay_Min = 0.2
 
 						Clayₙ = (max(Clay - X_Clay₁, 0.0) / (1.0 - X_Clay₁)) ^ τ₂ᵦ
-
 						Tclay = 1.0	- (1.0 - Tclay_Min) * sin(Clayₙ * π * 0.5)	
 						# Tclay = (Tclay_Max - Tclay_Min) * Clayₙ + Tclay_Min
 						# Tclay = (Tclay_Max - Tclay_Min) * (sin( Clayₙ * π - π * 0.5 ) + 1.0) / 2.0 + Tclay_Min
 	
 				# MATRIX 
-						T2_Max = 4.0; T3_Max = 2.0
+						T2_Max = 1.0; T3_Max = 4.0
 					# Tortuosity T1
 						T1 =  10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
 						# T1 = 10.0 ^ - (1.0 / (Tclay₀ * τ₁ₐ) -1.0)
@@ -198,7 +210,7 @@ module θψ_2_KsψModel
 						X_σ₁ = 0
 						Y_σ₁ = 1.0 
 						X_σ₂ = 3.7 - σclay
-						Y_σ₂ = τ₁ᵦ
+						Y_σ₂ = τclay
 						α  = (Y_σ₂ - Y_σ₁) / (X_σ₂ - X_σ₁)
 						B  = Y_σ₁ - X_σ₁ * α 
 
@@ -244,15 +256,15 @@ module θψ_2_KsψModel
 				elseif option.ksModel.KₛModel⍰=="KsΨmodel_5" # ===
 					# Transformation matrix
 					# Function to correct for clay
-					X1 = τ₁ᵦ
+					X1 = τclay
 					Y1 = 1.0
 					X2 = 1.0
-					Y2 = τ₁ᵦ	
+					Y2 = τclay	
 					A  = (Y2 - Y1) / (X2 - X1)
 					B  = Y1 - X1 * A
 					ση = σ_2_ση(hydro.σ[iZ])
 					# Func_T1 = max( (A * (ση ^ 2) + B), 0.0)
-					# Func_T1 = τMODEL_σ(hydro, iZ,  τ₁ᵦ, τ₂ᵦ, σ; Inverse=true, τ₄=1.0)
+					# Func_T1 = τMODEL_σ(hydro, iZ,  τclay, τ₂ᵦ, σ; Inverse=true, τ₄=1.0)
 
 					Func_T1 = 1
 					T1 = 10.0 ^ ( Func_T1 * (τ₁ₐ / (τ₁ₐ - 1.0)))

@@ -123,7 +123,7 @@ module plot
 
 			ColourMap = :plasma # :plasma, :ice, :viridis, :plasma
 
-			CairoMakie.activate!(type = "svg")
+			CairoMakie.activate!(type = "png")
 			Fig = Figure(font="Sans", xtickalign=1, ytickalign=1, titlesize=60, fontsize=45, ticksize=40)
 				# Dimensions of figure
 				Height= 1000
@@ -195,7 +195,7 @@ module plot
 				colgap!(Fig.layout, 20)
 				rowgap!(Fig.layout, 20)
 
-			Pathₛ = Path * "_" * NameSim * ".svg" 
+			Pathₛ = Path * "_" * NameSim * ".png" 
 
 			save(Pathₛ, Fig)
 			# Displaying figure in VScode

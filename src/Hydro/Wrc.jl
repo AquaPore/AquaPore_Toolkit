@@ -198,11 +198,11 @@ module wrc
 
 				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
 
-				if θs - θsMacMat > cst.ΔθsθsMacMat
+				# if θs - θsMacMat > cst.ΔθsθsMacMat
 					θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
-				else
-					θ_Mac = 0.0
-				end
+				# else
+				# 	θ_Mac = 0.0
+				# end
 
 			return θ_Mac + θ_Mat
 			end # function Ψ_2_θDual
