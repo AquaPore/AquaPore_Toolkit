@@ -64,7 +64,7 @@ module optKsModel
 				end # for iΨ =1:N_ΨObs
 
 				if option.ksModel.Of_KₛModel⍰ == "Wilmot"
-					Of_Kθ = Of_Kθ + (1.0 - stats.NSE_WILMOT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs]))
+					Of_Kθ = Of_Kθ + (1.0 - abs(stats.NSE_WILMOT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])))
 				else
 					Of_Kθ = Of_Kθ + stats.RMSE_CONCORDANCE_CORELATION_COEFICIENT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])
 				end

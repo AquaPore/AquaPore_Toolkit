@@ -121,16 +121,34 @@ module plot
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function KSMODEL(KₛModel, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, Ksₒᵦₛ, NameSim::String, Path::String, θrₒᵦₛ, θsMacMatₒᵦₛ, σₒᵦₛ, option)
 
+			TitleAdd = ""
+			# Dimension of figure
+				Height        = 1000 # Height of plot
+				Width         = 1000  # Width of plot
+
+			# Size of X and Y label
+				XlabelSize    = 40
+				YlabelSize    = 40
+
+			#  
+
+			# Title
+				TitleSize = 50
+
+			# Labels size of colourbar
+ 				TickLabelSize = 35
+         	TickSize      = 30
+				LabelSize     = 35
+        
+
 			ColourMap = :plasma # :plasma, :ice, :viridis, :plasma
 
 			CairoMakie.activate!(type = "png")
-			Fig = Figure(font="Sans", xtickalign=1, ytickalign=1, titlesize=60, fontsize=45, ticksize=40)
+			Fig = Figure(font="Sans")
 				# Dimensions of figure
-				Height= 1000
-				Width = 1000
 
 			# PLOTTING KS
-			Axis_Ks = Axis(Fig[1,1], width= Width, height=Height, aspect = 1, xlabel=L"$Ks _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$Ks _{Sim}$ $[mm$ $day^{-1}]$", xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xlabelsize=45, ylabelsize=45)
+			Axis_Ks = Axis(Fig[1,1], width=Width, height=Height, aspect=1, xlabel=L"$Ks _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$Ks _{Sim}$ $[mm$ $day^{-1}]$", xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xlabelsize=XlabelSize, ylabelsize=YlabelSize)
 
             Ksₒᵦₛ   = Ksₒᵦₛ .* cst.MmS_2_MmDay
             KₛModel = KₛModel .* cst.MmS_2_MmDay
@@ -152,14 +170,14 @@ module plot
 
 				ΔΘsMacΘr = θsMacMatₒᵦₛ .-  θrₒᵦₛ
 
-				Fig_Ks = scatter!(Fig[1,1], Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker=:circle, colormap =ColourMap, strokecolor=:black, strokewidth = 1)
+				Fig_Ks = scatter!(Fig[1,1], Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker=:circle, colormap=ColourMap, strokecolor=:black, strokewidth=1)
 				Line = range(0.0, stop=Ks_Max, length=10) 
-				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:grey, linestyle = :dash, linewidth=5)
+				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:grey, linestyle=:dash, linewidth=5)
 
 				# Leg1 = Colorbar(Fig, Fig_Ks, label = "Theta", ticklabelsize = 14, labelpadding = 5, width = 10)
 
 			# PLOTTING K₁₀ₖₚₐ
-				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, xlabel=L"$K10 _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$K10 _{Sim}$ $[mm$ $day^{-1}]$", xlabelsize=45, ylabelsize=45, xscale=Makie.pseudolog10,  yscale=Makie.pseudolog10,)
+				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, xlabel=L"$K10 _{Obs}$ $[mm$ $day^{-1}]$", ylabel=L"$K10 _{Sim}$ $[mm$ $day^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xscale=Makie.pseudolog10, yscale=Makie.pseudolog10)
 
 
 				KΨ_Obs₁₀ₖₚₐ = KΨ_Obs₁₀ₖₚₐ .* cst.MmS_2_MmDay
@@ -178,17 +196,30 @@ module plot
 
 				Axis_KΨ.xticklabelrotation = π/3
 
-
-				Fig_KΨ = scatter!(Fig[1,2], KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker =:circle, colormap=ColourMap, strokecolor=:black, strokewidth = 1)
+				Fig_KΨ = scatter!(Fig[1,2], KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, color=σₒᵦₛ, markersize=125.0*ΔΘsMacΘr, marker=:circle, colormap=ColourMap, strokecolor=:black, strokewidth=1)
 
 				Line = range(0.0, stop=Ks_Max, length=10) 
 				Fig_Ks = lines!(Fig[1,2], Line, Line, color=:grey, linestyle = :dash, linewidth=5)
 					
 			# Colour bas
-				Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical = true, labelsize=45, width=30, ticksize =10, ticklabelsize = 35, labelpadding = 5) # :thermal, :ice, :viridis, :plasma
+				Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical=true, labelsize=LabelSize, width=30, ticksize=TickSize, ticklabelsize=TickLabelSize, labelpadding=5) # :thermal, :ice, :viridis, :plasma
 				
+			# Letters
+
+				for (ax, label) in zip([Axis_Ks, Axis_KΨ], ["(A)", "(B)"])
+					text!(
+						ax, 0, 1,
+						text = label, 
+						font = :bold,
+						align = (:left, :top),
+						offset = (4, -2),
+						space = :relative,
+						fontsize = TitleSize
+					)
+				end
+
 			# Final adjustments
-				Label(Fig[1, 1:2, Top()], option.ksModel.KₛModel⍰, valign =:bottom, font =:bold, padding = (0, 0, 15, 0))
+				Label(Fig[1, 1:2, Top()], option.ksModel.KₛModel⍰, valign=:bottom, font=:bold, padding = (0, 0, 15, 0), fontsize=TitleSize)
 
 				resize_to_layout!(Fig)
 				trim!(Fig.layout)
