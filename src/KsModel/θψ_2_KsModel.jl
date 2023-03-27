@@ -115,7 +115,7 @@ module θψ_2_KsψModel
 
 			# MODEL 1 ====
 			# Original model	
-			if option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===
+			if option.ksModel.KₛModel⍰=="KsΨmodel_0" # ===
 					# Transforming matrix
 				T1 =  10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
 				# T1 =  (10.0 ^ - (1.0 / (1.0 - τ₁ ))) / 0.1
@@ -124,8 +124,8 @@ module θψ_2_KsψModel
 
 			# Transforming macro
 				T1Mac = 10.0 ^ (τ₁ₐ * τ₁ₐMac / (1.0 - τ₁ₐ * τ₁ₐMac))
-				T2Mac = 2.0 * (1.0 - τ₁ₐ * τ₁ₐMac)
-				T3Mac = 1.0 / (1.0 - τ₃ₐMac)
+				T2Mac = 2.0 * (1.0 - τ₂ₐ * τ₂ₐMac)
+				T3Mac = 1.0 / (1.0 - τ₃ₐ * τ₃ₐMac)
 		
 			# Ks model
 				KₛModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψm, ΨmMac), 0.0, 0.9999, rtol=1.0E-3)[1]
@@ -134,8 +134,8 @@ module θψ_2_KsψModel
 				
 			# MODEL 2 ====	
 			# Rekationship between macro and matrix		
-			elseif option.ksModel.KₛModel⍰=="KsΨmodel_2" # ===	
-				T2_Max = 4.0; T3_Max = 3.0
+			elseif option.ksModel.KₛModel⍰=="KsΨmodel_1" # ===	
+				T2_Max = 1.0; T3_Max = 4.0
 				# MATRIX 
 					# Tortuosity T1
 						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
@@ -158,9 +158,9 @@ module θψ_2_KsψModel
 			return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 				
 	
-			# MODEL 3 ====	
+			# MODEL 2 ====	
 			# Rekationship between macro and matrix
-			elseif option.ksModel.KₛModel⍰=="KsΨmodel_3"
+			elseif option.ksModel.KₛModel⍰=="KsΨmodel_2"
 				# CLAY FUNCTION
 					# Correlation between clay particle and Ψ
 						Ψ_Clay =  160000.0 * ( ( (cst.Y  / 0.002) - (cst.Y / 0.5) ) / ((cst.Y  / 0.001) - (cst.Y  / 0.5)) ) ^ 2.0
@@ -169,10 +169,11 @@ module θψ_2_KsψModel
 						Clay = wrc.Ψ_2_SeDual(option.hydro, Ψ_Clay, iZ, hydro)
 
 						X_Clay₁ =  τclay # τclay
-						Tclay_Min = 0.2
+						Tclay_Min = 0.1
+						Tclay_Max = 1.0
 
 						Clayₙ = (max(Clay - X_Clay₁, 0.0) / (1.0 - X_Clay₁)) ^ τ₂ᵦ
-						Tclay = 1.0	- (1.0 - Tclay_Min) * sin(Clayₙ * π * 0.5)	
+						Tclay = 1.0	- (Tclay_Max - Tclay_Min) * sin(Clayₙ * π * 0.5)	
 						# Tclay = (Tclay_Max - Tclay_Min) * Clayₙ + Tclay_Min
 						# Tclay = (Tclay_Max - Tclay_Min) * (sin( Clayₙ * π - π * 0.5 ) + 1.0) / 2.0 + Tclay_Min
 	
@@ -198,7 +199,97 @@ module θψ_2_KsψModel
 					# Tortuosity T3Mac
 						T3Mac = T3_Max * (1.0 - τ₃ₐMac)
 							
-				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)		
+				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)	
+				
+				
+			# MODEL 2 ====
+			# Model 2	
+			# Rekationship between macro and matrix
+			elseif option.ksModel.KₛModel⍰=="KsΨmodel_2Unimodal"
+				# CLAY FUNCTION
+					# Correlation between clay particle and Ψ
+						Ψ_Clay =  160000.0 * ( ( (cst.Y  / 0.002) - (cst.Y / 0.5) ) / ((cst.Y  / 0.001) - (cst.Y  / 0.5)) ) ^ 2.0
+
+					# Rough modelling % of clay [0-1]
+						Clay = wrc.Ψ_2_SeDual(option.hydro, Ψ_Clay, iZ, hydro)
+
+						X_Clay₁ =  τclay # τclay
+						Tclay_Min = 0.1
+						Tclay_Max = 1.0
+
+						Clayₙ = (max(Clay - X_Clay₁, 0.0) / (1.0 - X_Clay₁)) ^ τ₂ᵦ
+						Tclay = 1.0	- (Tclay_Max - Tclay_Min) * sin(Clayₙ * π * 0.5)	
+						
+				# MATRIX 
+						T2_Max = 3.0; T3_Max = 4.0
+					# Tortuosity T1
+						T1 =  10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+						# T1 = 10.0 ^ - (1.0 / (Tclay₀ * τ₁ₐ) -1.0)
+						
+					# Tortuosity T2
+						T2 = T2_Max * (1.0 - τ₂ₐ) 
+
+					# Tortuosity T3	
+						T3 = T3_Max * (1.0 - τ₃ₐ)
+
+				# MACRO
+					# Tortuosity T1Mac
+						τ₁ₐMac = 0.0
+						T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐ - 1.0))
+					
+					# Tortuosity T2Mac
+						τ₂ₐMac = 0.0
+						T2Mac = T2_Max * (1.0 - τ₂ₐMac) 
+					
+					# Tortuosity T3Mac
+						τ₃ₐMac = 0.0
+						T3Mac = T3_Max * (1.0 - τ₃ₐMac)
+							
+				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)	
+			
+			# MODEL 3 ====	
+			# Rekationship between macro and matrix
+			elseif option.ksModel.KₛModel⍰=="KsΨmodel_3"
+				# CLAY FUNCTION
+					# Correlation between clay particle and Ψ
+						Ψ_Clay =  160000.0 * ( ( (cst.Y  / 0.002) - (cst.Y / 0.5) ) / ((cst.Y  / 0.001) - (cst.Y  / 0.5)) ) ^ 2.0
+
+					# Rough modelling % of clay [0-1]
+						Clay = wrc.Ψ_2_SeDual(option.hydro, Ψ_Clay, iZ, hydro)
+
+						X_Clay₁ =  τclay # τclay
+						Tclay_Min = 0.1
+						Tclay_Max = 1.0
+
+						Clayₙ = (max(Clay - X_Clay₁, 0.0) / (1.0 - X_Clay₁)) ^ τ₂ᵦ
+						Tclay = 1.0	- (Tclay_Max - Tclay_Min) * sin(Clayₙ * π * 0.5)	
+						# Tclay = (Tclay_Max - Tclay_Min) * Clayₙ + Tclay_Min
+						# Tclay = (Tclay_Max - Tclay_Min) * (sin( Clayₙ * π - π * 0.5 ) + 1.0) / 2.0 + Tclay_Min
+
+				# MATRIX 
+						T2_Max = 1.0; T3_Max = 4.0
+					# Tortuosity T1
+						T1 =  10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+						# T1 = 10.0 ^ - (1.0 / (Tclay₀ * τ₁ₐ) -1.0)
+						
+					# Tortuosity T2
+						T2 = T2_Max * (1.0 - τ₂ₐ) 
+
+					# Tortuosity T3	
+						T3 = T3_Max * (1.0 - τ₃ₐ)#
+
+				# MACRO
+					# Tortuosity T1Mac
+						T1Mac = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+					
+					# Tortuosity T2Mac
+						T2Mac = T2_Max * (1.0 - τ₂ₐMac) 
+					
+					# Tortuosity T3Mac
+						T3Mac = T3_Max * (1.0 - τ₃ₐMac)
+						
+				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)	
+			
 			
 			elseif option.ksModel.KₛModel⍰=="KsΨmodel_4" # ===
 				# Transformation matrix

@@ -168,7 +168,7 @@ module hydrolabOpt
 
 			println("	=== === Optimizing Hydraulic parameters === ")
 			println("    		~  Nse_θΨ= $(round(Nse_θΨ_Aver,digits=3)),  NseWilmot_θΨ= $(round(NseWilmot_θΨ_Aver,digits=3)), Nse_KΨ_Aver= $(round(Nse_KΨ_Aver,digits=3)), NseWilmot_KΨ= $(round(NseWilmot_KΨ_Aver,digits=3)), Nse = $(round(Nse_Aver,digits=3))  ~")
-			println("    		~  Rmse_θΨ = $(round(Rmse_θΨ_Aver,digits=4)),  Rmse_KΨ = $(round(Rmse_KΨ_Aver,digits=4)), Rmse = $(round(Rmse_Aver,digits=4))  ~ \n")
+			println("    		~  Rmse_θΨ = $(round(Rmse_θΨ_Aver,digits=4)),  RmseLog10_KΨ = $(round(Rmse_KΨ_Aver,digits=4)), Rmse = $(round(Rmse_Aver,digits=4))  ~ \n")
 			println( "	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === ===")
 	return hydro, hydroOther
 	end  # function: HYPIXOPT_START
@@ -218,6 +218,9 @@ module hydrolabOpt
 			# RELATIONSHIP BETWEEN σ AND Ψm
 			if (optionₘ.σ_2_Ψm⍰ ≠ "No") && ("Ψm" ∈ optim.ParamOpt)
 				hydro = hydroRelation.FUNCTION_σ_2_Ψm_SOFTWARE(hydro, iZ, optionₘ, param.hydro; Pσ=3.0)
+			elseif (optionₘ.σ_2_Ψm⍰ =="UniqueRelationship") 
+				hydro = hydroRelation.FUNCTION_σ_2_Ψm_SOFTWARE(hydro, iZ, optionₘ, param.hydro; Pσ=3.0)
+
 			end # optionₘ.σ_2_Ψm⍰ ≠ No
 
 			#  <>=<>=<>=<>=<>=<> Relationship between σ and θr
