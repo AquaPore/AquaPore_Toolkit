@@ -26,6 +26,7 @@ using Suppressor
       include("Optim/Optimize.jl")
       include("Table.jl")
       include("Ksmodel/Struct_Ksmodel.jl")
+      include("KsModel/θψ_2_KsModel.jl")
       include("Reading.jl")
       include("Distribution.jl")
 

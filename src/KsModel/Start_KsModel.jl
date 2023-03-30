@@ -17,6 +17,9 @@ module startKsModel
 			# NUMBER OF CLASSES
 				ClassBool, ClassBool_All, N_Class = KSΨMODEL_CLASS(hydro, NiZ, option, param)
 
+			# Time now 
+				Time_Start = time()
+
 			# DERIVING OBSERVED K(Ψ₁₀ₖₚₐ)
 				KΨ_Obs₁₀ₖₚₐ = fill(0.0::Float64, NiZ)
 				KΨ_Sim₁₀ₖₚₐ = fill(0.0::Float64, NiZ)
@@ -61,7 +64,11 @@ module startKsModel
 				# PLOTTING ALL SOILS
 				if option.ksModel.Plot_KsModel
 					NameSim = "All soils"
-					plot.ksmodel.KSMODEL(KₛModel[1:NiZ], KΨ_Obs₁₀ₖₚₐ[1:NiZ], KΨ_Sim₁₀ₖₚₐ[1:NiZ], hydro.Ks[1:NiZ], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[1:NiZ], hydro.θsMacMat[1:NiZ], hydro.σ[1:NiZ], option)	
+					plot.ksmodel.KSMODEL(KₛModel[1:NiZ], KΨ_Obs₁₀ₖₚₐ[1:NiZ], KΨ_Sim₁₀ₖₚₐ[1:NiZ], hydro.Ks[1:NiZ], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[1:NiZ], hydro.θsMacMat[1:NiZ], hydro.σ[1:NiZ], option)
+
+ 					plot.ksmodel.KSMODEL_TCLAY( path.plotSoilwater.Plot_KsModel, option, ksmodelτ, 1)
+
+					plot.ksmodel.KSMODEL_FUNCTIONS( path.plotSoilwater.Plot_KsModel, option, ksmodelτ, 1)
 				end
 
 			# RUN KₛModel
@@ -84,7 +91,7 @@ module startKsModel
 				# PLOTTING ALL SOILS
 				if option.ksModel.Plot_KsModel
 					NameSim = "All soils"
-					plot.ksmodel.KSMODEL(KₛModel[1:NiZ], KΨ_Obs₁₀ₖₚₐ[1:NiZ], KΨ_Sim₁₀ₖₚₐ[1:NiZ], hydro.Ks[1:NiZ], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[1:NiZ], hydro.θsMacMat[1:NiZ], hydro.σ[1:NiZ], option)	
+					plot.ksmodel.KSMODEL(KₛModel[1:NiZ], KΨ_Obs₁₀ₖₚₐ[1:NiZ], KΨ_Sim₁₀ₖₚₐ[1:NiZ], hydro.Ks[1:NiZ], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[1:NiZ], hydro.θs[1:NiZ], hydro.σ[1:NiZ], option)	
 				end
 			end  # if: optimKsmodel
 
@@ -107,6 +114,10 @@ module startKsModel
 					end
 				end
 		
+			Time_End = time()
+
+			println("		~~~~~~~~~~ Time of simulations $(floor(Time_End-Time_Start)) Seconds")
+
 		return hydro, KₛModel, N_Class
 		end  # function: START_KSΨMODEL
 	#..................................................................

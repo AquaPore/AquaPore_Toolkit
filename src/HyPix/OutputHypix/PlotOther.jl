@@ -226,8 +226,6 @@ module plotOther
 
 						θhalf = (hydroHorizon₂.θs[1] - hydroHorizon₂.θr[1]) / 2.0
 						Δθ= 1.0E-2
-
-7
 						Δθ = [θhalf-Δθ, θhalf+Δθ, hydroHorizon₂.θs[1], hydroHorizon₂.θs[1]-Δθ, hydroHorizon₂.θr[1], hydroHorizon₂.θr[1]+Δθ]
 
 						for iθ = 1:N_Δθ
