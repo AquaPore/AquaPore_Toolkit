@@ -198,7 +198,7 @@ module θψ_2_KsψModel
 					# Tortuosity T3	
 						T3 = T3_Max * (1.0 - τ₃ₐ)
 
-				# MACRO
+				# MACRO ----------------------------
 					# Tortuosity T1Mac
 						T1Mac = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
 					

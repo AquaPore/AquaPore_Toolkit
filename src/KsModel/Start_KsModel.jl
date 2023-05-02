@@ -62,7 +62,7 @@ module startKsModel
 				end
 
 				# PLOTTING ALL SOILS
-				if option.ksModel.Plot_KsModel
+				if option.ksModel.Plot_KsModel && sum(optimKsmodel.NparamOpt) ≥ 1
 					NameSim = "All soils"
 					plot.ksmodel.KSMODEL(KₛModel[1:NiZ], KΨ_Obs₁₀ₖₚₐ[1:NiZ], KΨ_Sim₁₀ₖₚₐ[1:NiZ], hydro.Ks[1:NiZ], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[1:NiZ], hydro.θsMacMat[1:NiZ], hydro.σ[1:NiZ], option)
 
@@ -89,7 +89,7 @@ module startKsModel
 					ksmodelτ = STATISTICS_KSMODEL(ClassBool_All, hydro, 0, KₛModel, ksmodelτ, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, optimKsmodel, option)
 
 				# PLOTTING ALL SOILS
-				if option.ksModel.Plot_KsModel
+				if option.ksModel.Plot_KsModel &&  sum(optimKsmodel.NparamOpt) ≥ 1
 					NameSim = "All soils"
 					plot.ksmodel.KSMODEL(KₛModel[1:NiZ], KΨ_Obs₁₀ₖₚₐ[1:NiZ], KΨ_Sim₁₀ₖₚₐ[1:NiZ], hydro.Ks[1:NiZ], NameSim, path.plotSoilwater.Plot_KsModel, hydro.θr[1:NiZ], hydro.θs[1:NiZ], hydro.σ[1:NiZ], option)	
 				end

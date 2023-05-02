@@ -244,7 +244,7 @@ module lab
 		function KSMODEL_FUNCTIONS(Path, option, ksmodelτ, ipClass; τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τclay₀=ksmodelτ.τclay₀[ipClass],τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass],τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass])
 		
 			# DERIVING THE DATA TO PLOT
-				σ = 0.75:0.001:4.0
+				σ = 0.75:0.001:3.0
 				Nσ  = length(σ)
 
 				ΘsMacMatΘr =0.1:0.1:0.6
@@ -274,8 +274,7 @@ module lab
 
 						Clayₙ = max(Clay - X_Clay₁, 0.0) / (1.0 - X_Clay₁)
 
-						ΔθsMacθrₙ =  max(ΘsMacMatΘr[iΘsΘr] - τclayΔθsr , 0.0) / (1.0 - τclayΔθsr)
-
+						ΔθsMacθrₙ =  max(ΘsMacMatΘr[iΘsΘr] - τclayΔθsr , 0.0) 
 						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
 
 						Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5) 
@@ -301,7 +300,7 @@ module lab
 				# Labels size of colourbar
 					TickLabelSize = 35
 					TickSize      = 20
-					LabelSize     = 35
+					LabelSize     = 30
 			
 				# Colour map
 					ColourMap = :plasma # :thermal :plasma, :ice, :viridis, :plasma
@@ -311,7 +310,7 @@ module lab
 				Fig = Figure(font="Sans", fontsize=NumberSize)
 
 			# PLOTTING KsModel1	
-				Axis_KsModel1 = Axis(Fig[1,1], title="Not corrected for clay", width=Width, height=Height, xlabel=L"$σ [-]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, xminorticks=IntervalsBetween(10), yminorticksvisible=true, yminorticks=IntervalsBetween(10), yscale=Makie.pseudolog10)
+				Axis_KsModel1 = Axis(Fig[1,1], title="", width=Width, height=Height, xlabel=L"$σ [-]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, xminorticks=IntervalsBetween(10), yminorticksvisible=true, yminorticks=IntervalsBetween(10), yscale=Makie.pseudolog10)
 
 				Axis_KsModel1.yticks =  [0, 10^0, 10^1, 10^2, 10^3, 10^4] 
 
@@ -321,7 +320,7 @@ module lab
 				end
 
 			# PLOTTING KsModel2	
-				Axis_KsModel3 = Axis(Fig[2,1], title="Corrected for clay", width=Width, height=Height, xlabel=L"$σ [-]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, xminorticks=IntervalsBetween(10), yminorticksvisible=true, yminorticks=IntervalsBetween(10), yscale=Makie.pseudolog10)
+				Axis_KsModel3 = Axis(Fig[2,1], title="", width=Width, height=Height, xlabel=L"$σ [-]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, xminorticks=IntervalsBetween(10), yminorticksvisible=true, yminorticks=IntervalsBetween(10), yscale=Makie.pseudolog10)
 
 				Axis_KsModel3.yticks =  [0, 10^0, 10^1, 10^2, 10^3, 10^4] 
 
@@ -330,19 +329,18 @@ module lab
 					Fig_Model3 = lines!(Axis_KsModel3, σ[1:Nσ], Func_Ks3[iΘsΘr, 1:Nσ], linewidth=5, colormap =Colormap[iΘsΘr])
 				end
 				
-				Leg = Legend(Fig[1:2,2], Axis_KsModel1, "θₛ-θᵣ", framevisible=true, tellheight=true, tellwidth=true, labelsize=40, margin=(30, 30, 30, 30))
+				Leg = Legend(Fig[1:2,2], Axis_KsModel1, "θₛ-θᵣ", framevisible=true, tellheight=true, tellwidth=true, labelsize=LabelSize, margin=(30, 30, 30, 30))
 
 				# Letters
-					for (ax, label) in zip([Axis_KsModel1, Axis_KsModel3], ["(i)", "(ii)"])
+					for (ax, Label) in zip([Axis_KsModel1, Axis_KsModel3], ["(i)", "(ii)"])
 						text!(
-							ax, 0, 1,
-							text = label, 
+							ax, 3.0, 150,
+							text = Label, 
 							font = :bold,
-							align = (:left, :top),
-							offset = (4, -2),
-							space = :relative,
-							fontsize = TitleSize,
-							colour=:brown
+							align = (:right, :top),
+							# offset = (40, -2),
+							# space = :relative,
+							fontsize = 40,
 						)
 					end
 
@@ -364,10 +362,10 @@ module lab
 	# ------------------------------------------------------------------
 
 
-		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		#		FUNCTION : KSMODEL_TCLAY
-		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL_TCLAY(Path, option, ksmodelτ, ipClass; τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τclay₀=ksmodelτ.τclay₀[ipClass], τclayΔθsr=ksmodelτ.τclay₀[ipClass])
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : KSMODEL_TCLAY
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function KSMODEL_TCLAY(Path, option, ksmodelτ, ipClass; τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τclay₀=ksmodelτ.τclay₀[ipClass], τclayΔθsr=ksmodelτ. τclayΔθsr[ipClass])
 			# DERIVING THE DATA TO PLOT
 				Tclay_Min = 1.0
 				
@@ -387,7 +385,7 @@ module lab
 
 						Clayₙ = max(Clay[iClay] - X_Clay₁, 0.0) / (1.0 - X_Clay₁)
 
-						ΔθsMacθrₙ =  max(ΘsΘr[iΘsΘr] - τclayΔθsr , 0.0) / (1.0 - τclayΔθsr)
+						ΔθsMacθrₙ =  max(ΘsΘr[iΘsΘr] - τclayΔθsr , 0.0) 
 
 						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
 
@@ -428,7 +426,7 @@ module lab
 
 				Axis_Tclay.xticks = [0, 0.25, 0.5, 0.75, 1] 
 				xlims!(Axis_Tclay, 0, Clay[Nclay])
-				ylims!(Axis_Tclay, 10^-10, ΘsΘr[NΘsΘr] )
+				ylims!(Axis_Tclay, 10^-6, ΘsΘr[NΘsΘr] )
 
 				Fig_Tclay = empty
 				for iΘsΘr=1:NΘsΘr
