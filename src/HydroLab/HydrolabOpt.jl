@@ -31,13 +31,13 @@ module hydrolabOpt
 
 			# TEST IF EXIST Ψ=0  ~~~
 				if minimum(Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]) < eps(1000.0)
-					Flag_0sOpt = false
+					🎏_0sOpt = false
 				else
-					Flag_0sOpt = true
+					🎏_0sOpt = true
 				end
 
 			# CORRECTING θS  ~~~
-				if ("θs" ∈ optim.ParamOpt) && !Flag_0sOpt
+				if ("θs" ∈ optim.ParamOpt) && !🎏_0sOpt
 					hydro.θs_Min[iZ] = θobs_Max * 0.75
 					hydro.θs_Max[iZ] = θobs_Max * 1.1
 					hydro.Φ[iZ] = θobs_Max / param.hydro.Coeff_Φ_2_θs
@@ -47,7 +47,7 @@ module hydrolabOpt
 						optim.ParamOpt_Min[iθs] = hydro.θs_Min[iZ]
 						optim.ParamOpt_Max[iθs] = hydro.θs_Max[iZ]
 
-				elseif ("θs" ∉ optim.ParamOpt) && !Flag_0sOpt # <>=<>=<>=<>=<>
+				elseif ("θs" ∉ optim.ParamOpt) && !🎏_0sOpt # <>=<>=<>=<>=<>
 						hydro.θs[iZ] = θobs_Max
 						hydro.Φ[iZ] = hydro.θs[iZ] / param.hydro.Coeff_Φ_2_θs
 						
@@ -70,9 +70,9 @@ module hydrolabOpt
 			# CORRECTING Ks  ~~~
 				if option.data.Kθ
 					if minimum(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]) < eps(100.0)
-						Flag_KsOpt = false
+						🎏_KsOpt = false
 					else
-						Flag_KsOpt = true
+						🎏_KsOpt = true
 					end
 				end # if option.data.Kθ
 
@@ -80,15 +80,15 @@ module hydrolabOpt
 					# test if exist Ψ=0
 					if "Ks" ∈ optim.ParamOpt
 						if minimum(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]) < eps(100.0)
-							Flag_KsOpt = false
+							🎏_KsOpt = false
 						else
-							Flag_KsOpt = true
+							🎏_KsOpt = true
 						end
 					end # if "Ks" ∈ optim.ParamOpt
 
 					K_KΨobs_Max = maximum(K_KΨobs[iZ, 1:N_KΨobs[iZ]])
 
-					if Flag_KsOpt && ("Ks" ∈ optim.ParamOpt)
+					if 🎏_KsOpt && ("Ks" ∈ optim.ParamOpt)
 						hydro.Ks_Min[iZ] = K_KΨobs_Max # Greatest measure of Kunsat)
 
 						# Modifying the searchrange
@@ -96,7 +96,7 @@ module hydrolabOpt
 						optim.ParamOpt_Min[iKs] = hydro.Ks_Min[iZ]
 						optim.ParamOpt_Max[iKs] = max(optim.ParamOpt_Max[iKs], hydro.Ks_Min[iZ] + 0.01)
 
-					elseif !(Flag_KsOpt) && ("Ks" ∈ optim.ParamOpt)
+					elseif !(🎏_KsOpt) && ("Ks" ∈ optim.ParamOpt)
 						hydro.Ks_Max[iZ] = K_KΨobs_Max # Greatest measure of Kunsat
 
 						# Modifying the searchrange

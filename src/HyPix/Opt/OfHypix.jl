@@ -10,7 +10,7 @@ module ofHypix
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : WOF_θ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function WOF_θ(∑T, Nit::Int, Nz::Int, obsθ, paramHypix, Hpond, θ, θSim; Flag_WofDepth=false)
+			function WOF_θ(∑T, Nit::Int, Nz::Int, obsθ, paramHypix, Hpond, θ, θSim; 🎏_WofDepth=false)
 
 				θSim = interpolate.INTERPOLATE_2D_LOOP(∑T, obsθ.∑T[1:obsθ.Nit], Nit, Nz, θSim, θ)
 				
@@ -19,7 +19,7 @@ module ofHypix
 
 				for iZ=1:obsθ.Ndepth
 
-					if Flag_WofDepth
+					if 🎏_WofDepth
 						Wdepth = 2.0 * (Float64(obsθ.Ndepth) + 1.0 - Float64(iZ) ) / (Float64(obsθ.Ndepth) * (Float64(obsθ.Ndepth) + 1.0))
 					else
 						Wdepth = 1.0

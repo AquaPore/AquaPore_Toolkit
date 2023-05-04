@@ -11,7 +11,7 @@ module timeTransSteady
 		# FOR EVERY SOIL
 		for iZ=1:NiZ
 
-			Flag_Break = false
+			🎏_Break = false
 
 			# Want at least 3 remaining points
 				if N_Infilt[iZ] - N_LastInfiltPoint <= 3
@@ -45,9 +45,9 @@ module timeTransSteady
 						ΔSlope_Err = abs(∑Infilt_Model - ∑Infilt_Obs[iZ,iModel]) / (T[iZ,iModel+1]-T[iZ,iModel])
 						ΔSlope_Err = rad2deg(atan(abs(ΔSlope_Err)))
 					
-					if (ΔSlope_Err >= param.infilt.ΔSlope_Err_SteadyState || iModel<=3) && Flag_Break == false
+					if (ΔSlope_Err >= param.infilt.ΔSlope_Err_SteadyState || iModel<=3) && 🎏_Break == false
 
-						Flag_Break = true
+						🎏_Break = true
 
 						iModel = max(iModel - 1, 3)
 

@@ -34,7 +34,7 @@ module hypixStart
 
 				println("=== === === SITENAME=  ", ProjectHypix,"_", SiteName[iScenario], "  === === ===  \n")
 
-				∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑T_Qobs, ∑ΔQ_Obs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, Flag_θΨini, Flag_θΨini, Hpond, hydro_best, hydroHorizon, hydroHorizon_best, K_Aver_Vect, K_Aver₀_Vect, Layer, N_∑T_Climate, N_iRoot, N_Layer, N_SoilLayer, Nz, obsθ, optionHypix, paramHypix, pathInputHypix, pathOutputHypix, Pkₐᵥₑᵣ, Q, Residual, Temp, veg, veg_best, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest = readHypix.READ_START(dateHypix, Id, iScenario, N_Scenario, Path_Hypix, pathInputHypix, ProjectHypix, SiteName)
+				∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑T_Qobs, ∑ΔQ_Obs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, 🎏_θΨini, 🎏_θΨini, Hpond, hydro_best, hydroHorizon, hydroHorizon_best, K_Aver_Vect, K_Aver₀_Vect, Layer, N_∑T_Climate, N_iRoot, N_Layer, N_SoilLayer, Nz, obsθ, optionHypix, paramHypix, pathInputHypix, pathOutputHypix, Pkₐᵥₑᵣ, Q, Residual, Temp, veg, veg_best, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest = readHypix.READ_START(dateHypix, Id, iScenario, N_Scenario, Path_Hypix, pathInputHypix, ProjectHypix, SiteName)
 
 				# MEMORY FOR OUTPUT OF EVERY SCENARIO
 					if iScenario == 1
@@ -93,14 +93,14 @@ module hypixStart
 						end # INJECTING HYDRAULIC & VEGETATION PARAMETERS FROM OUTPUT
 					else
 						# options of optim		
-							optim = (NparamOpt=0, Flag_Opt=false)		
+							optim = (NparamOpt=0, 🎏_Opt=false)		
 					end # optionHypix.Optimisation
 
 					@simd for iZ=1:N_SoilLayer
 						hydroHorizon.So[iZ] = paramHypix.So # 1.0E-8
 					end
 
-					if !(optionHypix.opt.Optimisation) || optim.Flag_Opt == false
+					if !(optionHypix.opt.Optimisation) || optim.🎏_Opt == false
 						if optionHypix.HydroSmooth
 							hydro = hydroSmooth.HYDROHORIZON_2_HYDRO_SMOOTENING(discret, hydroHorizon, Layer, optionHypix)
 						else
@@ -110,12 +110,12 @@ module hypixStart
 						hydro = []
 					end
 
-					if optim.Flag_Opt
-						hydro, hydro_best, hydroHorizon, hydroHorizon_best, veg, veg_best, WofBest = hypixOpt.HYPIXOPTIMISATION_START(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, Flag_θΨini, Hpond, hydro_best, hydroHorizon, hydroHorizon_best, iOpt_Count, iScenario, K_Aver_Vect, K_Aver₀_Vect, Layer, N_∑T_Climate, N_iRoot, N_SoilLayer, Nz, obsθ, optim, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, veg_best, WofBest, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest)
+					if optim.🎏_Opt
+						hydro, hydro_best, hydroHorizon, hydroHorizon_best, veg, veg_best, WofBest = hypixOpt.HYPIXOPTIMISATION_START(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, 🎏_θΨini, Hpond, hydro_best, hydroHorizon, hydroHorizon_best, iOpt_Count, iScenario, K_Aver_Vect, K_Aver₀_Vect, Layer, N_∑T_Climate, N_iRoot, N_SoilLayer, Nz, obsθ, optim, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, veg_best, WofBest, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest)
 					end
 				
-					# if Flag_Opt then it will rerun with the optimal parameters
-					∑Pet, ∑PrThroughfall, ∑T, ∑T_Climate, clim, discret, Hpond, iNonConverge, IterCount, N_iRoot, Nit, Nz, Q, veg, ΔEvaporation, ΔRootDensity, ΔRunoff, ΔT, θ, Ψ = hypixModel.HYPIX_MODEL(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet_Climate, ∑Pet, ∑PrThroughfall_Climate, ∑PrThroughfall, ∑T_Climate, ∑T, clim, CropCoeficientᵀ_η, CropCoeficientᵀ, discret, Flag_θΨini, Hpond, hydro, iScenario, K_Aver_Vect, K_Aver₀_Vect, N_∑T_Climate, N_iRoot, Nz, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRunoff, ΔSink, ΔRootDensity, ΔT, θ, θini_or_Ψini, Ψ_Min, Ψ, Ψbest)
+					# if 🎏_Opt then it will rerun with the optimal parameters
+					∑Pet, ∑PrThroughfall, ∑T, ∑T_Climate, clim, discret, Hpond, iNonConverge, IterCount, N_iRoot, Nit, Nz, Q, veg, ΔEvaporation, ΔRootDensity, ΔRunoff, ΔT, θ, Ψ = hypixModel.HYPIX_MODEL(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet_Climate, ∑Pet, ∑PrThroughfall_Climate, ∑PrThroughfall, ∑T_Climate, ∑T, clim, CropCoeficientᵀ_η, CropCoeficientᵀ, discret, 🎏_θΨini, Hpond, hydro, iScenario, K_Aver_Vect, K_Aver₀_Vect, N_∑T_Climate, N_iRoot, Nz, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRunoff, ΔSink, ΔRootDensity, ΔT, θ, θini_or_Ψini, Ψ_Min, Ψ, Ψbest)
 
 					# WATER BALANCE
 					# Computed after the warmup period

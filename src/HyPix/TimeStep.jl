@@ -5,12 +5,12 @@ module timeStep
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    #		FUNCTION :  TIMESTEP
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function TIMESTEP(∑T::Vector{Float64}, discret, Flag_ReRun::Bool, hydro, iT::Int64, iTer::Int64, N_∑T_Climate::Float64, Nz::Int64, optionHypix, paramHypix, Q::Matrix{Float64}, ΔLnΨmax::Vector{Float64}, ΔSink::Matrix{Float64}, ΔT::Vector{Float64}, θ::Matrix{Float64}, Ψ::Matrix{Float64})
+		function TIMESTEP(∑T::Vector{Float64}, discret, 🎏_ReRun::Bool, hydro, iT::Int64, iTer::Int64, N_∑T_Climate::Float64, Nz::Int64, optionHypix, paramHypix, Q::Matrix{Float64}, ΔLnΨmax::Vector{Float64}, ΔSink::Matrix{Float64}, ΔT::Vector{Float64}, θ::Matrix{Float64}, Ψ::Matrix{Float64})
 
 			Δθ_Max = paramHypix.Δθ_Max
 
 			# The iT is of the previous simulation
-			if !Flag_ReRun # <>=<>=<>=<>=<>	
+			if !🎏_ReRun # <>=<>=<>=<>=<>	
 				ΔT₂, Δθ_Max = ADAPTIVE_TIMESTEP(discret, hydro, iT, Nz, optionHypix, paramHypix, Q, ΔLnΨmax, ΔSink, ΔT, θ, Ψ)
 				iT += 1 # Going to the next simulation
 				ΔT[iT] = ΔT₂
@@ -20,18 +20,18 @@ module timeStep
 			if N_∑T_Climate - (∑T[iT-1] + ΔT[iT]) <= 0.00001
 				if N_∑T_Climate - ∑T[iT-1] < 0.00001
 					ΔT[iT] = eps()
-					FlagContinueLoop = false
+					🎏ContinueLoop = false
 				else # New time step
 					ΔT[iT] = N_∑T_Climate - ∑T[iT-1]
 					∑T[iT] = ∑T[iT-1] + ΔT[iT]
-					FlagContinueLoop = true
+					🎏ContinueLoop = true
 				end
 			else # Not at the last time step: N_∑T_Climate - (∑T[iT] + ΔT) > 0.0
 				∑T[iT] = ∑T[iT-1] + ΔT[iT]
-				FlagContinueLoop = true
+				🎏ContinueLoop = true
 			end #  N_∑T_Climate - (∑T[iT] + ΔT) < 0.0
 
-		return ∑T, FlagContinueLoop, iT, ΔT, Δθ_Max
+		return ∑T, 🎏ContinueLoop, iT, ΔT, Δθ_Max
 		end # TIMESTEP()
       
 
@@ -77,12 +77,12 @@ module timeStep
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : ADAPTIVE_TIMESTEP
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ADAPTIVE_TIMESTEP(discret, hydro, iT::Int64, Nz::Int64, optionHypix, paramHypix, Q, ΔLnΨmax, ΔSink, ΔT, θ, Ψ; Flag_NoConverge=false, Power=2.0)
+		function ADAPTIVE_TIMESTEP(discret, hydro, iT::Int64, Nz::Int64, optionHypix, paramHypix, Q, ΔLnΨmax, ΔSink, ΔT, θ, Ψ; 🎏_NoConverge=false, Power=2.0)
 	
 			# Initializing
 				Δθ₂_Max = paramHypix.Δθ_Max
 
-				if Flag_NoConverge
+				if 🎏_NoConverge
 					ΔT_New = Inf::Float64
 				else
 					ΔT_New = 0.0::Float64
@@ -102,7 +102,7 @@ module timeStep
 							ΔT₂_New = (discret.ΔZ[iZ] * Δθ₂_Max + ΔSink[iT,iZ]) / (abs(Q[iT,iZ] - Q[iT,iZ+1]) + eps())
 						end
 
-						if Flag_NoConverge
+						if 🎏_NoConverge
 							ΔT_New = min(ΔT_New, min(max(paramHypix.ΔT_Min, ΔT₂_New), paramHypix.ΔT_Max))
 						else
 							# ΔT_New += min(max(paramHypix.ΔT_Min, ΔT₂_New), paramHypix.ΔT_Max)
@@ -115,7 +115,7 @@ module timeStep
 
 		# Averaging	
 			if Ngood ≥ 1
-				if !(Flag_NoConverge)
+				if !(🎏_NoConverge)
 					# ΔT₂_New = ΔT_New / Float64(Ngood)
 					# ΔT_New = √(ΔT_New / Float64(Ngood))
 					ΔT_New = (ΔT_New / Float64(Ngood)) ^ inv(Power)
@@ -125,7 +125,7 @@ module timeStep
 			end
 
 		# Smootening
-			if ΔT_New > ΔT[max(iT-1,1)] && !(Flag_NoConverge)
+			if ΔT_New > ΔT[max(iT-1,1)] && !(🎏_NoConverge)
 				W = 0.6 
 				ΔT_New = W * ΔT_New + (1.0 - W) * ΔT[max(iT-1,1)]
 			end

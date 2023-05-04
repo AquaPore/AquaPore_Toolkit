@@ -11,7 +11,7 @@ module hypixModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : HYPIX_MODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function HYPIX_MODEL(∂K∂Ψ::Vector{Float64}, ∂R∂Ψ::Vector{Float64}, ∂R∂Ψ△::Vector{Float64}, ∂R∂Ψ▽::Vector{Float64}, ∑Pet_Climate::Vector{Float64}, ∑Pet::Vector{Float64}, ∑PrThroughfall_Climate::Vector{Float64}, ∑PrThroughfall::Vector{Float64}, ∑T_Climate::Vector{Float64}, ∑T::Vector{Float64}, clim, CropCoeficientᵀ_η::Vector{Float64}, CropCoeficientᵀ::Vector{Float64}, discret, Flag_θΨini::Symbol, Hpond::Vector{Float64}, hydro, iScenario::Int64, K_Aver_Vect::Vector{Float64}, K_Aver₀_Vect::Vector{Float64}, N_∑T_Climate::Int64, N_iRoot::Int64, Nz::Int64, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ::Vector{Float64}, Q::Matrix{Float64}, Residual::Vector{Float64}, veg, Z::Vector{Float64}, ΔEvaporation::Vector{Float64}, ΔLnΨmax::Vector{Float64}, ΔPet::Vector{Float64}, ΔPrThroughfall::Vector{Float64}, ΔRunoff::Vector{Float64}, ΔSink::Matrix{Float64}, ΔRootDensity, ΔT::Vector{Float64}, θ::Matrix{Float64}, θini_or_Ψini::Vector{Float64}, Ψ_Min::Vector{Float64}, Ψ::Matrix{Float64}, Ψbest::Vector{Float64})
+	function HYPIX_MODEL(∂K∂Ψ::Vector{Float64}, ∂R∂Ψ::Vector{Float64}, ∂R∂Ψ△::Vector{Float64}, ∂R∂Ψ▽::Vector{Float64}, ∑Pet_Climate::Vector{Float64}, ∑Pet::Vector{Float64}, ∑PrThroughfall_Climate::Vector{Float64}, ∑PrThroughfall::Vector{Float64}, ∑T_Climate::Vector{Float64}, ∑T::Vector{Float64}, clim, CropCoeficientᵀ_η::Vector{Float64}, CropCoeficientᵀ::Vector{Float64}, discret, 🎏_θΨini::Symbol, Hpond::Vector{Float64}, hydro, iScenario::Int64, K_Aver_Vect::Vector{Float64}, K_Aver₀_Vect::Vector{Float64}, N_∑T_Climate::Int64, N_iRoot::Int64, Nz::Int64, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ::Vector{Float64}, Q::Matrix{Float64}, Residual::Vector{Float64}, veg, Z::Vector{Float64}, ΔEvaporation::Vector{Float64}, ΔLnΨmax::Vector{Float64}, ΔPet::Vector{Float64}, ΔPrThroughfall::Vector{Float64}, ΔRunoff::Vector{Float64}, ΔSink::Matrix{Float64}, ΔRootDensity, ΔT::Vector{Float64}, θ::Matrix{Float64}, θini_or_Ψini::Vector{Float64}, Ψ_Min::Vector{Float64}, Ψ::Matrix{Float64}, Ψbest::Vector{Float64})
 
 		# VEGETATION PARAMETERS WHICH VARY WITH TIME
 
@@ -60,8 +60,8 @@ module hypixModel
 			ΔLnΨmax = timeStep.ΔΨMAX!(hydro, Nz, optionHypix, paramHypix, ΔLnΨmax)
 
 		# FIRST TIME STEP
-         Flag_NoConverge         = false::Bool
-         Flag_ReRun              = false::Bool
+         🎏_NoConverge         = false::Bool
+         🎏_ReRun              = false::Bool
          IterCount               = 0::Int64
          iTer                    = 10
          iNonConverge            = 0::Int64
@@ -80,13 +80,13 @@ module hypixModel
          iCount_ReRun            = 1::Int64
 			
 		# Boundary conditions
-			if Flag_θΨini == :θini
+			if 🎏_θΨini == :θini
 				for iZ = 1:Nz
                θ[1,iZ] = max( min(hydro.θs[iZ] * 0.9, θini_or_Ψini[iZ]), min(hydro.θr[iZ] * 1.1, hydro.θs[iZ] * 0.9) ) # Just in case
                Ψ[1,iZ] = θ_2_ΨDual(optionHypix, θ[1,iZ], iZ, hydro)
 				end
 
-			elseif Flag_θΨini == :Ψini
+			elseif 🎏_θΨini == :Ψini
 				for iZ = 1:Nz
                Ψ[1,iZ] = θini_or_Ψini[iZ]
                θ[1,iZ] = Ψ_2_θDual(optionHypix, Ψ[1,iZ], iZ, hydro)
@@ -112,19 +112,19 @@ module hypixModel
 		# =+=+=+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+==+=+=+=+=+=+
 		while true # this controles the time loop
 			# INCREASING OR DECREASING THE TIME STEP
-				∑T, FlagContinueLoop, iT, ΔT, Δθ_Max = timeStep.TIMESTEP(∑T, discret, Flag_ReRun, hydro, iT, iTer, Float64(N_∑T_Climate), Nz, optionHypix, paramHypix, Q, ΔLnΨmax, ΔSink, ΔT, θ, Ψ)
+				∑T, 🎏ContinueLoop, iT, ΔT, Δθ_Max = timeStep.TIMESTEP(∑T, discret, 🎏_ReRun, hydro, iT, iTer, Float64(N_∑T_Climate), Nz, optionHypix, paramHypix, Q, ΔLnΨmax, ΔSink, ΔT, θ, Ψ)
 
-				if FlagContinueLoop == false
+				if 🎏ContinueLoop == false
 					iT = iT - 1
 					break # End of simulation
 				end
 
 			# DERIVING FORCING DATA ΔPrThroughfall & ΔPet:
-				∑PrThroughfall[iT], ΔPrThroughfall[iT], iT_Pr = interpolate.∑_2_Δ(∑PrThroughfall[iT-1], ∑PrThroughfall_Climate, ∑T, ∑T_Climate, iT_Pr, clim.N_Climate, Flag_ReRun, iT)
+				∑PrThroughfall[iT], ΔPrThroughfall[iT], iT_Pr = interpolate.∑_2_Δ(∑PrThroughfall[iT-1], ∑PrThroughfall_Climate, ∑T, ∑T_Climate, iT_Pr, clim.N_Climate, 🎏_ReRun, iT)
 
 			# POTENTIAL EVAPOTRANSPIRATION
 				if optionHypix.RootWaterUptake || optionHypix.Evaporation
-					∑Pet[iT], ΔPet[iT], iT_Pet = interpolate.∑_2_Δ(∑Pet[iT-1], ∑Pet_Climate, ∑T, ∑T_Climate, iT_Pet, clim.N_Climate, Flag_ReRun, iT)
+					∑Pet[iT], ΔPet[iT], iT_Pet = interpolate.∑_2_Δ(∑Pet[iT-1], ∑Pet_Climate, ∑T, ∑T_Climate, iT_Pet, clim.N_Climate, 🎏_ReRun, iT)
 				end # optionHypix.RootWaterUptake || optionHypix.Evaporation
 
 				if optionHypix.Evaporation						
@@ -158,7 +158,7 @@ module hypixModel
 				Sorptivity = sorptivity.SORPTIVITY(θ[iT-1, 1], 1, hydro, optionHypix, optionHypix; Rtol = 10^-3.0, SorptivityModelScaled=false)
 
 			# SOLVING THE EXPLICIT RICHARDS
-			Flag_NoConverge, Flag_ReRun, Hpond, iCount_ReRun, iNonConverge, iTer, IterCount, Q, ΔRunoff, ΔT, θ, Ψ = richard.RICHARD_ITERATION(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, discret, Flag_NoConverge, Hpond, hydro, iCount_ReRun, iNonConverge, iT, IterCount, K_Aver_Vect, K_Aver₀_Vect, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, Residual, Sorptivity, ΔLnΨmax, ΔPrThroughfall, ΔRunoff, ΔSink, ΔT, θ, Ψ_Max, Ψ_Min, Ψ, Ψbest)
+			🎏_NoConverge, 🎏_ReRun, Hpond, iCount_ReRun, iNonConverge, iTer, IterCount, Q, ΔRunoff, ΔT, θ, Ψ = richard.RICHARD_ITERATION(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, discret, 🎏_NoConverge, Hpond, hydro, iCount_ReRun, iNonConverge, iT, IterCount, K_Aver_Vect, K_Aver₀_Vect, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, Residual, Sorptivity, ΔLnΨmax, ΔPrThroughfall, ΔRunoff, ΔSink, ΔT, θ, Ψ_Max, Ψ_Min, Ψ, Ψbest)
 				
 			# SPECIAL BOUNDARY CONDITIONS
 				if optionHypix.TopBoundary⍰ == "Ψ"

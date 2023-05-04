@@ -12,7 +12,7 @@ module richard
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : RICHARD_ITERATION
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function RICHARD_ITERATION(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, discret, Flag_NoConverge::Bool, Hpond::Vector{Float64}, hydro, iCount_ReRun::Int64, iNonConverge::Int64, iT::Int64, IterCount::Int64, K_Aver_Vect::Vector{Float64}, K_Aver₀_Vect::Vector{Float64}, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ::Vector{Float64}, Q, Residual, Sorptivity::Float64, ΔLnΨmax::Vector{Float64}, ΔPrThroughfall::Vector{Float64}, ΔRunoff::Vector{Float64}, ΔSink::Matrix{Float64}, ΔT, θ::Matrix{Float64}, Ψ_Max::Float64, Ψ_Min::Vector{Float64}, Ψ::Matrix{Float64}, Ψbest::Vector{Float64})
+		function RICHARD_ITERATION(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, discret, 🎏_NoConverge::Bool, Hpond::Vector{Float64}, hydro, iCount_ReRun::Int64, iNonConverge::Int64, iT::Int64, IterCount::Int64, K_Aver_Vect::Vector{Float64}, K_Aver₀_Vect::Vector{Float64}, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ::Vector{Float64}, Q, Residual, Sorptivity::Float64, ΔLnΨmax::Vector{Float64}, ΔPrThroughfall::Vector{Float64}, ΔRunoff::Vector{Float64}, ΔSink::Matrix{Float64}, ΔT, θ::Matrix{Float64}, Ψ_Max::Float64, Ψ_Min::Vector{Float64}, Ψ::Matrix{Float64}, Ψbest::Vector{Float64})
 						
 			# INITIALIZING
 			 @simd for iZ = 1:Nz
@@ -28,7 +28,7 @@ module richard
             IterCount += 1 # Counting the iterations
 
 				# RESIDUAL MAX BEST: Deriving the Residual max because may be Ψ[iT-1,iZ] is the best solution
-				∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, Hpond, Q, Residual, ΔPr_Soil, θ = richard.RICHARD(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, discret, Flag_NoConverge, Hpond, hydro, iT, K_Aver_Vect, K_Aver₀_Vect, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, Residual, Sorptivity, ΔPrThroughfall, ΔRunoff, ΔSink, ΔT, θ, Ψ, Ψ_Max)
+				∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, Hpond, Q, Residual, ΔPr_Soil, θ = richard.RICHARD(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, discret, 🎏_NoConverge, Hpond, hydro, iT, K_Aver_Vect, K_Aver₀_Vect, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, Residual, Sorptivity, ΔPrThroughfall, ΔRunoff, ΔSink, ΔT, θ, Ψ, Ψ_Max)
 
 				# Computing Residual_Max_Best at the beginning before iteration
 				if iTer == 1
@@ -60,14 +60,14 @@ module richard
 			# Making sure we get the best if convergence fails
 			# No convergence
 			if iTer == paramHypix.N_Iter
-				Flag_NoConverge = true
+				🎏_NoConverge = true
 
 				# Put the best values
 				@simd for iZ=1:Nz
 					Ψ[iT,iZ] = Ψbest[iZ]
 				end
 			else
-				Flag_NoConverge = false
+				🎏_NoConverge = false
 			end #  iTer == paramHypix.N_Iter
 
 			# UPDATE Θ
@@ -76,9 +76,9 @@ module richard
 			end
 
 			# Determine if the simulation is going to rerun with a different time step
-			Flag_ReRun, iCount_ReRun, iNonConverge, ΔT = RERUN_HYPIX(discret, Flag_NoConverge, Hpond, hydro, iCount_ReRun, iNonConverge, iT, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, ΔLnΨmax, ΔPrThroughfall, ΔPr_Soil, ΔSink, ΔT, θ, Ψ)
+			🎏_ReRun, iCount_ReRun, iNonConverge, ΔT = RERUN_HYPIX(discret, 🎏_NoConverge, Hpond, hydro, iCount_ReRun, iNonConverge, iT, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, ΔLnΨmax, ΔPrThroughfall, ΔPr_Soil, ΔSink, ΔT, θ, Ψ)
 
-		return Flag_NoConverge, Flag_ReRun, Hpond, iCount_ReRun, iNonConverge, iTer, IterCount, Q, ΔRunoff, ΔT, θ, Ψ
+		return 🎏_NoConverge, 🎏_ReRun, Hpond, iCount_ReRun, iNonConverge, iTer, IterCount, Q, ΔRunoff, ΔT, θ, Ψ
 		end  # function: RICHARD_SOLVING
 	#----------------------------------------------------------]-------
 
@@ -86,7 +86,7 @@ module richard
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : RICHARD
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function RICHARD(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, discret, Flag_NoConverge::Bool, Hpond, hydro, iT::Int64, K_Aver_Vect, K_Aver₀_Vect, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, Residual, Sorptivity, ΔPrThroughfall, ΔRunoff, ΔSink, ΔT, θ, Ψ, Ψ_Max)
+		function RICHARD(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, discret, 🎏_NoConverge::Bool, Hpond, hydro, iT::Int64, K_Aver_Vect, K_Aver₀_Vect, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, Residual, Sorptivity, ΔPrThroughfall, ΔRunoff, ΔSink, ΔT, θ, Ψ, Ψ_Max)
 		
 			Hpond, ΔPr_Soil, ΔRunoff = ponding.PONDING_RUNOFF_SORPTIVITY(discret, Hpond, hydro, iT, optionHypix, paramHypix, Sorptivity, ΔPrThroughfall, ΔRunoff, ΔSink, ΔT, θ, Ψ)
 		
@@ -108,11 +108,11 @@ module richard
 				if !(optionHypix.∂R∂Ψ_NumericalAuto)
 					∂R∂Ψ[iZ], ∂R∂Ψ△[iZ], ∂R∂Ψ▽[iZ] = residual.∂RESIDUAL∂Ψ(∂K∂Ψ, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, K_Aver_Vect, K_Aver₀_Vect, ΔT, θ, Ψ)
 				else
-					∂R∂Ψ[iZ] = residual.∂R∂Ψ_FORWARDDIFF(Flag_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ[iT, max(iZ-1,1)], Ψ[iT-1, iZ], Ψ[iT-1,iZ], Ψ[iT-1,max(iZ-1,1)], Ψ[iT-1, min(iZ+1,Nz)], Ψ[iT,iZ], Ψ[iT, min(iZ+1,Nz)], Ψ_Max)
+					∂R∂Ψ[iZ] = residual.∂R∂Ψ_FORWARDDIFF(🎏_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ[iT, max(iZ-1,1)], Ψ[iT-1, iZ], Ψ[iT-1,iZ], Ψ[iT-1,max(iZ-1,1)], Ψ[iT-1, min(iZ+1,Nz)], Ψ[iT,iZ], Ψ[iT, min(iZ+1,Nz)], Ψ_Max)
 
-					∂R∂Ψ▽[iZ]  = residual.∂R∂Ψ▽_FORWARDDIFF(Flag_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ[iT, max(iZ-1,1)], Ψ[iT-1, iZ], Ψ[iT-1,iZ], Ψ[iT-1,max(iZ-1,1)], Ψ[iT-1, min(iZ+1,Nz)], Ψ[iT,iZ], Ψ[iT, min(iZ+1,Nz)], Ψ_Max)
+					∂R∂Ψ▽[iZ]  = residual.∂R∂Ψ▽_FORWARDDIFF(🎏_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ[iT, max(iZ-1,1)], Ψ[iT-1, iZ], Ψ[iT-1,iZ], Ψ[iT-1,max(iZ-1,1)], Ψ[iT-1, min(iZ+1,Nz)], Ψ[iT,iZ], Ψ[iT, min(iZ+1,Nz)], Ψ_Max)
 		
-					∂R∂Ψ△[iZ]  = residual.∂R∂Ψ△_FORWARDDIFF(Flag_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ[iT, max(iZ-1,1)], Ψ[iT-1, iZ], Ψ[iT-1,iZ], Ψ[iT-1,max(iZ-1,1)], Ψ[iT-1, min(iZ+1,Nz)], Ψ[iT,iZ], Ψ[iT, min(iZ+1,Nz)], Ψ_Max)
+					∂R∂Ψ△[iZ]  = residual.∂R∂Ψ△_FORWARDDIFF(🎏_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ[iT, max(iZ-1,1)], Ψ[iT-1, iZ], Ψ[iT-1,iZ], Ψ[iT-1,max(iZ-1,1)], Ψ[iT-1, min(iZ+1,Nz)], Ψ[iT,iZ], Ψ[iT, min(iZ+1,Nz)], Ψ_Max)
 					
 				end # if optionHypix.∂R∂Ψ_NumericalAuto"
 			end #for iZ= 1:Nz
@@ -143,16 +143,16 @@ module richard
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function ΨMIN(iT::Int64, Nz::Int64, paramHypix, Ψ::Matrix{Float64}, Ψ_Min::Vector{Float64})
 
-			Flag_Ψsmall = false
+			🎏_Ψsmall = false
 			for iZ=1:Nz
 				if Ψ[iT-1,iZ] < paramHypix.opt.ΨmacMat / 2.0 # mm
-					Flag_Ψsmall = true
+					🎏_Ψsmall = true
 					break
 				end
 			end
 
 			@simd for iZ=1:Nz
-				if Flag_Ψsmall
+				if 🎏_Ψsmall
 					Ψ_Min[iZ] = paramHypix.Ψ_MinMin
 				else
 					Ψ_Min[iZ] = 0.0::Float64
@@ -282,33 +282,33 @@ module richard
 	# 		WITH UPDATED Ψ
 	#     Rerun if updated ΔT is smaller compared to previously Ψ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function RERUN_HYPIX(discret, Flag_NoConverge::Bool, Hpond::Vector{Float64}, hydro, iCount_ReRun::Int64, iNonConverge::Int64, iT::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q::Matrix{Float64}, ΔLnΨmax::Vector{Float64}, ΔPrThroughfall::Vector{Float64},  ΔPr_Soil, ΔSink::Matrix{Float64}, ΔT::Vector{Float64}, θ::Matrix{Float64}, Ψ::Matrix{Float64})
+		function RERUN_HYPIX(discret, 🎏_NoConverge::Bool, Hpond::Vector{Float64}, hydro, iCount_ReRun::Int64, iNonConverge::Int64, iT::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q::Matrix{Float64}, ΔLnΨmax::Vector{Float64}, ΔPrThroughfall::Vector{Float64},  ΔPr_Soil, ΔSink::Matrix{Float64}, ΔT::Vector{Float64}, θ::Matrix{Float64}, Ψ::Matrix{Float64})
 
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-				function COMPUTE_ΔT(discret, Flag_NoConverge::Bool, Hpond::Vector{Float64}, hydro, iT::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ::Vector{Float64}, Q::Matrix{Float64}, ΔLnΨmax::Vector{Float64}, ΔPr_Soil::Float64, ΔPrThroughfall::Vector{Float64}, ΔSink::Matrix{Float64}, ΔT::Vector{Float64}, θ::Matrix{Float64}, Ψ::Matrix{Float64})
+				function COMPUTE_ΔT(discret, 🎏_NoConverge::Bool, Hpond::Vector{Float64}, hydro, iT::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ::Vector{Float64}, Q::Matrix{Float64}, ΔLnΨmax::Vector{Float64}, ΔPr_Soil::Float64, ΔPrThroughfall::Vector{Float64}, ΔSink::Matrix{Float64}, ΔT::Vector{Float64}, θ::Matrix{Float64}, Ψ::Matrix{Float64})
 
 					Q[iT,1] = flux.Q!(optionHypix, discret, hydro, 1, iT, Nz, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ[iT,1], Ψ[iT,1])
 					for iZ=1:Nz
 						Q[iT,iZ+1] = flux.Q!(optionHypix, discret, hydro, iZ+1, iT, Nz, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ[iT, min(iZ+1, Nz)], Ψ[iT,iZ])
 					end
 
-					ΔT_New, ~ = timeStep.ADAPTIVE_TIMESTEP(discret, hydro, iT, Nz, optionHypix, paramHypix, Q, ΔLnΨmax, ΔSink, ΔT, θ, Ψ; Flag_NoConverge=Flag_NoConverge)
+					ΔT_New, ~ = timeStep.ADAPTIVE_TIMESTEP(discret, hydro, iT, Nz, optionHypix, paramHypix, Q, ΔLnΨmax, ΔSink, ΔT, θ, Ψ; 🎏_NoConverge=🎏_NoConverge)
 				return ΔT_New
 				end  # function: COMPUTE_ΔT  
 			# ------------------------------------------------------------------
 
 			if iCount_ReRun ≤ 3 
-				if Flag_NoConverge
+				if 🎏_NoConverge
 				   # We cannot decrease time step further
 					if  ΔT[iT] ≤ paramHypix.ΔT_Min + 4.0 
-						Flag_ReRun    = false
+						🎏_ReRun    = false
 						iCount_ReRun  = 1
 					
 					elseif iCount_ReRun == 1
 						# Re compute ΔT by taking the smallest ΔT value of the whole prifile
-						ΔT[iT] = COMPUTE_ΔT(discret, Flag_NoConverge, Hpond, hydro, iT, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, ΔLnΨmax, ΔPr_Soil, ΔPrThroughfall, ΔSink, ΔT, θ, Ψ)
+						ΔT[iT] = COMPUTE_ΔT(discret, 🎏_NoConverge, Hpond, hydro, iT, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, ΔLnΨmax, ΔPr_Soil, ΔPrThroughfall, ΔSink, ΔT, θ, Ψ)
 						
-                  Flag_ReRun     = true
+                  🎏_ReRun     = true
                   iCount_ReRun   += 1
 
 					# We can decrease the ΔT
@@ -316,11 +316,11 @@ module richard
 						# ΔT[iT] = paramHypix.ΔT_Min + 0.45 * max(ΔT[iT] - paramHypix.ΔT_Min, 0.0)
 						ΔT[iT] = max(0.4 * ΔT[iT], paramHypix.ΔT_Min)
 						
-						Flag_ReRun     = true
+						🎏_ReRun     = true
 						iCount_ReRun   += 1
 					end	
 					
-				else # Flag_NoConverge
+				else # 🎏_NoConverge
 					Δθerror = 0.0
 					for  iZ=1:Nz
 						ΔθMax = timeStep.ΔθMAX(hydro, iT, iZ, optionHypix, ΔLnΨmax, Ψ)
@@ -329,31 +329,31 @@ module richard
 					Δθerror  = √(Δθerror / Float64(Nz))
 
 					if Δθerror > 1.0 
-						ΔTₒ = COMPUTE_ΔT(discret, Flag_NoConverge, Hpond, hydro, iT, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, ΔLnΨmax, ΔPr_Soil, ΔPrThroughfall, ΔSink, ΔT, θ, Ψ)
+						ΔTₒ = COMPUTE_ΔT(discret, 🎏_NoConverge, Hpond, hydro, iT, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, ΔLnΨmax, ΔPr_Soil, ΔPrThroughfall, ΔSink, ΔT, θ, Ψ)
 		
 						if ΔTₒ < paramHypix.ΔT_MaxChange * ΔT[iT] 
-							Flag_ReRun     = true
+							🎏_ReRun     = true
 							ΔT[iT]         = ΔTₒ
 							iCount_ReRun  += 1	
 						else # <>=<>=<>=<>=<>
-							Flag_ReRun   = false
+							🎏_ReRun   = false
 							iCount_ReRun = 1
 						end
 					else # Δθerror > 1.0 
-						Flag_ReRun   = false
+						🎏_ReRun   = false
 						iCount_ReRun = 1
 					end # Δθerror > 1.0 
-				end # Flag_NoConverge
+				end # 🎏_NoConverge
 			else # if iCount_ReRun ≤ 3
-				Flag_ReRun = false
+				🎏_ReRun = false
 				iCount_ReRun = 1
-				if Flag_NoConverge
+				if 🎏_NoConverge
 					iNonConverge += 1
 					# println(iNonConverge)
 				end
 			end  # if iCount_ReRun ≤ 2
 
-		return Flag_ReRun, iCount_ReRun, iNonConverge, ΔT
+		return 🎏_ReRun, iCount_ReRun, iNonConverge, ΔT
 		end  # function: RERUN_HYPIX
 	# ------------------------------------------------------------------
 

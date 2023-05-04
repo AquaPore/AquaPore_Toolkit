@@ -39,11 +39,11 @@ module readHypix
             if optionHypix.Discretisation_File_Auto⍰ == "Auto"
 
                # Read SoilLayer, could be either θini, Ψini
-                  Flag_θΨini, Layer, N_SoilLayer, ~, Zlayer, θini_or_Ψini = readHypix.DISCRETISATION(pathInputHypix.SoilLayer[iScenario])
+                  🎏_θΨini, Layer, N_SoilLayer, ~, Zlayer, θini_or_Ψini = readHypix.DISCRETISATION(pathInputHypix.SoilLayer[iScenario])
 
                # Option smoothening hydraulic parameters
                   if optionHypix.HydroSmooth
-                     Layer, N_Layer, Zlayer, θini_or_Ψini = hydroSmooth.DISCRETISATION_SMOOTENING!(Flag_θΨini, iScenario, N_SoilLayer, optionHypix, paramHypix, pathInputHypix, Zlayer, θini_or_Ψini)
+                     Layer, N_Layer, Zlayer, θini_or_Ψini = hydroSmooth.DISCRETISATION_SMOOTENING!(🎏_θΨini, iScenario, N_SoilLayer, optionHypix, paramHypix, pathInputHypix, Zlayer, θini_or_Ψini)
                   else
                      N_Layer = copy(N_SoilLayer)
                   end
@@ -55,10 +55,10 @@ module readHypix
                   Layer, Nz, Z, θini_or_Ψini = readHypix.DISCRETISATION_REDUCED(Layer, Nz, Z, θini_or_Ψini)
                end
 
-               tableHypix.DISCRETISATION_AUTO(Flag_θΨini, Layer, pathInputHypix.Discretisation[iScenario], Z, θini_or_Ψini)
+               tableHypix.DISCRETISATION_AUTO(🎏_θΨini, Layer, pathInputHypix.Discretisation[iScenario], Z, θini_or_Ψini)
             else
                # Read discretisation
-               Flag_θΨini, Layer, N_SoilLayer, Nz, Z, θini_or_Ψini = readHypix.DISCRETISATION(pathInputHypix.Discretisation[iScenario])
+               🎏_θΨini, Layer, N_SoilLayer, Nz, Z, θini_or_Ψini = readHypix.DISCRETISATION(pathInputHypix.Discretisation[iScenario])
                N_Layer = copy(N_SoilLayer)
             end # if optionHypix.Discretisation_File_Auto⍰ == "Auto" 
 
@@ -123,9 +123,9 @@ module readHypix
                hydroHorizon = []      
             end # optionHypix.Optimisation
 
-            # if Flag_ImpermeableLayer
+            # if 🎏_ImpermeableLayer
             #    hydro.Ks[Nz] = 1.15741E-05 #[mm s-1]  
-            # end  # if: Flag_ImpermeableLayer
+            # end  # if: 🎏_ImpermeableLayer
 
 
          # OPTIONAL DATA
@@ -159,7 +159,7 @@ module readHypix
          # MEMORY 
             ∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑PrThroughfall, ∑T, CropCoeficientᵀ, Hpond, K_Aver_Vect, K_Aver₀_Vect, Pkₐᵥₑᵣ, Q, Residual, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRunoff, ΔSink, ΔT, θ, θSim, Ψ, Ψ_Min, Ψbest = memory.MEMORY(clim, N_∑T_Climate, Nz, obsθ, optionHypix, paramHypix)
          
-   return ∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑T_Qobs, ∑ΔQ_Obs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, Flag_θΨini, Flag_θΨini, Hpond, hydro_best, hydroHorizon, hydroHorizon_best, K_Aver_Vect, K_Aver₀_Vect, Layer, N_∑T_Climate, N_iRoot, N_Layer, N_SoilLayer, Nz, obsθ, optionHypix, paramHypix, pathInputHypix, pathOutputHypix, Pkₐᵥₑᵣ, Q, Residual, Temp, veg, veg_best, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest
+   return ∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑T_Qobs, ∑ΔQ_Obs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, 🎏_θΨini, 🎏_θΨini, Hpond, hydro_best, hydroHorizon, hydroHorizon_best, K_Aver_Vect, K_Aver₀_Vect, Layer, N_∑T_Climate, N_iRoot, N_Layer, N_SoilLayer, Nz, obsθ, optionHypix, paramHypix, pathInputHypix, pathOutputHypix, Pkₐᵥₑᵣ, Q, Residual, Temp, veg, veg_best, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest
    end  # function: READ_START
    # ------------------------------------------------------------------
 
@@ -181,16 +181,16 @@ module readHypix
          # Depending on the initial boundary condition 
             if "θini" ∈ Header
                θini_or_Ψini = convert(Vector{Float64}, Tables.getcolumn(Data, :θini))
-               Flag_θΨini = :θini 
+               🎏_θΨini = :θini 
 
             elseif "Ψini" ∈ Header
                θini_or_Ψini = convert(Vector{Float64}, Tables.getcolumn(Data, :Ψini))
-               Flag_θΨini = :Ψini
+               🎏_θΨini = :Ψini
 
             else
                error("In $Path cannot find <θini> or <Ψini> in $Header")
             end
-      return Flag_θΨini, Layer, N_SoilLayer, Nz, Z, θini_or_Ψini
+      return 🎏_θΨini, Layer, N_SoilLayer, Nz, Z, θini_or_Ψini
       end # function DISCRETISATION
    #-------------------------------------------------------------------------
  
@@ -217,12 +217,12 @@ module readHypix
 
             # Automatic determine the format of the climate data
                if "Year[]" ∈ Header
-                  Flag_VirtualClimateStationNz = true
+                  🎏_VirtualClimateStationNz = true
                else
-                  Flag_VirtualClimateStationNz = false
+                  🎏_VirtualClimateStationNz = false
                end
 
-            if !Flag_VirtualClimateStationNz
+            if !🎏_VirtualClimateStationNz
                Year   = convert(Vector{Int64}, Tables.getcolumn(Data, :Year))
                N_Climate = length(Year)
                Month  = convert(Vector{Int64}, Tables.getcolumn(Data, :Month))
@@ -239,7 +239,7 @@ module readHypix
                   Temp = fill(24.0::Float64, N_Climate)
                end
 
-            elseif  Flag_VirtualClimateStationNz
+            elseif  🎏_VirtualClimateStationNz
                Year   = convert(Vector{Int64}, Tables.getcolumn(Data, Symbol("Year[]")))
                N_Climate = length(Year)
                Month  = convert(Vector{Int64}, Tables.getcolumn(Data, Symbol("Month[]")))
@@ -344,18 +344,18 @@ module readHypix
             
          # Determine if we need to optimize
             if sum(Opt) ≥ 1
-               Flag_Opt = true
+               🎏_Opt = true
             else
-               Flag_Opt = false
+               🎏_Opt = false
             end
 
          """Determening if multistep optimisation is performed (not the first step)
          This is such that the optimal values of the previous optimisation step is kept in memory
          We need to determine what next param to optimize"""
-            if Flag_Opt && (iMultistep ≥ paramHypix.opt.iOptMultiStep_Start + 1)
-               Flag_MultiStepOpt = true
+            if 🎏_Opt && (iMultistep ≥ paramHypix.opt.iOptMultiStep_Start + 1)
+               🎏_MultiStepOpt = true
             else
-               Flag_MultiStepOpt = false 
+               🎏_MultiStepOpt = false 
             end
             
          # ====================================================
@@ -369,7 +369,7 @@ module readHypix
          ParamOpt_LogTransform = []
 
          # Deriving hydroHorizon
-         if  !(Flag_MultiStepOpt)
+         if  !(🎏_MultiStepOpt)
             hydroHorizon = hydroStruct.HYDROSTRUCT(optionHypix, N_SoilLayer)
          end
 
@@ -380,7 +380,7 @@ module readHypix
             # Values of param for every Name to put in hydroHorizon
                Param_Vect = Float64.(Param[indexName])
 
-            if Type[i] == "hydro" && !(Flag_MultiStepOpt)
+            if Type[i] == "hydro" && !(🎏_MultiStepOpt)
                # Putting soil param in hydroHorizon
 
                # θsMacMat value depends on θs
@@ -396,7 +396,7 @@ module readHypix
                   setfield!(hydroHorizon, Symbol(Name_Unique[i] * "_Min"), Float64.(Param_Min[indexName]))
                   setfield!(hydroHorizon, Symbol(Name_Unique[i] * "_Max"), Float64.(Param_Max[indexName]))
 
-            elseif Type[i] == "veg" && !(Flag_MultiStepOpt)
+            elseif Type[i] == "veg" && !(🎏_MultiStepOpt)
                # Putting veg param in veg
                setfield!(veg, Symbol(Name_Unique[i]), Float64(Param[indexName][1]))
             end
@@ -444,7 +444,7 @@ module readHypix
          NparamOpt = length(ParamOpt)
 
          # CHECKING FOR UNCONSISTENCY WITH OPTIONS	
-         if Flag_Opt && optionHypix.opt.σ_2_Ψm⍰ ≠ "No" && "Ψm" ∈ ParamOpt
+         if 🎏_Opt && optionHypix.opt.σ_2_Ψm⍰ ≠ "No" && "Ψm" ∈ ParamOpt
             iψm = findfirst(isequal("Ψm"), ParamOpt)[1]
 
             if optionHypix.opt.σ_2_Ψm⍰=="UniqueRelationship" && "Ψm" ∈ ParamOpt
@@ -456,12 +456,12 @@ module readHypix
             elseif optionHypix.opt.σ_2_Ψm⍰=="Constrained" && ParamOpt_LogTransform[iψm]==1
                error("*** optionHypix.opt.σ_2_Ψm⍰==Constrained CANNOT log transforme Ψm") 
             end
-         end # Flag_Opt
+         end # 🎏_Opt
 
          # Putting all the parameters in  NamedTuple
-         optim = (ParamOpt_Min=ParamOpt_Min, ParamOpt_Max=ParamOpt_Max, ParamOpt_HorizonEq=ParamOpt_HorizonEq, ParamOpt_Type=ParamOpt_Type, ParamOpt=ParamOpt, NparamOpt=NparamOpt, Flag_Opt=Flag_Opt, ParamOpt_LogTransform=ParamOpt_LogTransform)
+         optim = (ParamOpt_Min=ParamOpt_Min, ParamOpt_Max=ParamOpt_Max, ParamOpt_HorizonEq=ParamOpt_HorizonEq, ParamOpt_Type=ParamOpt_Type, ParamOpt=ParamOpt, NparamOpt=NparamOpt, 🎏_Opt=🎏_Opt, ParamOpt_LogTransform=ParamOpt_LogTransform)
 
-         if Flag_Opt
+         if 🎏_Opt
             println("	=== === Optimizing the following parameters === ===")
             println("		NparamOpt=" , NparamOpt)
             println("		ParamOpt= " , optim.ParamOpt_Type .* optim.ParamOpt)

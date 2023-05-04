@@ -586,12 +586,12 @@ module tableHypix
    # ===================================================
    #          DISCRETISATION AUTO
    # ===================================================
-      function DISCRETISATION_AUTO(Flag_θΨini::Symbol, Layer::Vector{Float64}, PathDiscretisation::String, Z::Vector{Float64}, θini_or_Ψini_Cell::Vector{Float64})
+      function DISCRETISATION_AUTO(🎏_θΨini::Symbol, Layer::Vector{Float64}, PathDiscretisation::String, Z::Vector{Float64}, θini_or_Ψini_Cell::Vector{Float64})
 
-         if Flag_θΨini == :Ψini
+         if 🎏_θΨini == :Ψini
             Header = ["iZ","Z", "Layer", "Ψini"]
 
-         elseif Flag_θΨini == :θini
+         elseif 🎏_θΨini == :θini
             Header = ["iZ","Z", "Layer", "θini"]
          end
 

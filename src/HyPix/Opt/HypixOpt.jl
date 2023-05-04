@@ -11,11 +11,11 @@ module hypixOpt
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : HYPIXOPT_START
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function HYPIXOPTIMISATION_START(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, Flag_θΨini, Hpond, hydro_best, hydroHorizon, hydroHorizon_best, iOpt_Count, iScenario, K_Aver_Vect, K_Aver₀_Vect,  Layer, N_∑T_Climate, N_iRoot, N_SoilLayer, Nz, obsθ, optim, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, veg_best, WofBest, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest)
+	function HYPIXOPTIMISATION_START(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, 🎏_θΨini, Hpond, hydro_best, hydroHorizon, hydroHorizon_best, iOpt_Count, iScenario, K_Aver_Vect, K_Aver₀_Vect,  Layer, N_∑T_Climate, N_iRoot, N_SoilLayer, Nz, obsθ, optim, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, veg_best, WofBest, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest)
 
 		SearchRange = SEARCHRANGE(optim, optionHypix)
 
-		Optimization = BlackBoxOptim.bboptimize(X -> OF_HYPIX(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, Flag_θΨini, Hpond, hydroHorizon, iScenario, K_Aver_Vect, K_Aver₀_Vect,  Layer, N_∑T_Climate, N_iRoot, N_SoilLayer, Nz, obsθ, optim, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, X, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest); SearchRange=SearchRange, NumDimensions=optim.NparamOpt, TraceMode=:silent, MaxFuncEvals=paramHypix.opt.NmaxFuncEvals)
+		Optimization = BlackBoxOptim.bboptimize(X -> OF_HYPIX(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, 🎏_θΨini, Hpond, hydroHorizon, iScenario, K_Aver_Vect, K_Aver₀_Vect,  Layer, N_∑T_Climate, N_iRoot, N_SoilLayer, Nz, obsθ, optim, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, X, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest); SearchRange=SearchRange, NumDimensions=optim.NparamOpt, TraceMode=:silent, MaxFuncEvals=paramHypix.opt.NmaxFuncEvals)
 
 		X = BlackBoxOptim.best_candidate(Optimization)
 
@@ -54,7 +54,7 @@ module hypixOpt
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_HYPIX
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OF_HYPIX(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, Flag_θΨini, Hpond, hydroHorizon, iScenario, K_Aver_Vect, K_Aver₀_Vect,  Layer, N_∑T_Climate, N_iRoot, N_SoilLayer, Nz, obsθ, optim, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, X, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest)
+		function OF_HYPIX(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet, ∑Pet_Climate, ∑PrThroughfall, ∑PrThroughfall_Climate, ∑T, ∑T_Climate, ∑T_Qobs, ∑ΔQ_Obs, clim, CropCoeficientᵀ, CropCoeficientᵀ_η, discret, 🎏_θΨini, Hpond, hydroHorizon, iScenario, K_Aver_Vect, K_Aver₀_Vect,  Layer, N_∑T_Climate, N_iRoot, N_SoilLayer, Nz, obsθ, optim, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, X, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRootDensity, ΔRunoff, ΔSink, ΔT, θ, θini_or_Ψini, θSim, Ψ, Ψ_Min, Ψbest)
 
 			# New optimized paramHypix which are put into the matching veg or hydro parameters
 				hydro, hydroHorizon, veg = PARAM_2_hydro_veg(discret, hydroHorizon, Layer, N_SoilLayer, Nz, optim, optionHypix, paramHypix, veg, X)
@@ -63,7 +63,7 @@ module hypixOpt
 				Time_Start = now()
 
 			# Running Hypix model	
-			∑Pet, ∑PrThroughfall, ∑T, ∑T_Climate, clim, discret, Hpond, iNonConverge, IterCount, N_iRoot, Nit, Nz, Q, veg, ΔEvaporation, ΔRootDensity, ΔRunoff, ΔT, θ, Ψ = hypixModel.HYPIX_MODEL(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet_Climate, ∑Pet, ∑PrThroughfall_Climate, ∑PrThroughfall, ∑T_Climate, ∑T, clim, CropCoeficientᵀ_η, CropCoeficientᵀ, discret, Flag_θΨini, Hpond, hydro, iScenario,K_Aver_Vect, K_Aver₀_Vect, N_∑T_Climate, N_iRoot, Nz, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRunoff, ΔSink, ΔRootDensity, ΔT, θ, θini_or_Ψini, Ψ_Min, Ψ, Ψbest)
+			∑Pet, ∑PrThroughfall, ∑T, ∑T_Climate, clim, discret, Hpond, iNonConverge, IterCount, N_iRoot, Nit, Nz, Q, veg, ΔEvaporation, ΔRootDensity, ΔRunoff, ΔT, θ, Ψ = hypixModel.HYPIX_MODEL(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, ∑Pet_Climate, ∑Pet, ∑PrThroughfall_Climate, ∑PrThroughfall, ∑T_Climate, ∑T, clim, CropCoeficientᵀ_η, CropCoeficientᵀ, discret, 🎏_θΨini, Hpond, hydro, iScenario,K_Aver_Vect, K_Aver₀_Vect, N_∑T_Climate, N_iRoot, Nz, optionHypix, paramHypix, pathInputHypix, Pkₐᵥₑᵣ, Q, Residual, veg, Z, ΔEvaporation, ΔLnΨmax, ΔPet, ΔPrThroughfall, ΔRunoff, ΔSink, ΔRootDensity, ΔT, θ, θini_or_Ψini, Ψ_Min, Ψ, Ψbest)
 
 			# Timing end
 				Time_End = now()

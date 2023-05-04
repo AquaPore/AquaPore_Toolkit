@@ -16,8 +16,8 @@ module plotSmap
          function HYDROPARAM(hydro, IdSelect, K_KΨobs, KₛModel, NiZ, N_KΨobs, N_θΨobs, option, path, Smap_Depth, Soilname, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs; N_Se=1000)
             println("  ==  START: Plotting HydroParam  ==")
       
-            Flag_OtherData1 = false
-            Flag_OtherData2 = false
+            🎏_OtherData1 = false
+            🎏_OtherData2 = false
       
             # ===================== DATA =====================
             θ_Sim             = fill(0.0,N_Se)
@@ -32,7 +32,7 @@ module plotSmap
 
             Ψ_θΨobs_Min = 0.0
 
-            if Flag_OtherData1
+            if 🎏_OtherData1
                Path = "D:\\Main\\MODELS\\SoilWater-ToolBox2\\src\\INPUT\\Data_SoilWater\\Smap20210226\\Smap20210226_ClappHornberger_Constrained_A_Table_ThetaHK.csv"
 
                option.hydro.HydroModel⍰ = "ClappHornberger"
@@ -56,7 +56,7 @@ module plotSmap
                   # Populate the values of the parameters
                      hydroData3, ~ = tool.readWrite.READ_STRUCT_SIMPLE(hydroData3, Path) 
 
-            end # if Flag_OtherData
+            end # if 🎏_OtherData
 
             for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
                Ψ_θΨobs_Max = maximum(Ψ_θΨobs[iZ,N_θΨobs[iZ]]) + 100000.0
@@ -71,7 +71,7 @@ module plotSmap
                       θ_Sim[iΨ] = wrc.Ψ_2_θDual(option.hydro,Ψ_Sim[iΨ], iZ, hydro)
                       Kunsat_Sim[iΨ] = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 
-                     if Flag_OtherData1
+                     if 🎏_OtherData1
                         # ClappHornberger model Smap_Hydro
                         option.hydro.HydroModel⍰ = "ClappHornberger"
                            θ_OtherData[iΨ] = wrc.Ψ_2_θDual(option.hydro,Ψ_Sim[iΨ], iZ, hydroData)
@@ -139,7 +139,7 @@ module plotSmap
                   # Plot_θ_Ψ: Simulated
                      # lines!(Fig[1,1], log1p.(cst.Mm_2_kPa .* Ψ_Sim[1:N_Se]), θ_Sim[1:N_Se], color=:blue, linewidth=2, label="Sim")
 
-                  if Flag_OtherData1
+                  if 🎏_OtherData1
                      P_ClappHonb = lines!(Fig[1,1], log1p.(cst.Mm_2_kPa .* Ψ_Sim[1:N_Se]), θ_OtherData[1:N_Se], color=:red, linewidth=3)
 
                      P_ClappHonb_Loan = lines!(Fig[1,1], log1p.(cst.Mm_2_kPa .* Ψ_Sim[1:N_Se]), θ_OtherData2[1:N_Se], color=:yellow1, linewidth=3)
@@ -174,7 +174,7 @@ module plotSmap
 
                    Pvang = lines!(Fig[1,2], log1p.(Ψ_Sim[1:N_Se].*cst.Mm_2_kPa), log1p.(Kunsat_Sim[1:N_Se].*cst.MmS_2_MmH), color=:pink, linewidth=3)
 
-                  if Flag_OtherData1
+                  if 🎏_OtherData1
 
                      Pclapp = lines!(Fig[1,2], log1p.(Ψ_Sim[1:N_Se].*cst.Mm_2_kPa), log1p.(Kunsat_OtherData[1:N_Se].*cst.MmS_2_MmH), color=:red, linewidth=3)
 

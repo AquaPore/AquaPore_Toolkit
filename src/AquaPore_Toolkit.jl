@@ -151,7 +151,7 @@ module AquaPore_Toolkit
 					IsTopsoil, RockClass = reading.PEDOLOGICAL(IdSelect, NiZ, path.inputSoilwater.Pedological⍰)
 				
 				elseif option.data.Pedological⍰ == "Smap"
-					IsTopsoil, Ks_Impermeable, RockClass, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_RockDepth, Smap_SmapFH, Soilname = readSmap.SMAP(IdSelect_True, NiZ, path)
+					IsTopsoil, Ks_Impermeable, RockClass, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_SmapFH, Soilname = readSmap.SMAP(IdSelect_True, NiZ, path)
 				end  # if: option.data.Pedological⍰
 
 
@@ -227,26 +227,30 @@ module AquaPore_Toolkit
 
 			if option.hydro.HydroModel⍰ == "Kosugi" && (option.run.KsModel || !(option.data.Kθ && "Ks" ∈ optim.ParamOpt))
 				printstyled("\n ----- START RUNNING Ks Model from θ(Ψ)  ----------------------------------------------- \n"; color=:red)
+					printstyled("		Running KsModel= ", option.ksModel.KₛModel⍰, "\n" ; color=:green)
 
-				printstyled("		Running KsModel= ", option.ksModel.KₛModel⍰, "\n" ; color=:green)
+				# Default value
+					🎏_IsTopsoil=false; 🎏_RockFragment=false; IsTopsoil₀=[]; RockFragment₀=[]; Ks_Impermeable₀=[]
+
+				if  @isdefined RockFragment
+               🎏_RockFragment = true
+               RockFragment₀   = RockFragment
+				end
+				
+				if @isdefined IsTopsoil
+               🎏_IsTopsoil = true
+               IsTopsoil₀   = IsTopsoil
+				end
 
 				if option.run.Smap
-				# path.option.ModelName
-					hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment, Ks_Impermeable=Ks_Impermeable)
+               🎏_IsTopsoil    = true
+               🎏_RockFragment = true
+               IsTopsoil₀      = IsTopsoil
+               RockFragment₀   = RockFragment
+               Ks_Impermeable₀ = Ks_Impermeable
+				end
 
-				elseif  (@isdefined RockFragment) && (@isdefined IsTopsoil)
-					hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
-				
-				elseif (@isdefined RockFragment) && !(@isdefined IsTopsoil)	
-					hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_RockFragment=true, RockFragment=RockFragment)
-				
-				elseif !(@isdefined RockFragment) && (@isdefined IsTopsoil)
-					hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; Flag_IsTopsoil=true, IsTopsoil=IsTopsoil)
-				
-				elseif !(@isdefined RockFragment) && !(@isdefined IsTopsoil)
-					hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path)
-
-				end # if: RockFragment && IsTopsoil
+				hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, IsTopsoil=IsTopsoil₀, RockFragment=RockFragment₀, Ks_Impermeable=Ks_Impermeable₀, ∑Psd=∑Psd)
 
 				printstyled("\n ----- END RUNNING Ks Modelfrom θ(Ψ) ----------------------------------------------- \n";color=:green)
 			end # if: option.hydro.HydroModel⍰ == :Kosugi
@@ -283,13 +287,13 @@ module AquaPore_Toolkit
 
 				printstyled("\n 	----- START RUNNING Ks Model from θ(Ψ)PSD  -----------------------------------------------"; color=:green)
 					if  (@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, Flag_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
+						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; 🎏_IsTopsoil=true, 🎏_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
 					
 					elseif (@isdefined RockFragment) && !(@isdefined IsTopsoil)	
-						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_RockFragment=true, RockFragment=RockFragment)
+						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; 🎏_RockFragment=true, RockFragment=RockFragment)
 					
 					elseif !(@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; Flag_IsTopsoil=true, IsTopsoil=IsTopsoil)
+						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; 🎏_IsTopsoil=true, IsTopsoil=IsTopsoil)
 					
 					elseif !(@isdefined RockFragment) && !(@isdefined IsTopsoil)
 						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel)
@@ -377,7 +381,7 @@ module AquaPore_Toolkit
 
 					# When all the models are performed
 					if iSim==length(Scenarios)
-						tableSmap.SMAP(hydro, IdSelect, IsTopsoil, NiZ, option.hydro, param, path, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_RockDepth, Smap_SmapFH, Soilname)
+						tableSmap.SMAP(hydro, IdSelect, IsTopsoil, NiZ, option.hydro, param, path, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_SmapFH, Soilname)
 					end
 				end # option.run.Smap	
 			end # option.run.HydroLabθΨ⍰ ≠ :No && option.run.HydroLabθΨ⍰ ≠ :File
@@ -481,8 +485,8 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="TESTCASE", SiteName_Soilwater="Convert")
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapSmapNZSnapshot20210823")
 	
-	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
+	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
 
-		# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Grizzly")
+	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)

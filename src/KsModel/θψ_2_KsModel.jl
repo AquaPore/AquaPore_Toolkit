@@ -11,21 +11,21 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSΨMODEL_START
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSΨMODEL_START(hydro, ipClass, iZ, ksmodelτ, option, Ψ₁; Flag_IsTopsoil=false, Flag_RockFragment=false, IsTopsoil=[], RockFragment=[])
+		function KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ₁; 🎏_IsTopsoil=false, 🎏_RockFragment=false, IsTopsoil=[], RockFragment=[])
 
-			if Flag_RockFragment
+			if 🎏_RockFragment
 				RockFragment₁ = RockFragment[iZ]
 			else
 				RockFragment₁ = 0.0
 			end #@isdefined RockFragment
 
-			# if Flag_IsTopsoil
+			# if 🎏_IsTopsoil
 			# 	IsTopsoil₁ = Int64(IsTopsoil[iZ])
 			# else
 			# 	IsTopsoil₁ = 1	# Default value				
 			# end  # if: @isdefined IsTopsoil
 
-			return KsΨmodel = TORTUOSITYMODELS(hydro, option, ipClass, iZ, ksmodelτ, Ψ₁; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
+			return KsΨmodel = TORTUOSITYMODELS(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ₁; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
 		end  # function: KS_MODEL
 	#..................................................................
 
@@ -96,7 +96,7 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : TORTUOSITYMODELS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function TORTUOSITYMODELS(hydro, option, ipClass, iZ::Int64,ksmodelτ, Ψ₁; RockFragment=0.0, θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τclay₀=ksmodelτ.τclay₀[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τclay₀Mac=ksmodelτ.τclay₀Mac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τclayₘₐₓMac=ksmodelτ.τclayₘₐₓMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τclayΔθsrMac=ksmodelτ.τclayΔθsrMac, RockFragment_Treshold=0.4, Smap_ImpermClass=[], KsImpClass_Dict=[] )
+		function TORTUOSITYMODELS(∑Psd, 🎏_Clay::Bool, hydro, ipClass, iZ::Int64, ksmodelτ, option, param, Ψ₁; RockFragment=0.0, θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τclay₀=ksmodelτ.τclay₀[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τclay₀Mac=ksmodelτ.τclay₀Mac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τclayₘₐₓMac=ksmodelτ.τclayₘₐₓMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τclayΔθsrMac=ksmodelτ.τclayΔθsrMac, RockFragment_Treshold=0.4, Smap_ImpermClass=[], KsImpClass_Dict=[] )
 
 			# Determine when Ks increases for increasing RockFragment	
 				if RockFragment > RockFragment_Treshold
@@ -154,7 +154,7 @@ module θψ_2_KsψModel
 			elseif option.ksModel.KₛModel⍰=="KsΨmodel_2"
 				# CLAY FUNCTION
 					# CLAY FUNCTION					
-					Tclay = TORTUOSITY_CLAY(hydro, iZ, option, τclay₀, τclayₘₐₓ, τclayΔθsr)
+					Tclay = TORTUOSITY_CLAY(∑Psd, 🎏_Clay, hydro, iZ, option, param, τclay₀, τclayₘₐₓ, τclayΔθsr)
 				
 				# MATRIX 
 						T2_Max = 3.0; T3_Max = 4.0
@@ -185,7 +185,7 @@ module θψ_2_KsψModel
 			# Rekationship between macro and matrix
 			elseif option.ksModel.KₛModel⍰=="KsΨmodel_3"
 				# CLAY FUNCTION					
-					Tclay = TORTUOSITY_CLAY(hydro, iZ, option, τclay₀, τclayₘₐₓ, τclayΔθsr)
+					Tclay = TORTUOSITY_CLAY(∑Psd, 🎏_Clay, hydro, iZ, option, param, τclay₀, τclayₘₐₓ, τclayΔθsr)
 						
 				# MATRIX ----------------------------
 						T2_Max = 3.0; T3_Max = 4.0
@@ -214,7 +214,7 @@ module θψ_2_KsψModel
 			elseif option.ksModel.KₛModel⍰=="KsΨmodel_3Unimodal"
 				# CLAY FUNCTION
 					# CLAY FUNCTION					
-					Tclay = TORTUOSITY_CLAY(hydro, iZ, option, τclay₀, τclayₘₐₓ, τclayΔθsr)
+					Tclay = TORTUOSITY_CLAY(∑Psd, 🎏_Clay, hydro, iZ, option, param, τclay₀, τclayₘₐₓ, τclayΔθsr)
 						
 				# MATRIX 
 						T2_Max = 3.0; T3_Max = 3.0
@@ -324,12 +324,20 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : TORTUOSITY_CLAY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function TORTUOSITY_CLAY(hydro, iZ, option, τclay₀, τclayₘₐₓ, τclayΔθsr)
+		function TORTUOSITY_CLAY(∑Psd, 🎏_Clay, hydro, iZ, option, param, τclay₀, τclayₘₐₓ, τclayΔθsr)
+
+			# If we have clay information derived from PSD
+			if 🎏_Clay
+				Clay = ∑Psd[iZ,1]
+			
 			# Rough modelling % of clay [0-1]
 			# Correlation between clay particle and Ψ
-			Ψ_Clay =  160000.0 * ( ( (cst.Y  / 0.002) - (cst.Y / 0.5) ) / ((cst.Y  / 0.001) - (cst.Y  / 0.5)) ) ^ 2.0
+			else
+				# Ψ_Clay =  160000.0 * ( ( (cst.Y  / 0.002) - (cst.Y / 0.5) ) / ((cst.Y  / 0.001) - (cst.Y  / 0.5)) ) ^ 2.0
+				Ψ_Clay = param.psd.imp.Ψ_Max * (((cst.Y / 0.002) - (cst.Y / 0.5) ) / ((cst.Y / 0.002) - (cst.Y / 0.5))) ^ param.psd.imp.λ 
 
-			Clay = wrc.Ψ_2_SeDual(option.hydro, Ψ_Clay, iZ, hydro)
+				Clay = wrc.Ψ_2_SeDual(option.hydro, Ψ_Clay, iZ, hydro)
+			end # 🎏_Clay
 			
 			X_Clay₁ =  τclay₀
 
@@ -341,93 +349,7 @@ module θψ_2_KsψModel
 
 			Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
 
-			Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5) 
-		return Tclay
+		return Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5) 
 		end				
 	# ------------------------------------------------------------------
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION :  τMODEL_σSilt
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function τMODEL_σSilt_σ(hydro, iZ, Pₘᵢₙ, Pₘₐₓ, σ; Amplitude=0.5, σSilt_η=0.538, Pσ=3, Distribution⍰="Normal", Normalise=true, Invert=false)
-			ση = τMODEL_σ(hydro, iZ, Pₘₐₓ, Pₘᵢₙ, σ)
-
-			τσ_Dist = τMODEL_σSilt(hydro, iZ, Pₘₐₓ, Pₘᵢₙ, ση; σSilt_η=σSilt_η, Pσ=Pσ, Distribution⍰="Normal", Normalise=Normalise, Invert=Invert)
-
-			τσ = τMODEL_σ(hydro, iZ, Pₘₐₓ, Pₘᵢₙ, σ)
-
-		return τ = min(τσ + Amplitude * (τσ_Dist / (σSilt_η + 1.0)) , 1.0) * (Pₘₐₓ - Pₘᵢₙ) + Pₘᵢₙ
-		end
-	#..................................................................
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION :  τMODEL_σSilt
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function τMODEL_σSilt(hydro, iZ, Pₘᵢₙ, Pₘₐₓ,  σ; σSilt_η=0.538, Pσ=3.0, Distribution⍰="Normal", Normalise=true, Invert=false)
-
-			ση = τMODEL_σ(hydro, iZ, Pₘₐₓ, Pₘᵢₙ, σ)
-
-			if  Distribution⍰== "Normal"
-				σ_Dist = σSilt_η / Pσ
-
-			elseif  Distribution⍰== "LogNormal"
-				σ_Dist = log(σSilt_η) / Pσ
-
-			else
-				error("*** τMODEL_σSilt: $Distribution⍰ not implemented try <Normal> or  <LogNormal>  ***")
-			end
-
-			τσ_Dist = distribution.DISTRIBUTION(ση, σSilt_η, σ_Dist; Distribution⍰=Distribution⍰, Normalise=Normalise, Invert=Invert)[1]
-		return τ = τσ_Dist  * (Pₘₐₓ - Pₘᵢₙ) + Pₘᵢₙ
-		end
-	#..................................................................
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : τMODEL_σ
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function τMODEL_σ(hydro, iZ,  Pₘᵢₙ, Pₘₐₓ, σ; Inverse=false, τ₄=0.5)
-			ση = σ_2_ση(hydro.σ[iZ])
-			if Inverse
-				return τ = (1.0 - ση) ^ τ₄  * (Pₘₐₓ - Pₘᵢₙ) + Pₘᵢₙ
-			else
-				return τ = ση ^ τ₄  * (Pₘₐₓ - Pₘᵢₙ) + Pₘᵢₙ
-			end	
-		end
-	#..................................................................
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION :τMODEL_σ2
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function τMODEL_σ2(hydro, iZ,  Pₘᵢₙ, Pₘₐₓ, σ; τ₄=0.5, σboundWater = 0.5)
-			ση = σ_2_ση(hydro, iZ, σ)
-
-		return τ = (Pₘₐₓ - Pₘᵢₙ) * min((ση / σboundWater) ^ τ₄, 1.0) + Pₘᵢₙ
-		end
-	#..................................................................
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : τMODEL_θsθr
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function τMODEL_θsθr(hydro, iZ,  Pₘᵢₙ, Pₘₐₓ, θs, θr, θsMacMat)
-			θη = (θs - θr)
-		return τ = (1.0 - θη)  * (Pₘₐₓ - Pₘᵢₙ) + Pₘᵢₙ
-		end
-	#..................................................................
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : σ_2_ση
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function σ_2_ση(Xσ)
-			return ση = (Xσ - 0.75) / (3.5 - 0.75)
-		end  # function: σ_2_ση
-	# ------------------------------------------------------------------
-
-
 end  # module θψ_2_KsψModel
-# ............................................................

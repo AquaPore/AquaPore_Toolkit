@@ -9,7 +9,7 @@ module hydroSmooth
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    #		FUNCTION : SMOOTENING_DISCRETISATION
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      function DISCRETISATION_SMOOTENING!(Flag_θΨini::Symbol, iScenario::Int64, N_SoilLayer::Int64, optionHypix, paramHypix, pathInputHypix, Zlayer::Vector{Float64}, θini_or_Ψini::Vector{Float64})
+      function DISCRETISATION_SMOOTENING!(🎏_θΨini::Symbol, iScenario::Int64, N_SoilLayer::Int64, optionHypix, paramHypix, pathInputHypix, Zlayer::Vector{Float64}, θini_or_Ψini::Vector{Float64})
             
          ΔZfine_⬓ = paramHypix.ΔZfine * 0.5
 
@@ -36,7 +36,7 @@ module hydroSmooth
                   append!(Layer₀, iZ + 0.5)
 
                # Adding smootening θini_or_Ψini₀
-                  if Flag_θΨini == :θini
+                  if 🎏_θΨini == :θini
                      append!(θini_or_Ψini₀, (θini_or_Ψini[iZ] + θini_or_Ψini[iZ+1]) * 0.5)
                   else
                      append!(θini_or_Ψini₀, exp((log(θini_or_Ψini[iZ]) + log(θini_or_Ψini[iZ+1])) * 0.5))

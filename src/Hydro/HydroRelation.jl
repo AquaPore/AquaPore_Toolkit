@@ -11,13 +11,13 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function σ_2_Ψm(σ₁, Ψσ, Ψm_Min, Ψm_Max; Pσ=3.0)
 			Ψm = Ψσ * exp(σ₁ * Pσ)
-			return max(min(Ψm , Ψm_Max), Ψm_Min)
+		return max(min(Ψm , Ψm_Max), Ψm_Min)
 		end # function: σ_2_Ψm
 	# ----------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : σ_Ψm_
+	#		FUNCTION : FUNCTION_σ_2_Ψm_SOFTWARE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0)
 			if (option₂.σ_2_Ψm⍰ == "Constrained")
@@ -31,7 +31,6 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE
 				hydro₂.Ψm[iZ] = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], exp((log(√param.ΨmacMat) + log(param.ΨmacMat)) * 0.5), hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ]; Pσ=Pσ)
 
 			end #option.infilt.σ_2_Ψm⍰
-
 		return hydro₂
 		end
 	# ----------------------------------------------------------------

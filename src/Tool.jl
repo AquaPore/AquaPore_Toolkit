@@ -92,34 +92,30 @@ module tool
 
 				Data_Output, N_X = READ_HEADER_FAST(Data, Header, Name)
 
-				# if NiZ ≠ N_X
-				# 	error("READ_ROW_SELECT  NiZ ≠ N_X")
-				# end
-
 			# ===========================================
 			# Only keeping data which is selected
 			# ===========================================
 				Id_Data = Int64.(Data[1:end,1])
 
 				# Determening if there is existence of an empty cell
-				Flag_IsEmpty = false
+				🎏_IsEmpty = false
 				for i = 1:N_X
 					if isempty(Data_Output[i])
-						Flag_IsEmpty = true
+						🎏_IsEmpty = true
 						break
 					end
 				end
 
-				if Flag_IsEmpty
-					Flag_String = false
+				if 🎏_IsEmpty
+					🎏_String = false
 					Data_Select = zeros(Union{Float64,Missing}, (NiZ, N_Point_Max))
 
 				elseif typeof(Data_Output[1]) == SubString{String}
 					Data_Select = fill(Data_Output[1], (NiZ, N_Point_Max))
-					Flag_String = true
+					🎏_String = true
 
 				else
-					Flag_String = false
+					🎏_String = false
 					Data_Select = fill(0.0::Float64, (NiZ, N_Point_Max))
 				end
 
@@ -129,7 +125,7 @@ module tool
 				
 				for i = 1:N_X
 					if Id_Data[i] > IdSelect[iSelect] && iSelect ≠ NiZ
-						error("SoilWater_ToolBox error: READ_ROW_SELECT problem with no matching id:  i= $i IdSelect[iSelect] = $( IdSelect[iSelect]) < Id_Data[i] = $(Id_Data[i])")
+						error("SoilWater_ToolBox error: READ_ROW_SELECT problem with no matching id:  i= $i IdSelect[iSelect] = $(IdSelect[iSelect]) < Id_Data[i] = $(Id_Data[i])")
 					end
 
 					if Id_Data[i] == IdSelect[iSelect] # Only append Ids which correspond to the selected one

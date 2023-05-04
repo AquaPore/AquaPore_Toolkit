@@ -39,7 +39,7 @@ module tableSmap
    JulesModel_VangenuchtenJules = ["ThetaS_VgJules[mm3_mm3]";"ThetaR_VgJules[mm3_mm3]";"n_VgJules[-]";"Hvg_VgJules[mm]"; "Ks_VgJules[mm_s1]";"3300mm";"10000mm"]
 
    """
-      function SMAP(hydro, IdSelect, IsTopsoil, NiZ, optionₘ, param, path, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_RockDepth, Smap_SmapFH, Soilname)
+      function SMAP(hydro, IdSelect, IsTopsoil, NiZ, optionₘ, param, path, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_SmapFH, Soilname)
 
          println("    ~  $(path.tableSmap.Table_Smap) ~")
 
@@ -54,7 +54,7 @@ module tableSmap
             Option_Kosugi_Table_θψ   = true
             Option_Kosugi_Table_Kψ   = true
 
-         Header = ["Id"; "SoilName"; "Depth_mm"; "IsTopsoil"; "RockFragment_%";"RockDepth_mm"; "MaxRootingDepth_mm"; "PermeabilityClass"; "SmapFH"]
+         Header = ["Id"; "SoilName"; "Depth_mm"; "IsTopsoil"; "RockFragment_%";"MaxRootingDepth_mm"; "PermeabilityClass"; "SmapFH"]
          Data = []
       
       # Select data
@@ -260,7 +260,7 @@ module tableSmap
       end # Option_Kosugi
          
       # COMBINING OUTPUTS  
-         CSV.write(path.tableSmap.Table_Smap, Tables.table( [IdSelect[1:NiZ] Soilname[1:NiZ] Smap_Depth[1:NiZ] IsTopsoil[1:NiZ] RockFragment[1:NiZ] Smap_RockDepth[1:NiZ] Smap_MaxRootingDepth[1:NiZ] Smap_PermeabilityClass[1:NiZ] Smap_SmapFH[1:NiZ] Data[1:NiZ,:]]), writeheader=true, header=Header, bom=!(HeaderSmap))
+         CSV.write(path.tableSmap.Table_Smap, Tables.table( [IdSelect[1:NiZ] Soilname[1:NiZ] Smap_Depth[1:NiZ] IsTopsoil[1:NiZ] RockFragment[1:NiZ] Smap_MaxRootingDepth[1:NiZ] Smap_PermeabilityClass[1:NiZ] Smap_SmapFH[1:NiZ] Data[1:NiZ,:]]), writeheader=true, header=Header, bom=!(HeaderSmap))
 
       return nothing
       end  # function:  smap

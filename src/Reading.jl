@@ -57,7 +57,7 @@ module reading
 			println("    ~  $(Path) ~")
 
 			# Read data
-				Data = DelimitedFiles.readdlm(Path, ',')
+				Data = readdlm(Path, ',')
 			# Read header
 				Header = Data[1,1:end]
 			# Remove first READ_ROW_SELECT
@@ -313,7 +313,7 @@ module reading
 			Param_Max :: Vector{Float64}
 			ParamOpt :: Vector{String}
 			NparamOpt :: Int64
-			Flag_Opt :: Bool
+			🎏_Opt :: Bool
 			ParamOpt_LogTransform :: Vector{Bool}
 		end
 
@@ -367,9 +367,9 @@ module reading
 			
 		# Determine if we need to optimize
 			if sum(Opt) ≥ 1
-				Flag_Opt = true
+				🎏_Opt = true
 			else
-				Flag_Opt = false
+				🎏_Opt = false
 			end
 
 		# ====================================================
@@ -420,7 +420,7 @@ module reading
 				if Param_Min[i] > Param_Max[i]
 					error("LabOpt ERROR: $(Param_Min[i]) < $(ParamValue[i]) < $(Param_Max[i]) !")
 				end
-			end # if Flag_Opt
+			end # if 🎏_Opt
 
 			i += 1
 		end # for loop
@@ -429,9 +429,9 @@ module reading
 			NparamOpt = length(ParamOpt)
 	
 		# Putting all the in mutable structure
-			optim = OPTIM(Param_Name,ParamOpt_Min,ParamOpt_Max,Param_Min,Param_Max,ParamOpt,NparamOpt,Flag_Opt,ParamOpt_LogTransform)
+			optim = OPTIM(Param_Name,ParamOpt_Min,ParamOpt_Max,Param_Min,Param_Max,ParamOpt,NparamOpt,🎏_Opt,ParamOpt_LogTransform)
 
-		if Flag_Opt == true && PrintScreen
+		if 🎏_Opt == true && PrintScreen
 			println("	=== === Optimizing the following parameters === ===")
 			println("		Model=" , optionₘ.HydroModel⍰)
 			println("		NparamOpt=" , NparamOpt)
@@ -454,7 +454,7 @@ module reading
          ParamOpt_Max :: Array{Float64}
          ParamOpt     :: Array{String}
          NparamOpt    :: Vector{Int64}
-         Flag_Opt     :: Bool
+         🎏_Opt     :: Bool
 		end
 
 		function KSΨMODEL_PARAM(NiZ, option, param, Path) 
@@ -505,9 +505,9 @@ module reading
 				N_Opt = sum(Opt)
 				# Determine if we need to optimize
 					if N_Opt ≥ 1
-						Flag_Opt = true
+						🎏_Opt = true
 					else
-						Flag_Opt = false
+						🎏_Opt = false
 					end
 
 			#CLASSES ========================
@@ -601,7 +601,7 @@ module reading
 							if ParamOpt_Min[iClass, NparamOpt[iClass]] > ParamOpt_Max[iClass, NparamOpt[iClass]]
 								error("SoilWater LabOpt ERROR: $(ParamOpt[iClass, NparamOpt[iClass]]) $(ParamOpt_Min[iClass, NparamOpt[iClass]] ) < $(ParamValue[i]) < $( ParamOpt_Max[iClass, NparamOpt[iClass]]) !")
 							end
-					end # if Flag_Opt
+					end # if 🎏_Opt
 				end # !(🎏skip)
 			i += 1
 			end # for loop
@@ -619,9 +619,9 @@ module reading
 				end  # if: option.ksModel.OptIndivSoil
 
 			# Putting values into the mutable structure
-				optimKsmodel = OPTIMKS(Param_Name, ParamOpt_Min, ParamOpt_Max, ParamOpt, NparamOpt, Flag_Opt)
+				optimKsmodel = OPTIMKS(Param_Name, ParamOpt_Min, ParamOpt_Max, ParamOpt, NparamOpt, 🎏_Opt)
 
-			if Flag_Opt
+			if 🎏_Opt
 				println("\n	=== === Optimizing the following τ parameters === ===")
 				println("		KsModel=" , option.ksModel.KₛModel⍰)
 				# println("		ksmodelτ=", Param_Name)

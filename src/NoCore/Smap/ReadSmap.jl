@@ -23,7 +23,7 @@
             Soilname               = convert(Vector{String}, Data."Soilname")
             Soilname               = Soilname[IdSelect]
 			
-            RockClass              = convert(Vector{String}, Data."RockClass")
+            RockClass              = convert(Vector{String}, Data."RockClassFines")
             RockClass              = RockClass[IdSelect]
 				
             Smap_Depth             = convert(Vector{Float64}, Data."depth_mm")
@@ -32,9 +32,6 @@
             RockFragment           = convert(Vector{Float64}, Data."Stone_Prop")
             RockFragment           = min.(RockFragment_Max, RockFragment)
             RockFragment           = RockFragment[IdSelect]
-
-            Smap_RockDepth         = convert(Vector{Float64}, Data."RockDepth_mm")
-            Smap_RockDepth         = Smap_RockDepth[IdSelect]
 				
             Smap_MaxRootingDepth   = convert(Vector{Float64}, Data."MaxRootingDepth_mm")
             Smap_MaxRootingDepth   = Smap_MaxRootingDepth[IdSelect]
@@ -42,28 +39,24 @@
             Smap_SmapFH            = convert(Vector{String}, Data."SmapFH")
             Smap_SmapFH            = Smap_SmapFH[IdSelect]
 
-            Smap_PermeabilityClass = convert(Vector{String}, Data."PermeabilityClass")
+            Smap_PermeabilityClass = convert(Vector{String}, Data."SoilImpermClass")
             Smap_PermeabilityClass = Smap_PermeabilityClass[IdSelect]
 
-            Smap_IsImpermeable     = convert(Vector{Bool}, Data."IsImpermeable")
-            Smap_IsImpermeable     = Smap_IsImpermeable[IdSelect]
-
-            Smap_ImpermClass       = convert(Vector{String}, Data."ImpermClass")
+            Smap_ImpermClass       = convert(Vector{String}, Data."FHImpermClass")
             Smap_ImpermClass       = Smap_ImpermClass[IdSelect]
 
 				NiZ = length(Smap_ImpermClass)
 
 				# KS_IMPERMEABLE
+					# If impermeable than the value is greater than 0
 					KsImpClass_Dict = readSmap.IMPERMEABLE_CLASS(path.inputSmap.LookupTable_Impermeable)
 
 					Ks_Impermeable = fill(-1.0, NiZ)
 					for iZ=1:NiZ
-						if Smap_IsImpermeable[iZ]
-							Ks_Impermeable[iZ] = KsImpClass_Dict[Smap_ImpermClass[iZ]]
-						end
+						Ks_Impermeable[iZ] = KsImpClass_Dict[Smap_ImpermClass[iZ]]
 					end
 			
-			return IsTopsoil, Ks_Impermeable, RockClass, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_RockDepth, Smap_SmapFH, Soilname
+			return IsTopsoil, Ks_Impermeable, RockClass, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_SmapFH, Soilname
 			end  # function: SMAP
 
 
@@ -76,7 +69,6 @@
 		# 		Soilname     ::Vector{String}
 		# 		RockFragment ::Vector{Float64}
 		# 		RockClass    ::Vector{String}
-		# 		Smap_RockDepth    ::Vector{Float64}
 		# 		Smap_MaxRootingDepth ::Vector{Float64}
 		# 	end
 
@@ -162,7 +154,7 @@
 				# Read data
 					Data = CSV.read(Path,  DataFrame, header=true)
 
-               ImpermClass    = convert(Vector{String}, Data."ImpermClass")
+               ImpermClass    = convert(Vector{String}, Data."FHImpermClass")
                Ks_ImpermClass = convert(Vector{Float64}, Data."Ks[mm s-1]")
                N_ImpermClass  = length(ImpermClass)
 

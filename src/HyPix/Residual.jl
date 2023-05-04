@@ -69,7 +69,7 @@ module residual
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : RESIDUAL_DIFF DERIVATIVE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function RESIDUAL_DIFF(Flag_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
+		function RESIDUAL_DIFF(🎏_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
 
 			# Q[iT,iZ] format for ForwardDiff
 				Q₁ = flux.Q!(optionHypix, discret, hydro, iZ, iT, Nz, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ_, Ψ▲)
@@ -87,11 +87,11 @@ module residual
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : ∂R∂Ψ_NUMERICAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ∂R∂Ψ_FORWARDDIFF(Flag_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)	
+		function ∂R∂Ψ_FORWARDDIFF(🎏_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)	
 
 			ψ = Ψ_
 
-			∂R∂Ψ_Func(ψ) = RESIDUAL_DIFF(Flag_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, ψ, Ψ▼, Ψ_Max)[1]
+			∂R∂Ψ_Func(ψ) = RESIDUAL_DIFF(🎏_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, ψ, Ψ▼, Ψ_Max)[1]
 
 			∂R∂Ψ_Derivative_1 = ψ -> derivative(∂R∂Ψ_Func, ψ)	
 
@@ -103,12 +103,12 @@ module residual
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : ∂R∂Ψ▽_NUMERICAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ∂R∂Ψ▽_FORWARDDIFF(Flag_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
+		function ∂R∂Ψ▽_FORWARDDIFF(🎏_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
 
 			if iZ ≤ Nz-1
 				ψ▼ = Ψ▼
 
-				∂R∂Ψ_Func(ψ▼) = RESIDUAL_DIFF(Flag_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, ψ▼, Ψ_Max)[1]
+				∂R∂Ψ_Func(ψ▼) = RESIDUAL_DIFF(🎏_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, ψ▼, Ψ_Max)[1]
 
 				∂R∂Ψ_Derivative_1 = ψ▼ -> derivative(∂R∂Ψ_Func, ψ▼)			
 				
@@ -123,12 +123,12 @@ module residual
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : ∂R∂Ψ▽_NUMERICAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ∂R∂Ψ△_FORWARDDIFF(Flag_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
+		function ∂R∂Ψ△_FORWARDDIFF(🎏_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
 
 			if iZ ≥ 2
 				ψ▲ = Ψ▲
 
-				∂R∂Ψ_Func(ψ▲) =  RESIDUAL_DIFF(Flag_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, ψ▲, Ψ₀, Ψbest_,Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)[1]
+				∂R∂Ψ_Func(ψ▲) =  RESIDUAL_DIFF(🎏_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, ψ▲, Ψ₀, Ψbest_,Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)[1]
 				
 				∂R∂Ψ_Derivative_1 = ψ▲ -> derivative(∂R∂Ψ_Func, ψ▲)			
 				
@@ -143,10 +143,10 @@ module residual
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION2 : ∂∂R∂Ψ_NUMERICAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ∂∂R∂Ψ_FORWARDDIFF(Flag_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)	
+		function ∂∂R∂Ψ_FORWARDDIFF(🎏_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)	
 			ψ = Ψ_
 
-			∂R∂Ψ_Func(ψ) = RESIDUAL_DIFF(Flag_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, ψ, Ψ▼, Ψ_Max)[1]
+			∂R∂Ψ_Func(ψ) = RESIDUAL_DIFF(🎏_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, ψ, Ψ▼, Ψ_Max)[1]
 			
 			∂R∂Ψ_Derivative_1 = ψ -> derivative(∂R∂Ψ_Func, ψ)	
 
@@ -164,10 +164,10 @@ module residual
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION2 : ∂R∂Ψ▽_NUMERICAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ∂∂R∂Ψ▽_FORWARDDIFF(Flag_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
+		function ∂∂R∂Ψ▽_FORWARDDIFF(🎏_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
 			ψ▼ = Ψ▼
 
-			∂R∂Ψ_Func(ψ▼) = RESIDUAL_DIFF(Flag_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, ψ▼, Ψ_Max)[1]
+			∂R∂Ψ_Func(ψ▼) = RESIDUAL_DIFF(🎏_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, ψ▼, Ψ_Max)[1]
 			
 			∂R∂Ψ_Derivative_1 = ψ▼ -> derivative(∂R∂Ψ_Func, ψ▼)
 			
@@ -181,10 +181,10 @@ module residual
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION2 : ∂R∂Ψ▽_NUMERICAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ∂∂R∂Ψ△_FORWARDDIFF(Flag_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
+		function ∂∂R∂Ψ△_FORWARDDIFF(🎏_NoConverge::Bool, discret, hydro, iT::Int64, iZ::Int64, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▲, Ψ₀, Ψbest_, Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)
 			ψ▲ = Ψ▲
 
-			∂R∂Ψ_Func(ψ▲) = RESIDUAL_DIFF(Flag_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, ψ▲, Ψ₀, Ψbest_,Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)[1]
+			∂R∂Ψ_Func(ψ▲) = RESIDUAL_DIFF(🎏_NoConverge, discret, hydro, iT, iZ, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, ψ▲, Ψ₀, Ψbest_,Ψbest▲, Ψbest▼, Ψ_, Ψ▼, Ψ_Max)[1]
 			
 			∂R∂Ψ_Derivative_1 = ψ▲ -> derivative(∂R∂Ψ_Func, ψ▲)
 			
