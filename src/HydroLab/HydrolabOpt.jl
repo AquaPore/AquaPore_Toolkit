@@ -230,7 +230,7 @@ module hydrolabOpt
 
 			# Converting θsMacMat_ƞ -> θsMacMat
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				hydro.θsMacMat[iZ] = hydro.θsMacMat_ƞ[iZ] * hydro.θs[iZ]
+				hydro.θsMacMat[iZ] = min(hydro.θsMacMat_ƞ[iZ] * (hydro.θs[iZ] - hydro.θr[iZ]) + hydro.θr[iZ], hydro.θs[iZ])
 			end
 
 		return hydro

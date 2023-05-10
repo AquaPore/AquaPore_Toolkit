@@ -163,10 +163,10 @@ module lab
 				ylims!(Axis_Ks, 0, Ks_Max)
 
 				# KsTicks = (range(0.0, stop=Ks_Max, length=10)) 
-				Axis_Ks.xticks = [0, 0^0, 10^1, 10^2, 10^3, 10^4] 
+				Axis_Ks.xticks = [0.0, 0.0^0, 10.0^1, 10.0^2, 10.0^3, 10.0^4] 
 				# (KsTicks, string.( floor.(KsTicks, digits=1)))
 				# Axis_Ks.yticks = (KsTicks, string.(floor.(KsTicks, digits=1)))
-				Axis_Ks.yticks =  [0, 10^0, 10^1, 10^2, 10^3, 10^4] 
+				Axis_Ks.yticks =  [0, 10.0^0, 10.0^1, 10.0^2, 10.0^3, 10.0^4] 
 				# Axis_Ks.xticklabelrotation = π/3
 
 				ΔΘsMacΘr = θsₒᵦₛ .-  θrₒᵦₛ

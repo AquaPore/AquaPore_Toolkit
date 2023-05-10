@@ -45,7 +45,7 @@ module AquaPore_Toolkit
 		N_Scenario = 1
 		if option.run.Smap
 			Scenarios = option.hydro.HydroModel_List
-			N_Scenario =	length(Scenarios)
+			N_Scenario = length(Scenarios)
 		end 
 		for iSim =1:N_Scenario
 			if option.run.Smap
@@ -68,6 +68,7 @@ module AquaPore_Toolkit
 
 			# IF WE HAVE Θ(Ψ) DATA: <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 				if option.data.θΨ && !(option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠"Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained")
+				
 					θ_θΨobs, Ψ_θΨobs, N_θΨobs = reading.θΨ(IdSelect, NiZ, path)
 
 				elseif option.data.θΨ && option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠ "Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained" # Ading extra data
@@ -82,7 +83,8 @@ module AquaPore_Toolkit
 
 
 			# IF WE HAVE K(Θ) DATA: <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-				if option.data.Kθ && !(option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠"Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained")
+				# if option.data.Kθ && !(option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠"Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained")
+				if option.data.Kθ && !(option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠"Kosugi")
 					K_KΨobs, Ψ_KΨobs, N_KΨobs = reading.KUNSATΨ(IdSelect, NiZ, path, path.inputSoilwater.Kunsat)
 
 				elseif option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠ "Kosugi" 
@@ -187,14 +189,20 @@ module AquaPore_Toolkit
 				end # option.data.Φ⍰ ≠ :No
 
 			# CORRECT θ(Ψ) FOR ROCK FRAGMENT
-			if option.run.RockCorection
+			if option.run.RockCorection && !(option.data.SimulationKosugiθΨK)
+			
 				if option.rockFragment.RockInjectedIncluded⍰ =="InjectRock"
-					@info "\n Correction for rock fragments  \n" 
+					@info "\n Correction for rock fragments for θ(Ψ) \n" 
 					θ_θΨobs = rockFragment.injectRock.CORECTION_θΨ!(NiZ, N_θΨobs, RockFragment, θ_θΨobs)
+
+					if option.data.Kθ
+					@info "\n Correction for rock fragments for K(Ψ) \n" 
+					  K_KΨobs = rockFragment.injectRock.RF_CORECTION_KΨ!(NiZ, N_KΨobs, RockFragment, K_KΨobs)
+					end
 				end #  option.rockFragment.RockInjectedIncluded⍰ ==:InjectRock
 
 				if option.rockFragment.CorectStoneRockWetability
-					@info "\n Correction for rock wettability  \n" 
+					@info "\n Correction for rock wettability for θ(Ψ)\n" 
 					θ_θΨobs = rockFragment.CORECTION_θΨ_WETABLE!(NiZ, N_θΨobs, rfWetable, RockClass, RockFragment, θ_θΨobs, Ψ_θΨobs)
 				end # option.rockFragment.CorrectStoneWetability
 			end # if:option.run.RockCorection
@@ -230,27 +238,31 @@ module AquaPore_Toolkit
 					printstyled("		Running KsModel= ", option.ksModel.KₛModel⍰, "\n" ; color=:green)
 
 				# Default value
-					🎏_IsTopsoil=false; 🎏_RockFragment=false; IsTopsoil₀=[]; RockFragment₀=[]; Ks_Impermeable₀=[]
+					if  @isdefined RockFragment
+                  RockFragment₀   = RockFragment
+					else
+                  RockFragment₀   = []
+					end
+					
+					if @isdefined IsTopsoil         
+                  IsTopsoil₀      = IsTopsoil
+					else
+                  IsTopsoil₀      = []
+					end
 
-				if  @isdefined RockFragment
-               🎏_RockFragment = true
-               RockFragment₀   = RockFragment
-				end
-				
-				if @isdefined IsTopsoil
-               🎏_IsTopsoil = true
-               IsTopsoil₀   = IsTopsoil
-				end
+					if @isdefined IsTopsoil         
+                  Ks_Impermeable₀ = Ks_Impermeable
+					else
+                  Ks_Impermeable₀ = []
+					end
 
-				if option.run.Smap
-               🎏_IsTopsoil    = true
-               🎏_RockFragment = true
-               IsTopsoil₀      = IsTopsoil
-               RockFragment₀   = RockFragment
-               Ks_Impermeable₀ = Ks_Impermeable
-				end
+					if @isdefined ∑Psd         
+                  ∑Psd₀           = ∑Psd
+					else
+                  ∑Psd            = []
+					end
 
-				hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, IsTopsoil=IsTopsoil₀, RockFragment=RockFragment₀, Ks_Impermeable=Ks_Impermeable₀, ∑Psd=∑Psd)
+				hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; IsTopsoil=IsTopsoil₀, RockFragment=RockFragment₀, Ks_Impermeable=Ks_Impermeable₀, ∑Psd=∑Psd₀)
 
 				printstyled("\n ----- END RUNNING Ks Modelfrom θ(Ψ) ----------------------------------------------- \n";color=:green)
 			end # if: option.hydro.HydroModel⍰ == :Kosugi
@@ -284,21 +296,7 @@ module AquaPore_Toolkit
 				KunsatModel_Psd = fill(0.0::Float64, NiZ)
 
 				hydroPsd, hydroOther_Psd = hydrolabOpt.HYDROLABOPT_START(NiZ=NiZ, ∑Psd=∑Psd, θ_θΨobs=θ_Rpart, Ψ_θΨobs=Ψ_Rpart, N_θΨobs=N_Psd, hydro=hydroPsd, hydroOther=hydroOther_Psd, option=option, optionₘ=option.psd, optim=optim_Psd, param=param) 
-
-				printstyled("\n 	----- START RUNNING Ks Model from θ(Ψ)PSD  -----------------------------------------------"; color=:green)
-					if  (@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; 🎏_IsTopsoil=true, 🎏_RockFragment=true, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
 					
-					elseif (@isdefined RockFragment) && !(@isdefined IsTopsoil)	
-						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; 🎏_RockFragment=true, RockFragment=RockFragment)
-					
-					elseif !(@isdefined RockFragment) && (@isdefined IsTopsoil)
-						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel; 🎏_IsTopsoil=true, IsTopsoil=IsTopsoil)
-					
-					elseif !(@isdefined RockFragment) && !(@isdefined IsTopsoil)
-						hydroPsd, KₛModel = startKsModel.START_KSΨMODEL(hydroPsd, option, param, path, KₛModel, path.option.ModelName, ksmodelτ, NiZ, optim, optimKsmodel)
-					end # if: RockFragment && IsTopsoil
-				printstyled("\n 	----- END RUNNING Ks Model from θ(Ψ)PSD  ----------------------------------------------- \n"; color=:green)					
 			
 			printstyled("\n ----- END: RUNNING IntergranularMixingPsd ----------------------------------------------- \n"; color=:yellow)
 		end
@@ -355,11 +353,6 @@ module AquaPore_Toolkit
 		#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		# _______________________ START: table _______________________ 
 
-		# if option.run.ChangeHydroModel
-		# 	table.hydroLab.TABLE_EXTRAPOINTS_Kθ(option.hydro, hydro, IdSelect, param.hydro.K_Table, NiZ, path.inputSoilwater.Kunsat)
-			
-		# 	table.hydroLab.TABLE_EXTRAPOINTS_θΨ(option.hydro, hydro, IdSelect, NiZ, path.inputSoilwater.Ψθ , param.hydro.TableComplete_θΨ; Orientation="Vertical")
-		# end
 
 		if option.run.HydroLabθΨ⍰ ≠ "No" && option.run.HydroLabθΨ⍰ ≠ "HydroParamPrecomputed" # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 			# CORE OUTPUT
@@ -367,8 +360,10 @@ module AquaPore_Toolkit
 
 				# When optimising other model than Kosugi we do not have a model for σ_2_Ψm⍰. Therefore we assume that θ(Ψ) and K(θ) derived by Kosugi from very dry to very wet are physical points
 				# if option.hydro.HydroModel⍰ == "Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained"
-				if option.run.ChangeHydroModel
-				println(path.tableSoilwater.TableComplete_KΨ)
+				if option.run.Smap || (option.hydro.HydroModel⍰ =="Kosugi" && option.data.Pedological⍰=="Smap")
+
+					println(path.tableSoilwater.TableComplete_KΨ)
+					
 					table.hydroLab.TABLE_EXTRAPOINTS_Kθ(option.hydro, hydro, IdSelect, param.hydro.K_Table, NiZ, path.tableSoilwater.TableComplete_KΨ)
 			
 					table.hydroLab.TABLE_EXTRAPOINTS_θΨ(option.hydro, hydro, IdSelect, NiZ, path.tableSoilwater.TableComplete_θΨ, param.hydro.TableComplete_θΨ; Orientation="Vertical")
@@ -386,7 +381,7 @@ module AquaPore_Toolkit
 				end # option.run.Smap	
 			end # option.run.HydroLabθΨ⍰ ≠ :No && option.run.HydroLabθΨ⍰ ≠ :File
 
-			if option.run.KsModel # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
+			if option.run.KsModel && option.hydro.HydroModel⍰=="Kosugi"# <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 				table.ksmodel.KSMODEL(hydro, IdSelect, KₛModel,  path.tableSoilwater.Table_KsModel)
 				table.ksmodel.KSMODEL_τ(ksmodelτ, N_Class, path.tableSoilwater.Table_KsModel_τ)
 			end  # if: option.run.KsModel
@@ -485,8 +480,8 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="TESTCASE", SiteName_Soilwater="Convert")
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapSmapNZSnapshot20210823")
 	
-	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
+	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
 
-	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
+	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)

@@ -3,7 +3,7 @@
 # =============================================================
 module tableSmap
    import ..tool, ..wrc, ..kunsat
-   import DelimitedFiles, CSV, Tables
+   import CSV, Tables
 
    	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : θΨK
@@ -46,8 +46,8 @@ module tableSmap
           # User input
             HeaderSmap = true # <true> the greek characters are replaced by alphabet; <false> original parameter names with no units usefull to use values in SoilWater-ToolBox
 
-            Option_BrooksCorey       = false
-            Option_ClappHornberger   = false
+            Option_BrooksCorey       = true
+            Option_ClappHornberger   = true
             Option_VanGenuchten      = true
             Option_VanGenuchtenJules = false
             Option_Kosugi            = true

@@ -386,7 +386,7 @@ module readHypix
                # θsMacMat value depends on θs
                   if Symbol(Name_Unique[i]) == :θsMacMat_ƞ
                      for iZ =1:length(Param_Vect)
-                        hydroHorizon.θsMacMat[iZ] = hydroHorizon.θs[iZ] * Param_Vect[iZ]
+                        hydroHorizon.θsMacMat[iZ] = min((hydroHorizon.θs[iZ] - hydroHorizon.θr[iZ]) * Param_Vect[iZ] + hydroHorizon.θr[iZ], hydroHorizon.θr[iZ])
                      end
                   end 
                

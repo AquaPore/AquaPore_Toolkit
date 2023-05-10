@@ -8,8 +8,9 @@ module checking
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       function CHECKING(option, optionₘ, optim)
 
-		 # ------------ Cannot run simultaneously HyIx and soilwater---------------------
+		
 
+		 # ------------ Cannot run simultaneously HyIx and soilwater---------------------
 		 	if option.run.Hypix && (option.run.ChangeHydroModel || option.run.HydroLabθΨ⍰≠"No" || option.run.Infiltration || option.run.IntergranularMixingPsd ||  option.run.Smap2Hypix || option.run.Temporary)
 				error("*** Cannot run simulataneously HyPix and SoilWater ***")
 
@@ -20,11 +21,12 @@ module checking
 		 	elseif "Ks" ∈ optim.ParamOpt && !(option.data.Kθ) 
 				error("*** If Ks ∈ optim.ParamOpt ⇒ option.data.θΨ ***")
 
+			elseif "θr"∉ optim.ParamOpt && option.hydro.θrOpt⍰=="Opt" 
+				error("*** AquaPore-ToolKit Error: option.hydro.θrOpt⍰==Opt ⇒ θr ∈ optim.ParamOpt ***")
+
 			elseif option.run.HydroLabθΨ⍰≠"No" && !option.data.θΨ
 				error("*** If option.run.HydroLabθΨ⍰ ⇒option.data.θΨ ***")
 
-			# elseif option.run.RockCorection && option.rockFragment.RockInjectedIncluded⍰ =="InjectRock" && !( option.data.Φ⍰ && option.data.θΨ)
-			# 	error("*** If option.run.RockCorrection && option.rockFragment.RockInjectedIncluded⍰ ==InjectRock ⇒ option.data.BulkDensity OR option.data.θΨ ***")
 
 			elseif optionₘ.HydroModel⍰=="Kosugi" && "θsMacMat" ∈ optim.ParamOpt
 				error("*** optionₘ.HydroModel⍰==Kosugi && optionₘ.HydroModel⍰==Bimodal THAN optionₘ.HydroModel⍰ == Φ ***")

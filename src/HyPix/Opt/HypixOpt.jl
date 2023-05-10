@@ -238,7 +238,7 @@ module hypixOpt
 				
 			# Converting θsMacMat_ƞ -> θsMacMat
 				for iZ=1:N_SoilLayer
-					hydroHorizon.θsMacMat[iZ] = hydroHorizon.θsMacMat_ƞ[iZ] * hydroHorizon.θs[iZ]
+					hydroHorizon.θsMacMat[iZ] = min(hydroHorizon.θsMacMat_ƞ[iZ] * (hydroHorizon.θs[iZ] - hydroHorizon.θr[iZ]) + hydroHorizon.θr[iZ], hydroHorizon.θs[iZ])
 				end 
 
 			#  <>=<>=<>=<>=<>=<> Relationship between  θs & θr

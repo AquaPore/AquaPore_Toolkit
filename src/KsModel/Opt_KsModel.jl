@@ -9,7 +9,7 @@ module optKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : START_OPT_KθMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function START_OPT_KθMODEL(∑Psd, 🎏_Clay, ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
+		function START_OPT_KθMODEL(∑Psd, 🎏_Clay, ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param;🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, RockFragment=RockFragment, IsTopsoil=IsTopsoil)
 				
 			# Deriving the feasible range of the τ parameters
 				SearchRange = SEARCHRANGE(ipClass, optimKsmodel)
@@ -26,7 +26,7 @@ module optKsModel
 			# Computing optimal KₛModel
 			for iZ=1:NiZ
 				if ClassBool_Select[iZ]
-					KₛModel[iZ] = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, 0.0; 🎏_IsTopsoil=false, 🎏_RockFragment=false, IsTopsoil=[], RockFragment=[])
+					KₛModel[iZ] = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, 0.0; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, RockFragment=RockFragment, IsTopsoil=IsTopsoil)
 				end
 			end
 		return KₛModel
@@ -37,7 +37,7 @@ module optKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_KθMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OF_KθMODEL(∑Psd, 🎏_Clay, ClassBool_Select, hydro, ipClass, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; 🎏_IsTopsoil=false, 🎏_RockFragment=false, IsTopsoil=[], RockFragment=[], KsMinMax=0.005555556)
+		function OF_KθMODEL(∑Psd, 🎏_Clay, ClassBool_Select, hydro, ipClass, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
 
 			# Deriving the optimal τ parameters from X
 				ksmodelτ = X_2_τ(ipClass, ksmodelτ, optimKsmodel, X)
@@ -54,7 +54,7 @@ module optKsModel
 			if ClassBool_Select[iZ]
 				for iΨ =1:N_ΨObs
 					# K(Ψ) simulated
-						Kθ_Sim = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ_Obs[iΨ]; 🎏_IsTopsoil=false, 🎏_RockFragment=false, IsTopsoil=[], RockFragment=[])
+						Kθ_Sim = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ_Obs[iΨ]; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, RockFragment=RockFragment, IsTopsoil=IsTopsoil)
 
 						Kθ_Log_Sim[iΨ] = log(Kθ_Sim)
 

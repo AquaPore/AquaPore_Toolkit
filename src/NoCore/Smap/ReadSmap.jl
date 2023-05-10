@@ -2,6 +2,19 @@
 	#		module non Core : smap
 	# =============================================================
 	module readSmap
+
+		Base.@kwdef mutable struct SMAP
+         IsTopsoil              :: Vector{Float64}
+         RockClass              :: Vector{Float64}
+         RockFragment           :: Vector{Float64}
+         Smap_Depth             :: Vector{Float64}
+         Smap_ImpermClass       :: Vector{Float64}
+         Smap_MaxRootingDepth   :: Vector{Float64}
+         Smap_PermeabilityClass :: Vector{Float64}
+         Smap_SmapFH            :: Vector{Float64}
+         Soilname               :: Vector{Float64}
+		end
+
 	   import ..tool
    	import Polynomials
 		using CSV, Tables, DataFrames
@@ -13,7 +26,6 @@
 				println("    ~  $(path.inputSmap.Smap) ~")
 
 				Data = CSV.read(path.inputSmap.Smap, DataFrame, header=true)
-
 				DataFrames.sort!(Data, [:Id])
 				
             IsTopsoil              = convert(Vector{Float64}, Data."IsTopsoil")
@@ -46,6 +58,13 @@
             Smap_ImpermClass       = Smap_ImpermClass[IdSelect]
 
 				NiZ = length(Smap_ImpermClass)
+
+				# CORRECTION FOR RockFragment if no correction is required
+					for iZ=1:NiZ
+						if RockClass[iZ] == "NoAdj"
+							RockFragment[iZ] == 0.0
+						end
+					end
 
 				# KS_IMPERMEABLE
 					# If impermeable than the value is greater than 0
@@ -88,15 +107,15 @@
 				println("    ~  $(Path) ~")
 				
 				# Read data
-					Data = CSV.read(Path,  DataFrame, header=true)
+               Data             = CSV.read(Path,  DataFrame, header=true)
 
-					RockClass = convert(Vector{String}, Data. "RockClass")
+               RockClass        = convert(Vector{String}, Data. "RockClass")
 
-					N_RockClass = length(RockClass)
+               N_RockClass      = length(RockClass)
 
-					RockClass_Unique = unique(RockClass)
+               RockClass_Unique = unique(RockClass)
 					
-					N_RockClass = length(RockClass_Unique)
+               N_RockClass      = length(RockClass_Unique)
 
 				# Dictionary
 					RockClass_Dict = Dict("a"=>9999)
@@ -105,14 +124,14 @@
 					end
 
 				# Read data
-					Ψ₂ = convert(Vector{Float64}, Data."H[mm]")
-					θ₂ = convert(Vector{Float64}, Data."Theta[0-1]") 
+               Ψ₂   = convert(Vector{Float64}, Data."H[mm]")
+               θ₂   = convert(Vector{Float64}, Data."Theta[0-1]")
 
-					N₂ =length(Ψ₂)
+               N₂   = length(Ψ₂)
 
-					Ψ_Rf = zeros(Int64,(N_RockClass, 100))
-					θ_Rf = zeros(Float64,(N_RockClass, 100))
-					N_Ψ = zeros(Int64,(N_RockClass))
+               Ψ_Rf = zeros(Int64,(N_RockClass, 100))
+               θ_Rf = zeros(Float64,(N_RockClass, 100))
+               N_Ψ  = zeros(Int64,(N_RockClass))
 
 					iRockClass=1 ; iΨ=1
 					for i=1:N₂
@@ -120,7 +139,7 @@
 							Ψ_Rf[iRockClass,iΨ] = Ψ₂[i]
 							θ_Rf[iRockClass,iΨ] = θ₂[i]
 						else
-							N_Ψ[iRockClass]  = iΨ -1
+							N_Ψ[iRockClass]  = iΨ - 1
 							iRockClass += 1
 							iΨ = 1
 							Ψ_Rf[iRockClass,iΨ] = Ψ₂[i]

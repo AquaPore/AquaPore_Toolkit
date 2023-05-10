@@ -3,7 +3,7 @@
 # =============================================================
 module θψ_2_KsψModel
 	import ..cst, ..distribution, ..wrc, ..kunsat
-	import QuadGK
+	import QuadGK, Polynomials
 	import SpecialFunctions: erfc, erfcinv
 	
 	export KSΨMODEL_START
@@ -11,21 +11,10 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSΨMODEL_START
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ₁; 🎏_IsTopsoil=false, 🎏_RockFragment=false, IsTopsoil=[], RockFragment=[])
+		function KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ₁; 🎏_IsTopsoil=false, 🎏_RockFragment=false, RockFragment=[], IsTopsoil=[])
 
-			if 🎏_RockFragment
-				RockFragment₁ = RockFragment[iZ]
-			else
-				RockFragment₁ = 0.0
-			end #@isdefined RockFragment
+			return KsΨmodel = KSMODEL_OPTIONS(∑Psd, 🎏_Clay, 🎏_RockFragment, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ₁; RockFragment=RockFragment)
 
-			# if 🎏_IsTopsoil
-			# 	IsTopsoil₁ = Int64(IsTopsoil[iZ])
-			# else
-			# 	IsTopsoil₁ = 1	# Default value				
-			# end  # if: @isdefined IsTopsoil
-
-			return KsΨmodel = TORTUOSITYMODELS(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ₁; RockFragment=RockFragment₁, Smap_ImpermClass=[], KsImpClass_Dict=[])
 		end  # function: KS_MODEL
 	#..................................................................
 
@@ -38,14 +27,15 @@ module θψ_2_KsψModel
 			Kunsat_Mat = T1 * ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) ) ^ T2
 
 			Kunsat_Mac = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) ^ T2Mac 
-		return KsModel = Kunsat_Mat + Kunsat_Mac
+
+		return Kunsat_Mat + Kunsat_Mac
 		end  # function: KS_MODEL
 	# ------------------------------------------------------------------
 	
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : KsΨMODEL
+	#		FUNCTION : KsΨMODEL_NOINTEGRAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KsΨMODEL(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
+		function KsΨMODEL_NOINTEGRAL(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
 			# Matrix ====	
 				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
@@ -64,13 +54,13 @@ module θψ_2_KsψModel
 				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
 				Kunsat_Mac = Ks_Mac * √Se_Mac * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-		return K_Ψ = Kunsat_Mat + Kunsat_Mac
-		end  # function: KsΨMODEL
+		return Kunsat_Mat + Kunsat_Mac
+		end  # function: KsΨMODEL_NOINTEGRAL
 	# ------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : KsΨMODEL
+	#		FUNCTION : KsΨMODEL_CLAY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function KsΨMODEL_CLAY(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
@@ -83,12 +73,12 @@ module θψ_2_KsψModel
 				Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
 			# Macropore ===
-				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat)  * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
+				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
 				Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
-	return K_Ψ = Kunsat_Mat + Kunsat_Mac
-	end  # function: KsΨMODEL
+	return  Kunsat_Mat + Kunsat_Mac
+	end  # function: KsΨMODEL_CLAY
 	# ------------------------------------------------------------------
 
 	# ^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^__^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^__^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_^_
@@ -96,12 +86,13 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : TORTUOSITYMODELS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function TORTUOSITYMODELS(∑Psd, 🎏_Clay::Bool, hydro, ipClass, iZ::Int64, ksmodelτ, option, param, Ψ₁; RockFragment=0.0, θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τclay₀=ksmodelτ.τclay₀[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τclay₀Mac=ksmodelτ.τclay₀Mac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τclayₘₐₓMac=ksmodelτ.τclayₘₐₓMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τclayΔθsrMac=ksmodelτ.τclayΔθsrMac, RockFragment_Treshold=0.4, Smap_ImpermClass=[], KsImpClass_Dict=[] )
+		function KSMODEL_OPTIONS(∑Psd, 🎏_Clay::Bool, 🎏_RockFragment::Bool, hydro, ipClass, iZ::Int64, ksmodelτ, option, param, Ψ₁; RockFragment=[], θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τclay₀=ksmodelτ.τclay₀[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τclay₀Mac=ksmodelτ.τclay₀Mac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τclayₘₐₓMac=ksmodelτ.τclayₘₐₓMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τclayΔθsrMac=ksmodelτ.τclayΔθsrMac)
 
-			# Determine when Ks increases for increasing RockFragment	
-				if RockFragment > RockFragment_Treshold
-					θr, θs, θsMacMat = ROCKCORRECTION(RockFragment, RockFragment_Treshold, θr, θs, θsMacMat)
-				end
+			# Only correct if RF > Rf_StartIncrease
+			if 🎏_RockFragment
+				θr, θs, θsMacMat = ROCKCORRECTION!(RockFragment[iZ], θr, θs, θsMacMat)
+			end #@isdefined RockFragment
+
 
 			# MODEL 0 ====
 			# Original model	
@@ -146,7 +137,7 @@ module θψ_2_KsψModel
 					
 					# Tortuosity T3Mac
 						T3Mac = T3_Max * (1.0 - τ₃ₐMac)			 											
-			return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+			return KsΨMODEL_NOINTEGRAL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 				
 	
 			# MODEL 2 ====	
@@ -243,58 +234,6 @@ module θψ_2_KsψModel
 						T3Mac = T3_Max * (1.0 - τ₃ₐMac)
 							
 				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)	
-			
-			elseif option.ksModel.KₛModel⍰=="KsΨmodel_4" # ===
-				# Transformation matrix
-
-				# CLAY MODEL 
-					# Reducing with σ
-						σclay = 2.3 # 2.3
-
-						X_σ₁ = 0
-						Y_σ₁ = 1.0 
-						X_σ₂ = 3.7 - σclay
-						Y_σ₂ = τclay₀
-						α  = (Y_σ₂ - Y_σ₁) / (X_σ₂ - X_σ₁)
-						B  = Y_σ₁ - X_σ₁ * α 
-
-					Tσ = max(min(α * (σ - σclay) + B, 1.0), Y_σ₂)
-
-					# Reducing with θs - θr
-						X_θs₁ = 0.0
-						Y_θs₁ = 1.0
-						X_θs₂ = 0.6
-						Y_θs₂ = 0.0
-						α = (Y_θs₂ - Y_θs₁) / (X_θs₂  - X_θs₁)
-						Β  = Y_θs₁ - X_θs₁ * α
-
-						TθsMacMat = max(min(α * (θsMacMat - θr) + Β, 1.0), Y_θs₂)
-					
-					# T1 TORTUSOSITY MODEL
-						T1 = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
-						if σ ≥ σclay 
-							if (θsMacMat - θr) ≥ 0.25
-								T1 = T1 * TθsMacMat ^ τ₂ₐ
-							end
-						end
-			
-				# Tortuosity T2
-					T2_Min = 1.0; T2_Max = 3.0
-					T2 = ((T2_Min - T2_Max) * τ₂ₐ + T2_Max)
-
-					if σ ≥ σclay 					
-						T2 = T2 * Tσ 
-					end
-
-				# Tortuosity T3
-					T3 = τ₃ₐ
-
-			# Transformation macro
-				T1Mac = 10.0 ^ (τ₁ₐMac / (τ₁ₐMac - 1.0))
-				T2Mac = (T2_Min - T2_Max) * τ₂ₐMac + T2_Max
-				T3Mac = τ₃ₐMac							
-			
-			return KsΨMODEL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 				
 			else
 				error("option.ksModel.KₛModel⍰ = $(option.ksModel.KₛModel⍰) is not yet implemented try <KsModel_Traditional>; <KsModel_Tσ>; <KsModel_New>; <KsModel_NewSimplified> ")
@@ -303,24 +242,10 @@ module θψ_2_KsψModel
 		end  # function: TORTUOSITYMODELS 
 
 
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : ROCKCORRECTION
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ROCKCORRECTION(RockFragment, RockFragment_Treshold, θr, θs, θsMacMat)
-				RockFragment2 = max(2.0 * RockFragment_Treshold - RockFragment, 0.0)
-
-				θs = (θs / (1.0 - RockFragment)) * (1.0 - RockFragment2)
-				
-				θsMacMat = (θsMacMat / (1.0 - RockFragment)) * (1.0 - RockFragment2)
-
-				θr = (θr / (1.0 - RockFragment)) * (1.0 - RockFragment2)		
-		return θr, θs, θsMacMat
-		end  # function: ROCKCORRECTION
-	# ------------------------------------------------------------------
-
 	# =====================================================================================================================
 	# =====================================================================================================================
 
+	
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : TORTUOSITY_CLAY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -352,4 +277,41 @@ module θψ_2_KsψModel
 		return Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5) 
 		end				
 	# ------------------------------------------------------------------
+
+	
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : ROCKCORRECTION
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
+		function ROCKCORRECTION!(Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.35, Rf_EndIncrease=0.8)
+
+			Rf = min(Rf, Rf_EndIncrease)
+
+			if Rf > Rf_StartIncrease
+				println("Rf=$Rf, θr=$θr, θs=$θs, θsMacMat=$θsMacMat")
+				X = [Rf_StartIncrease, Rf_EndIncrease]
+				
+				# θs ----
+					θs_NoRf = θs / (1.0 - Rf)
+					Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, 1.2 * θs_NoRf]
+					Fit_θs = Polynomials.fit(X, Y_θs, 1)
+					θs = Fit_θs(Rf)
+
+				# θr ----
+					θr_NoRf = θr / (1.0 - Rf)
+					Y_θr = [(1.0 - Rf_StartIncrease) * θr_NoRf,θr_NoRf]
+					Fit_θr = Polynomials.fit(X, Y_θr, 1)
+					θr = Fit_θr(Rf)
+
+				# θsMacMat ----
+					θsMacMat_NoRf =  θsMacMat / (1.0 - Rf)
+					Y_θsMacMat = [(1.0 - Rf_StartIncrease) * θsMacMat_NoRf, 0.75 * (θs - θr) + θr]
+					Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)	
+					θsMacMat = Fit_θsMacMat(Rf)					
+			println("Rf=$Rf, θr_NoRf = $θr_NoRf, θr=$θr, θs_NoRf=$θs_NoRf, θs=$θs, θsMacMat_NoRf=$θsMacMat_NoRf, θsMacMat=$θsMacMat \n \n")
+			end
+		return θr, θs, θsMacMat
+		end  # function: ROCKCORRECTION
+	# ------------------------------------------------------------------
+
 end  # module θψ_2_KsψModel

@@ -388,7 +388,7 @@ module reading
 			# θsMacMat value depends on θs
 			if  Symbol(inParamValue) == :θsMacMat_ƞ
 				for iZ = 1:NiZ 
-					hydro.θsMacMat[iZ] =  hydro.θs[iZ] * hydro.θsMacMat_ƞ[iZ]
+					hydro.θsMacMat[iZ] = min((hydro.θs[iZ] - hydro.θr[iZ]) * hydro.θsMacMat_ƞ[iZ] + hydro.θr[iZ], hydro.θs[iZ])
 				end
 			end # Symbol(inParamValue) == :θsMacMat_ƞ
 

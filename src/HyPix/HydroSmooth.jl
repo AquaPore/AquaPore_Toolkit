@@ -119,7 +119,7 @@ module hydroSmooth
 
                hydro_Smooth.σ[iSmooth]        = σ_AVER(hydroHorizon.σ[iZ], hydroHorizon.σ[iZ-1], 0.5)
 
-               hydro_Smooth.θsMacMat_ƞ[iSmooth] =  hydroHorizon.θsMacMat[iZ] / hydroHorizon.θs[iZ]
+               hydro_Smooth.θsMacMat_ƞ[iSmooth] = min((hydroHorizon.θsMacMat[iZ] - hydroHorizon.θr[iZ]) / (hydroHorizon.θs[iZ] - hydroHorizon.θr[iZ]), 1.0)
 
             else
                iZ = Int64(Layer_Smooth[iSmooth])
@@ -140,7 +140,7 @@ module hydroSmooth
 
                hydro_Smooth.σ[iSmooth]        = hydroHorizon.σ[iZ]
 
-               hydro_Smooth.θsMacMat_ƞ[iSmooth] = hydroHorizon.θsMacMat[iZ] / hydroHorizon.θs[iZ]
+               hydro_Smooth.θsMacMat_ƞ[iSmooth] = min((hydroHorizon.θsMacMat[iZ] - hydroHorizon.θr[iZ]) / (hydroHorizon.θs[iZ] - hydroHorizon.θr[iZ]), 1.0)
               
             end #  if Layer_Smooth[iSmooth] - floor(Layer_Smooth[iSmooth]) > 0.4
 

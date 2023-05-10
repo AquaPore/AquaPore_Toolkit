@@ -13,13 +13,15 @@ module startKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : START_KSΨMODEL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; 🎏_IsTopsoil=false, 🎏_RockFragment=false, IsTopsoil=[], RockFragment=[], Ks_Impermeable=[], ∑Psd=[])
+		function START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; IsTopsoil=[], RockFragment=[], Ks_Impermeable=[], ∑Psd=[])
 				
 			# NUMBER OF CLASSES
 				ClassBool, ClassBool_All, N_Class = KSΨMODEL_CLASS(hydro, NiZ, option, param)
 
-			# Do we have clay information
-				🎏_Clay = !isempty(∑Psd)
+			# What data do we have for our analysis 
+            🎏_Clay         = !isempty(∑Psd)
+            🎏_IsTopsoil    = !isempty(IsTopsoil)
+            🎏_RockFragment = !isempty(RockFragment)
 
 			# Time now 
 				Time_Start = time()
@@ -39,12 +41,12 @@ module startKsModel
 					if sum(ClassBool[1:NiZ, ipClass]) ≥ 1 && optimKsmodel.NparamOpt[ipClass] ≥ 1
 						println("\n       === ipClass=$ipClass === \n")
 						
-						KₛModel = optKsModel.START_OPT_KθMODEL(∑Psd, 🎏_Clay, ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param)
+						KₛModel = optKsModel.START_OPT_KθMODEL(∑Psd, 🎏_Clay, ClassBool_Select, hydro, ipClass, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, RockFragment=RockFragment, IsTopsoil=IsTopsoil)
 
 						# Computing KΨ_Sim₁₀ₖₚₐ
 						for iZ=1:NiZ
 							if ClassBool_Select[iZ]
-								KΨ_Sim₁₀ₖₚₐ[iZ] = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, 1000.0; 🎏_IsTopsoil=false, 🎏_RockFragment=false, IsTopsoil=[], RockFragment=[])
+								KΨ_Sim₁₀ₖₚₐ[iZ] = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, 1000.0; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, RockFragment=RockFragment, IsTopsoil=IsTopsoil)
 							end
 						end
 
@@ -82,9 +84,9 @@ module startKsModel
 
 					for iZ=1:NiZ
 						if ClassBool_Select[iZ]
-							KₛModel[iZ] = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, 0.0; 🎏_IsTopsoil=false,🎏_RockFragment=false, IsTopsoil=[], RockFragment=[])
+							KₛModel[iZ] = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, 0.0; 🎏_IsTopsoil=🎏_IsTopsoil,🎏_RockFragment=🎏_RockFragment, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
 							
-							KΨ_Sim₁₀ₖₚₐ[iZ] = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, 10_00.0; 🎏_IsTopsoil=false, 🎏_RockFragment=false, IsTopsoil=[], RockFragment=[])
+							KΨ_Sim₁₀ₖₚₐ[iZ] = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, 10_00.0;  🎏_IsTopsoil=🎏_IsTopsoil,🎏_RockFragment=🎏_RockFragment, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
 						end
 					end # for ipClass=1:N_Class, 
 				end #ifor ipClass=1:N_Class
@@ -99,28 +101,23 @@ module startKsModel
 				end
 			end  # if: optimKsmodel
 
+
+			# CHECKING FOR CONSISTENCY
 			for iZ=1:NiZ
-				if "Ks" ∉ optim.ParamOpt
-					hydro.Ks[iZ] = KₛModel[iZ]
+				KₛModel[iZ] = max(min(KₛModel[iZ], hydro.Ks_Max[iZ]), hydro.Ks_Min[iZ])
 
-					# If wanting to assure that the feasible range is physical
-					hydro.Ks[iZ] = max( min(hydro.Ks[iZ], hydro.Ks_Max[iZ]), hydro.Ks_Min[iZ])
-				end #  hydro.Ks[iZ] < eps(100.0)
-			end # if: hydro.Ks[iZ] > eps(10.0)
-
-
-			# SMAP SPECIAL COORECTING FOR IMPERMEABLE LAYERS
-				# This is to force values of Ks for special soils such as pans/ rocks etc... 
 				if option.run.Smap
-					for iZ=1:NiZ
-						if Ks_Impermeable[iZ] ≥ 0.0
-							KₛModel[iZ] = Ks_Impermeable[iZ]
-						end
-
-						KₛModel[iZ] = min(KₛModel[iZ], hydro.Ks_Max)
-
+					# Special cases for impermeable layers
+					if Ks_Impermeable[iZ] ≥ 0.0
+						KₛModel[iZ] = Ks_Impermeable[iZ]
 					end
 				end
+
+				if "Ks" ∉ optim.ParamOpt
+					hydro.Ks[iZ] = KₛModel[iZ]
+				end #  hydro.Ks[iZ] < eps(100.0)
+			end
+
 		
 			Time_End = time()
 
@@ -164,6 +161,7 @@ module startKsModel
 		return ClassBool, ClassBool_All, N_Class
 		end  # function: SELECTION
 	# ------------------------------------------------------------------
+
 		
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

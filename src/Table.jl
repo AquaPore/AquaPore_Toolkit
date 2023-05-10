@@ -143,9 +143,7 @@ module table
 						iCount += 1
 					end # iΨ
 				end # iZ
-
 				CSV.write(Path, Tables.table([string.(Id₂[1:N]) Ψ₂[1:N] Kunsat₂[1:N]]), writeheader=true, header=FieldName_String, bom=true)
-
 		return nothing
 		end  # function:  θΨ
 			
