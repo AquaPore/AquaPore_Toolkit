@@ -9,7 +9,7 @@ module hydrolabOpt
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : HYPIXOPT_START
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function HYDROLABOPT_START(;NiZ, ∑Psd, θ_θΨobs, Ψ_θΨobs, N_θΨobs, K_KΨobs=[0], Ψ_KΨobs=[0], N_KΨobs=1, hydro, hydroOther, option, optionₘ, optim, param, θϵ=0.005)
+	function HYDROLABOPT_START(;NiZ, ∑Psd, θ_θΨobs, Ψ_θΨobs, N_θΨobs, K_KΨobs=[0], Ψ_KΨobs=[0], N_KΨobs=1, hydro, hydroOther, option, optionₘ, optim, param, θϵ=0.005, Minθs_θr=0.15)
 		for iZ = 1:NiZ
 			# CORRECTION OF THE FEASIBLE RANGE ~~~
 				θobs_Min = minimum(θ_θΨobs[iZ, 1:N_θΨobs[iZ]])  	# Smallest measure θ
@@ -19,17 +19,18 @@ module hydrolabOpt
 			# CORRECTING Θr ~~~
 			# We overwrite  if optionₘ.θrOpt⍰=="ParamPsd"
 				if ("θr" ∈ optim.ParamOpt)
-					hydro.θr_Max[iZ] = max( min(θobs_Min-θϵ, hydro.θr_Max[iZ]), hydro.θr_Min[iZ] ) # Maximum value of θr
+					hydro.θr_Max[iZ] = max( min(θobs_Min - θϵ, hydro.θr_Max[iZ]), hydro.θr_Min[iZ] ) # Maximum value of θr
 
 					# Changing the feasible range of θr
 					iθr = findfirst(isequal("θr"), optim.ParamOpt)[1]
 					optim.ParamOpt_Max[iθr] = hydro.θr_Max[iZ]
 
 				elseif ("θr" ∉ optim.ParamOpt) && (optionₘ.θrOpt⍰=="ParamPsd") && (option.data.Psd) # Derive θr frpm PSD
-					hydro.θr[iZ] = min(psdThetar.PSD_2_θr_FUNC(∑Psd, hydro, iZ, param), max(θobs_Min-θϵ, 0.0))
+					hydro.θr[iZ] = min(psdThetar.PSD_2_θr_FUNC(∑Psd, hydro, iZ, param), max(θobs_Min - θϵ, 0.0))
+
 				end # if ("θr" ∈ optim.ParamOpt)
 
-			# TEST IF EXIST Ψ=0  ~~~
+			# TEST IF EXIST Ψ ≈ 0  ~~~
 				if minimum(Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]) < eps(1000.0)
 					🎏_0sOpt = false
 				else
@@ -52,19 +53,36 @@ module hydrolabOpt
 						hydro.Φ[iZ] = hydro.θs[iZ] / param.hydro.Coeff_Φ_2_θs
 						
 						# Reinforcing θs > θr
-							hydro.θs[iZ] = max(hydro.θs[iZ], hydro.θr_Max[iZ] + 0.01)
+							hydro.θr_Max[iZ] = min(max(hydro.θs[iZ] - Minθs_θr, 0.0), hydro.θr_Max[iZ])
+
+							if "θr" ∈ optim.ParamOpt
+								iθr = findfirst(isequal("θr"), optim.ParamOpt)[1]
+								optim.ParamOpt_Max[iθr] = hydro.θr_Max[iZ]
+							else
+								hydro.θr[iZ] = min(hydro.θr_Max[iZ], hydro.θr[iZ])
+							end
 
 				elseif  ("θs" ∉ optim.ParamOpt) # <>=<>=<>=<>=<>
 					if hydro.Φ[iZ] *  param.hydro.Coeff_Φ_2_θs > θobs_Max + θϵ
 						hydro.θs[iZ] = hydro.Φ[iZ] *  param.hydro.Coeff_Φ_2_θs
+
 					elseif hydro.Φ[iZ] *  (param.hydro.Coeff_Φ_2_θs + 0.015) > θobs_Max + θϵ
 						hydro.θs[iZ] = hydro.Φ[iZ] *  (param.hydro.Coeff_Φ_2_θs + 0.015)
+
 					else
 						hydro.θs[iZ] = max(hydro.Φ[iZ] - θϵ, θobs_Max + θϵ)
+
 					end # hydro.Φ[iZ] * 0.95 > θobs_Max + θϵ
 
 					# Reinforcing θs > θr
-						hydro.θs[iZ] = max(hydro.θs[iZ], hydro.θr_Max[iZ] + 0.01)
+						hydro.θr_Max[iZ] = min(max(hydro.θs[iZ] - Minθs_θr, 0.0), hydro.θr_Max[iZ])
+
+						if "θr" ∈ optim.ParamOpt
+							iθr = findfirst(isequal("θr"), optim.ParamOpt)[1]
+							optim.ParamOpt_Max[iθr] = hydro.θr_Max[iZ]
+						else
+							hydro.θr[iZ] = min(hydro.θr_Max[iZ], hydro.θr[iZ])
+						end
 				end
 				
 			# CORRECTING Ks  ~~~

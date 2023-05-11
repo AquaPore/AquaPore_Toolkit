@@ -20,7 +20,7 @@
 		using CSV, Tables, DataFrames
 		export SMAP, ROCKFRAGMENT_WETTABLE_STRUCT, IMPERMEABLE_CLASS
 
-			const RockFragment_Max = 0.9
+			const RockFragment_Max = 0.8
 
 			function SMAP(IdSelect, NiZ, path)
 				println("    ~  $(path.inputSmap.Smap) ~")
@@ -171,7 +171,7 @@
 			function IMPERMEABLE_CLASS(Path)
 					
 				# Read data
-					Data = CSV.read(Path,  DataFrame, header=true)
+					Data = CSV.read(Path, DataFrame, header=true)
 
                ImpermClass    = convert(Vector{String}, Data."FHImpermClass")
                Ks_ImpermClass = convert(Vector{Float64}, Data."Ks[mm s-1]")

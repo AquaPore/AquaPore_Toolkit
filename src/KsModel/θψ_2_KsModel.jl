@@ -90,7 +90,7 @@ module θψ_2_KsψModel
 
 			# Only correct if RF > Rf_StartIncrease
 			if 🎏_RockFragment
-				θr, θs, θsMacMat = ROCKCORRECTION!(RockFragment[iZ], θr, θs, θsMacMat)
+				θr, θs, θsMacMat = ROCKCORRECTION!(hydro, iZ, RockFragment[iZ], θr, θs, θsMacMat)
 			end #@isdefined RockFragment
 
 
@@ -283,7 +283,7 @@ module θψ_2_KsψModel
 	#		FUNCTION : ROCKCORRECTION
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
-		function ROCKCORRECTION!(Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.35, Rf_EndIncrease=0.8)
+		function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.35, Rf_EndIncrease=0.8, θs_Amplify=1.0)
 
 			Rf = min(Rf, Rf_EndIncrease)
 
@@ -293,15 +293,15 @@ module θψ_2_KsψModel
 				
 				# θs ----
 					θs_NoRf = θs / (1.0 - Rf)
-					Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, 1.2 * θs_NoRf]
+					Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, θs_Amplify * θs_NoRf]
 					Fit_θs = Polynomials.fit(X, Y_θs, 1)
-					θs = Fit_θs(Rf)
+					θs = max(min(Fit_θs(Rf), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
 
 				# θr ----
 					θr_NoRf = θr / (1.0 - Rf)
-					Y_θr = [(1.0 - Rf_StartIncrease) * θr_NoRf,θr_NoRf]
+					Y_θr = [(1.0 - Rf_StartIncrease) * θr_NoRf, θr_NoRf]
 					Fit_θr = Polynomials.fit(X, Y_θr, 1)
-					θr = Fit_θr(Rf)
+					θr = max(min(Fit_θr(Rf), hydro.θr_Min[iZ]), hydro.θr_Max[iZ])
 
 				# θsMacMat ----
 					θsMacMat_NoRf =  θsMacMat / (1.0 - Rf)

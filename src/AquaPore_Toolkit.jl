@@ -154,6 +154,9 @@ module AquaPore_Toolkit
 				
 				elseif option.data.Pedological⍰ == "Smap"
 					IsTopsoil, Ks_Impermeable, RockClass, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_SmapFH, Soilname = readSmap.SMAP(IdSelect_True, NiZ, path)
+				else
+					IsTopsoil=[]; Ks_Impermeable=[]; Ks_Impermeable=[]
+
 				end  # if: option.data.Pedological⍰
 
 
@@ -237,32 +240,7 @@ module AquaPore_Toolkit
 				printstyled("\n ----- START RUNNING Ks Model from θ(Ψ)  ----------------------------------------------- \n"; color=:red)
 					printstyled("		Running KsModel= ", option.ksModel.KₛModel⍰, "\n" ; color=:green)
 
-				# Default value
-					if  @isdefined RockFragment
-                  RockFragment₀   = RockFragment
-					else
-                  RockFragment₀   = []
-					end
-					
-					if @isdefined IsTopsoil         
-                  IsTopsoil₀      = IsTopsoil
-					else
-                  IsTopsoil₀      = []
-					end
-
-					if @isdefined IsTopsoil         
-                  Ks_Impermeable₀ = Ks_Impermeable
-					else
-                  Ks_Impermeable₀ = []
-					end
-
-					if @isdefined ∑Psd         
-                  ∑Psd₀           = ∑Psd
-					else
-                  ∑Psd            = []
-					end
-
-				hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; IsTopsoil=IsTopsoil₀, RockFragment=RockFragment₀, Ks_Impermeable=Ks_Impermeable₀, ∑Psd=∑Psd₀)
+				hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; IsTopsoil=IsTopsoil, RockFragment=RockFragment, Ks_Impermeable=Ks_Impermeable, ∑Psd=∑Psd)
 
 				printstyled("\n ----- END RUNNING Ks Modelfrom θ(Ψ) ----------------------------------------------- \n";color=:green)
 			end # if: option.hydro.HydroModel⍰ == :Kosugi
@@ -360,7 +338,8 @@ module AquaPore_Toolkit
 
 				# When optimising other model than Kosugi we do not have a model for σ_2_Ψm⍰. Therefore we assume that θ(Ψ) and K(θ) derived by Kosugi from very dry to very wet are physical points
 				# if option.hydro.HydroModel⍰ == "Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained"
-				if option.run.Smap || (option.hydro.HydroModel⍰ =="Kosugi" && option.data.Pedological⍰=="Smap")
+				Force_Print = true
+				if Force_Print || option.run.Smap || (option.hydro.HydroModel⍰ =="Kosugi" && option.data.Pedological⍰=="Smap")
 
 					println(path.tableSoilwater.TableComplete_KΨ)
 					
