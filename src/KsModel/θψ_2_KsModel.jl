@@ -283,13 +283,14 @@ module θψ_2_KsψModel
 	#		FUNCTION : ROCKCORRECTION
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
-		function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.35, Rf_EndIncrease=0.8, θs_Amplify=1.0)
+		function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.35, Rf_EndIncrease=0.9, θs_Amplify=1.2)
 
 			Rf = min(Rf, Rf_EndIncrease)
 
 			if Rf > Rf_StartIncrease
-				println("Rf=$Rf, θr=$θr, θs=$θs, θsMacMat=$θsMacMat")
-				X = [Rf_StartIncrease, Rf_EndIncrease]
+			
+				# X values
+					X = [Rf_StartIncrease, Rf_EndIncrease]
 				
 				# θs ----
 					θs_NoRf = θs / (1.0 - Rf)
@@ -305,10 +306,9 @@ module θψ_2_KsψModel
 
 				# θsMacMat ----
 					θsMacMat_NoRf =  θsMacMat / (1.0 - Rf)
-					Y_θsMacMat = [(1.0 - Rf_StartIncrease) * θsMacMat_NoRf, 0.75 * (θs - θr) + θr]
+					Y_θsMacMat = [min((1.0 - Rf_StartIncrease) * θsMacMat_NoRf, θs), 0.75 * (θs - θr) + θr]
 					Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)	
-					θsMacMat = Fit_θsMacMat(Rf)					
-			println("Rf=$Rf, θr_NoRf = $θr_NoRf, θr=$θr, θs_NoRf=$θs_NoRf, θs=$θs, θsMacMat_NoRf=$θsMacMat_NoRf, θsMacMat=$θsMacMat \n \n")
+					θsMacMat = min(Fit_θsMacMat(Rf), θs)					
 			end
 		return θr, θs, θsMacMat
 		end  # function: ROCKCORRECTION

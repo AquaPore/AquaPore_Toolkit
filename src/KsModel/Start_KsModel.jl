@@ -21,7 +21,7 @@ module startKsModel
 			# What data do we have for our analysis 
             🎏_Clay         = !isempty(∑Psd)
             🎏_IsTopsoil    = !isempty(IsTopsoil)
-            🎏_RockFragment = !isempty(RockFragment)
+            🎏_RockFragment = !isempty(RockFragment) && option.run.RockCorection
 
 			# Time now 
 				Time_Start = time()

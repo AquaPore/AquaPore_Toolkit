@@ -133,7 +133,6 @@ module table
 				iCount  = 1
 				hydroParam₂ = deepcopy(hydroParam)
 
-				println("NiZ=$NiZ")
 				for iZ=1:NiZ
 					for iK =1:N_K
 						Id₂[iCount] = IdSelect[iZ]

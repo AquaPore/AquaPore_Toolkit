@@ -20,9 +20,9 @@
 		using CSV, Tables, DataFrames
 		export SMAP, ROCKFRAGMENT_WETTABLE_STRUCT, IMPERMEABLE_CLASS
 
-			const RockFragment_Max = 0.8
 
-			function SMAP(IdSelect, NiZ, path)
+
+			function SMAP(IdSelect, NiZ, path; RockFragment_Max=0.9)
 				println("    ~  $(path.inputSmap.Smap) ~")
 
 				Data = CSV.read(path.inputSmap.Smap, DataFrame, header=true)
