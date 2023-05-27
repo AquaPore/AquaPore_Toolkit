@@ -8,7 +8,7 @@ module tableSmap
    	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : θΨK
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         function θΨK(hydro, hydroOther, IdSelect, KₛModel, NiZ, Path, Smap_Depth, Soilname)
+         function θΨK(hydro, hydroOther, IdSelect, KₛModel, NiZ, Path, smap)
             println("    ~  $(Path) ~")
 
             Matrix, FieldName_String = tool.readWrite.STRUCT_2_FIELDNAME(NiZ, hydro)
@@ -24,7 +24,7 @@ module tableSmap
 
                FieldName_String = vcat("Id", "SoilName", "Depth", FieldName_String, "Ks_Model[mm/s]")
 
-               CSV.write(Path, Tables.table( [string.(IdSelect[1:NiZ]) Soilname[1:NiZ] Smap_Depth[1:NiZ] Matrix]), writeheader=true, header=FieldName_String, bom=true)
+               CSV.write(Path, Tables.table( [string.(IdSelect[1:NiZ]) smap.Soilname[1:NiZ] smap.Smap_Depth[1:NiZ] Matrix]), writeheader=true, header=FieldName_String, bom=true)
          return nothing
          end  # function:  θΨK
 
@@ -39,7 +39,7 @@ module tableSmap
    JulesModel_VangenuchtenJules = ["ThetaS_VgJules[mm3_mm3]";"ThetaR_VgJules[mm3_mm3]";"n_VgJules[-]";"Hvg_VgJules[mm]"; "Ks_VgJules[mm_s1]";"3300mm";"10000mm"]
 
    """
-      function SMAP(hydro, IdSelect, IsTopsoil, NiZ, optionₘ, param, path, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_SmapFH, Soilname)
+      function SMAP(hydro, IdSelect, IsTopsoil, NiZ, optionₘ, param, path, smap)
 
          println("    ~  $(path.tableSmap.Table_Smap) ~")
 
@@ -260,7 +260,7 @@ module tableSmap
       end # Option_Kosugi
          
       # COMBINING OUTPUTS  
-         CSV.write(path.tableSmap.Table_Smap, Tables.table( [IdSelect[1:NiZ] Soilname[1:NiZ] Smap_Depth[1:NiZ] IsTopsoil[1:NiZ] RockFragment[1:NiZ] Smap_MaxRootingDepth[1:NiZ] Smap_PermeabilityClass[1:NiZ] Smap_SmapFH[1:NiZ] Data[1:NiZ,:]]), writeheader=true, header=Header, bom=!(HeaderSmap))
+         CSV.write(path.tableSmap.Table_Smap, Tables.table( [IdSelect[1:NiZ] smap.Soilname[1:NiZ] smap.Smap_Depth[1:NiZ] smap.IsTopsoil[1:NiZ] smap.RockFragment[1:NiZ] smap.Smap_MaxRootingDepth[1:NiZ] smap.Smap_PermeabilityClass[1:NiZ] smap.Smap_SmapFH[1:NiZ] Data[1:NiZ,:]]), writeheader=true, header=Header, bom=!(HeaderSmap))
 
       return nothing
       end  # function:  smap

@@ -251,7 +251,7 @@ module hydrolabOpt
 				end
 
 				if hydro.θr[iZ] > hydro.θs[iZ]
-					error("Θr _θs: $iZ $(hydro.θr[iZ]) > $(hydro.θs[iZ])")
+					error("Θr_θs: $iZ $(hydro.θr[iZ]) > $(hydro.θs[iZ])")
 				end
 
 				if hydro.θr[iZ] < 0.0

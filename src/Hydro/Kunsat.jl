@@ -464,7 +464,6 @@ module kunsat
 				else 
 					return Kunsat = Ks
 				end
-
 			end #function Ψ_2_KUNSAT
 
 
@@ -474,8 +473,8 @@ module kunsat
 			function  Se_2_KUNSAT(optionₘ, Se, iZ, hydroParam, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψbc=hydroParam.Ψbc[iZ], λbc=hydroParam.λbc[iZ], Ks=hydroParam.Ks[iZ])
 				
 				M = -3.0 * λbc - 2.0
-				return Kunsat = Ks * Se .^ M 
-			
+
+			return Ks * Se .^ M 
 			end # function Se_2_KUNSAT
 
 
@@ -486,8 +485,7 @@ module kunsat
 				
 				M = -3.0 * λbc - 2.0
 		
-				return ∂K∂Ψ = Ks * M / Ψbc * (Ψ₁/Ψbc) ^ (M-1.0) 
-
+			return Ks * M / Ψbc * (Ψ₁/Ψbc) ^ (M-1.0) 
 			end # function ∂K∂Ψ
 
 
@@ -509,11 +507,10 @@ module kunsat
 				M = -3.0 * λch - 2.0
 
 				if Ψ₁ > Ψch
-					return Kunsat = Ks * (Ψ₁ / Ψch) ^ M 
+					return Ks * (Ψ₁ / Ψch) ^ M 
 				else 
-					return Kunsat = Ks
+					return Ks
 				end
-
 			end #function Ψ_2_KUNSAT
 
 
@@ -523,8 +520,7 @@ module kunsat
 			function  Se_2_KUNSAT(optionₘ, Se, iZ, hydroParam, θs=hydroParam.θs[iZ], Ψch=hydroParam.Ψbc[iZ], λch=hydroParam.λch[iZ], Ks=hydroParam.Ks[iZ])
 					
 				M = -3.0 * λch - 2.0
-				return Kunsat = Ks * Se .^ M 
-			
+			return Ks * Se .^ M 
 			end # function Se_2_KUNSAT
 
 
@@ -535,8 +531,7 @@ module kunsat
 				
 				M = -3.0 * λch - 2.0
 		
-				return ∂K∂Ψ = Ks * M / Ψch * (Ψ₁/Ψch) ^ (M-1.0) 
-
+			return Ks * M / Ψch * (Ψ₁/Ψch) ^ (M-1.0) 
 			end # function ∂K∂ΨMODEL
 
 	end #module ch ...............................................

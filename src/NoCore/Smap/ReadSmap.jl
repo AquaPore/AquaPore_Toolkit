@@ -3,93 +3,93 @@
 	# =============================================================
 	module readSmap
 
-		Base.@kwdef mutable struct SMAP
-         IsTopsoil              :: Vector{Float64}
-         RockClass              :: Vector{Float64}
-         RockFragment           :: Vector{Float64}
-         Smap_Depth             :: Vector{Float64}
-         Smap_ImpermClass       :: Vector{Float64}
-         Smap_MaxRootingDepth   :: Vector{Float64}
-         Smap_PermeabilityClass :: Vector{Float64}
-         Smap_SmapFH            :: Vector{Float64}
-         Soilname               :: Vector{Float64}
-		end
-
 	   import ..tool
    	import Polynomials
 		using CSV, Tables, DataFrames
 		export SMAP, ROCKFRAGMENT_WETTABLE_STRUCT, IMPERMEABLE_CLASS
 
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		STRUCTURE : SMAP
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			Base.@kwdef mutable struct SMAPSTRUCT # <>=<>=<>=<>=<>=<>=<>=<>=<>
+				IsTopsoil              :: Vector{Int64}    = Int64[]
+				Ks_Impermeable 		  :: Vector{Float64}  = Float64[]
+				RockClass              :: Vector{String}   = String[]
+				RockFragment           :: Vector{Float64}  = Float64[]
+				Smap_Depth             :: Vector{Float64}  = Float64[]
+				Smap_ImpermClass       :: Vector{String}   = String[]
+				Smap_MaxRootingDepth   :: Vector{Float64}  = Float64[]
+				Smap_PermeabilityClass :: Vector{String}   = String[]
+				Smap_SmapFH            :: Vector{String}   = String[]
+				Soilname               :: Vector{String}   = String[]
+			end
+		# ............................................................
 
 
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION: READING SMAP                    
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function SMAP(IdSelect, NiZ, path; RockFragment_Max=0.9)
 				println("    ~  $(path.inputSmap.Smap) ~")
 
 				Data = CSV.read(path.inputSmap.Smap, DataFrame, header=true)
 				DataFrames.sort!(Data, [:Id])
+
+				# reading the structure defined above
+				smap = SMAPSTRUCT()
 				
-            IsTopsoil              = convert(Vector{Float64}, Data."IsTopsoil")
-            IsTopsoil              = Int64.(IsTopsoil)
-            IsTopsoil              = IsTopsoil[IdSelect]
+            smap.IsTopsoil              = convert(Vector{Float64}, Data."IsTopsoil")
+            smap.IsTopsoil              = Int64.(smap.IsTopsoil)
+            smap.IsTopsoil              = smap.IsTopsoil[IdSelect]
 
-            Soilname               = convert(Vector{String}, Data."Soilname")
-            Soilname               = Soilname[IdSelect]
-			
-            RockClass              = convert(Vector{String}, Data."RockClassFines")
-            RockClass              = RockClass[IdSelect]
+            smap.RockClass              = convert(Vector{String}, Data."RockClassRock")
+            smap.RockClass              = smap.RockClass[IdSelect]
 				
-            Smap_Depth             = convert(Vector{Float64}, Data."depth_mm")
-            Smap_Depth             = Smap_Depth[IdSelect]
-
-            RockFragment           = convert(Vector{Float64}, Data."Stone_Prop")
-            RockFragment           = min.(RockFragment_Max, RockFragment)
-            RockFragment           = RockFragment[IdSelect]
+            smap.RockFragment           = convert(Vector{Float64}, Data."Stone_Prop")
+            smap.RockFragment           = min.(RockFragment_Max, smap.RockFragment)
+            smap.RockFragment           = smap.RockFragment[IdSelect]
 				
-            Smap_MaxRootingDepth   = convert(Vector{Float64}, Data."MaxRootingDepth_mm")
-            Smap_MaxRootingDepth   = Smap_MaxRootingDepth[IdSelect]
+            smap.Smap_Depth             = convert(Vector{Float64}, Data."depth_mm")
+            smap.Smap_Depth             = smap.Smap_Depth[IdSelect]
+            
+            smap.Smap_ImpermClass       = convert(Vector{String}, Data."FHImpermClass")
+            smap.Smap_ImpermClass       = smap.Smap_ImpermClass[IdSelect]
+				
+            smap.Smap_MaxRootingDepth   = convert(Vector{Float64}, Data."MaxRootingDepth_mm")
+            smap.Smap_MaxRootingDepth   = smap.Smap_MaxRootingDepth[IdSelect]
+				
+				smap.Smap_PermeabilityClass = convert(Vector{String}, Data."SoilImpermClass")
+				smap.Smap_PermeabilityClass = smap.Smap_PermeabilityClass[IdSelect]
 
-            Smap_SmapFH            = convert(Vector{String}, Data."SmapFH")
-            Smap_SmapFH            = Smap_SmapFH[IdSelect]
+				smap.Smap_SmapFH            = convert(Vector{String}, Data."SmapFH")
+				smap.Smap_SmapFH            = smap.Smap_SmapFH[IdSelect]
 
-            Smap_PermeabilityClass = convert(Vector{String}, Data."SoilImpermClass")
-            Smap_PermeabilityClass = Smap_PermeabilityClass[IdSelect]
+				smap.Soilname               = convert(Vector{String}, Data."Soilname")
+            smap.Soilname               = smap.Soilname[IdSelect]
 
-            Smap_ImpermClass       = convert(Vector{String}, Data."FHImpermClass")
-            Smap_ImpermClass       = Smap_ImpermClass[IdSelect]
-
-				NiZ = length(Smap_ImpermClass)
+				NiZ = length(smap.Smap_ImpermClass)
 
 				# CORRECTION FOR RockFragment if no correction is required
 					for iZ=1:NiZ
-						if RockClass[iZ] == "NoAdj"
-							RockFragment[iZ] == 0.0
+						if smap.RockClass[iZ] == "NoAdj"
+							smap.RockFragment[iZ] == 0.0
 						end
 					end
+
 
 				# KS_IMPERMEABLE
 					# If impermeable than the value is greater than 0
 					KsImpClass_Dict = readSmap.IMPERMEABLE_CLASS(path.inputSmap.LookupTable_Impermeable)
 
-					Ks_Impermeable = fill(-1.0, NiZ)
+					smap.Ks_Impermeable = fill(-1.0, NiZ)
 					for iZ=1:NiZ
-						Ks_Impermeable[iZ] = KsImpClass_Dict[Smap_ImpermClass[iZ]]
+						smap.Ks_Impermeable[iZ] = KsImpClass_Dict[smap.Smap_ImpermClass[iZ]]
 					end
 			
-			return IsTopsoil, Ks_Impermeable, RockClass, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_SmapFH, Soilname
+			return smap
 			end  # function: SMAP
 
 
-		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		# #		FUNCTION :SMAP
-		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		# 	struct SMAP_STRUCT
-		# 		Smap_Depth        ::Vector{Float64}
-		# 		IsTopsoil    ::Vector{Int64}
-		# 		Soilname     ::Vector{String}
-		# 		RockFragment ::Vector{Float64}
-		# 		RockClass    ::Vector{String}
-		# 		Smap_MaxRootingDepth ::Vector{Float64}
-		# 	end
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ROCKFRAGMENT_WETTABLE

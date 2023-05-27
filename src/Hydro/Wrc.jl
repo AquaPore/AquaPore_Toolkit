@@ -505,7 +505,7 @@ module wrc
 
 				θ₂ = Ψ_2_θ(Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], Ψch=hydroParam.Ψch[iZ], λch=hydroParam.λch[iZ])
 
-				return Se = wrc.θ_2_Se(θ₂, iZ::Int64, hydroParam)
+			return wrc.θ_2_Se(θ₂, iZ::Int64, hydroParam)
 			end # function Ψ_2_Se
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -514,7 +514,7 @@ module wrc
 			function θ_2_Ψ(θ₂, iZ, hydroParam; θs=hydroParam.θs[iZ], Ψch=hydroParam.Ψch[iZ], λch=hydroParam.λch[iZ])
 
 				Se = wrc.θ_2_Se(θ₂, iZ, hydroParam)
-				return Ψ₁ = Ψch * (Se ^ -λch)
+			return Ψch * (Se ^ -λch)
 			end # θ_2_Ψ
 
 
@@ -523,7 +523,7 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function ∂θ∂Ψ(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], Ψch=hydroParam.Ψch[iZ], λch=hydroParam.λch[iZ]) 
 					
-				return (-λch / Ψch) * θs * (Ψ₁/Ψch) .^ (-λch - 1.)
+			return (-λch / Ψch) * θs * (Ψ₁/Ψch) .^ (-λch - 1.)
 			end # function ∂θ∂Ψ
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -532,7 +532,7 @@ module wrc
 			""" Parameters derived by Brooks and Corey 1964
 			Brooks RH, Corey AT. 1964. Hydraulic properties of porous media. Hydrology Papers 3, Colorado State University, Fort Collins, 27 p. 3"""
 			function GREEN_AMPT(optionₘ, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψch=hydroParam.Ψch[iZ], λch=hydroParam.λch[iZ], A=2.0, B=3.0, C=1.0)
-				return Ψga = Ψch * (A + B *λch) / (C + B * λch)
+			return Ψga = Ψch * (A + B *λch) / (C + B * λch)
 			end # GREEN_AMPT
 
 	end # module CLAPP AND HORNBERGER # ...............................................

@@ -149,14 +149,18 @@ module AquaPore_Toolkit
 
 
 			# IF WE HAVE PEDOLOGICAL⍰: <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-				if option.data.Pedological⍰ == "Core"
-					IsTopsoil, RockClass = reading.PEDOLOGICAL(IdSelect, NiZ, path.inputSoilwater.Pedological⍰)
+				# if option.data.Pedological⍰ == "Core"
+				# 	IsTopsoil, RockClass = reading.PEDOLOGICAL(IdSelect, NiZ, path.inputSoilwater.Pedological⍰)
 				
-				elseif option.data.Pedological⍰ == "Smap"
-					IsTopsoil, Ks_Impermeable, RockClass, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_SmapFH, Soilname = readSmap.SMAP(IdSelect_True, NiZ, path)
-				else
-					IsTopsoil=[]; Ks_Impermeable=[]; Ks_Impermeable=[]
+				if option.data.Pedological⍰ == "Smap"
+					smap = readSmap.SMAP(IdSelect_True, NiZ, path)
 
+               RockFragment   = copy(smap.RockFragment)
+               RockClass      = copy(smap.RockClass)
+               IsTopsoil      = copy(smap.IsTopsoil)
+               Ks_Impermeable = copy(smap.Ks_Impermeable)
+				else
+					IsTopsoil=[]; Ks_Impermeable=[]
 				end  # if: option.data.Pedological⍰
 
 
@@ -193,10 +197,10 @@ module AquaPore_Toolkit
 
 			# CORRECT θ(Ψ) FOR ROCK FRAGMENT
 			if option.run.RockCorection && !(option.data.SimulationKosugiθΨK)
-			
+				
 				if option.rockFragment.RockInjectedIncluded⍰ =="InjectRock"
 					@info "\n Correction for rock fragments for θ(Ψ) \n" 
-					θ_θΨobs = rockFragment.injectRock.CORECTION_θΨ!(NiZ, N_θΨobs, RockFragment, θ_θΨobs)
+					θ_θΨobs = rockFragment.injectRock.CORECTION_θΨ!(N_θΨobs, NiZ, RockFragment, θ_θΨobs)
 
 					if option.data.Kθ
 					@info "\n Correction for rock fragments for K(Ψ) \n" 
@@ -351,11 +355,11 @@ module AquaPore_Toolkit
 
 				# IF SMAP OUTPUTS
 				if option.run.Smap
-					tableSmap.θΨK(hydro, hydroOther, IdSelect, KₛModel, NiZ, path.tableSmap.Table_θΨK, Smap_Depth, Soilname)
+					tableSmap.θΨK(hydro, hydroOther, IdSelect, KₛModel, NiZ, path.tableSmap.Table_θΨK, smap)
 
 					# When all the models are performed
 					if iSim==length(Scenarios)
-						tableSmap.SMAP(hydro, IdSelect, IsTopsoil, NiZ, option.hydro, param, path, RockFragment, Smap_Depth, Smap_MaxRootingDepth, Smap_PermeabilityClass, Smap_SmapFH, Soilname)
+						tableSmap.SMAP(hydro, IdSelect, IsTopsoil, NiZ, option.hydro, param, path, smap)
 					end
 				end # option.run.Smap	
 			end # option.run.HydroLabθΨ⍰ ≠ :No && option.run.HydroLabθΨ⍰ ≠ :File
@@ -459,8 +463,8 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="TESTCASE", SiteName_Soilwater="Convert")
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapSmapNZSnapshot20210823")
 	
-	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
+	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
 
-	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
+	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)

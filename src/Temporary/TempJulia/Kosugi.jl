@@ -16,7 +16,7 @@ function RUN_KOSUGI()
 	Rf=0.0
 
 	for iZ=1:N
-		θ[iZ] = KG(Ψ₀[iZ], θs=0.1/(1-Rf), θr=0.0/(1-Rf), σ=3.)
+		θ[iZ] = KG(Ψ₀[iZ], θs=0.1/(1-Rf), θr=0.0/(1-Rf), σ=3.8)
 	end 
 
 	println(Ψ₀)

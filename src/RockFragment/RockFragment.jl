@@ -20,7 +20,7 @@ module rockFragment
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : STONECORRECTION_WETABLE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function CORECTION_θΨ_WETABLE!(NiZ, N_θΨobs, rfWetable, RockClass, RockFragment, θ_θΨobs, Ψ_θΨobs)
+		function CORECTION_θΨ_WETABLE!(NiZ::Int64, N_θΨobs::Vector{Int64}, rfWetable, RockClass::Vector{String}, RockFragment::Vector{Float64}, θ_θΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
 			for iZ = 1:NiZ	
 				iRockClass = rfWetable.RockClass_Dict[RockClass[iZ]]
 
@@ -46,7 +46,7 @@ module rockFragment
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : CORECTION_θΨ!
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function CORECTION_θΨ!(NiZ, N_θΨobs, RockFragment, θ_θΨobs)
+			function CORECTION_θΨ!(N_θΨobs::Vector{Int64}, NiZ::Int64, RockFragment::Vector{Float64}, θ_θΨobs::Array{Float64})
 				for iZ = 1:NiZ 
 					for iθ=1:N_θΨobs[iZ]
 						θ_θΨobs[iZ,iθ] = θ_θΨobs[iZ,iθ] * (1.0 - RockFragment[iZ])
@@ -60,7 +60,8 @@ module rockFragment
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : CORECTION_KΨ!
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function RF_CORECTION_KΨ!(NiZ, N_KΨobs, RockFragment, K_KΨobs; RF_Start_Increase=0.35, RF_End_Increase=0.8)
+			function RF_CORECTION_KΨ!(NiZ::Int64, N_KΨobs::Vector{Float64}, RockFragment::Vector{Float64}, K_KΨobs::Vector{Float64}; RF_Start_Increase=0.35, RF_End_Increase=0.8)
+
 				for iZ=1:NiZ, iΨ=1:N_KΨobs[iZ]
 					if RockFragment[iZ] < RF_Start_Increase
 
@@ -86,9 +87,7 @@ module rockFragment
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			""" Naseri (2022) Rock fragments influence the water retention and hydraulic conductivity of soils """
 			function ϜUNC_RF_CORECTION_KΨ_NASEI(Rf::Float64; Pshape=1.26, Pcritical=1.26)
-
 				return (1.0 - Rf / Pcritical) ^ Pshape	
-			
 			end  #  FUNC_RF_CORECTION_KΨ_NASEI()
 		# ------------------------------------------------------------------
 
@@ -110,7 +109,7 @@ module rockFragment
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION :  ρᵦ_2_Φ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ρᵦ_2_Φ(NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
+			function ρᵦ_2_Φ(NiZ::Int64, option, RockFragment::Vector{Float64}, ρₚ_Fine::Vector{Float64}, ρₚ_Rock::Vector{Float64}, ρᵦ_Soil::Vector{Float64})
 				Φ = fill(0.0::Float64, NiZ)
 
 				for iZ=1:NiZ
@@ -129,7 +128,7 @@ module rockFragment
 		# =============================================================
 		#		module: included
 		# =============================================================
-	module included
+		module included
 		export ρᵦ_2_Φ
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
