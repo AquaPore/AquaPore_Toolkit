@@ -6,7 +6,7 @@ module θψ_2_KsψModel
 	import QuadGK, Polynomials
 	import SpecialFunctions: erfc, erfcinv
 	
-	export KSΨMODEL_START
+	export KSΨMODEL_START, KsΨMODEL_NOINTEGRAL
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSΨMODEL_START
@@ -35,7 +35,7 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KsΨMODEL_NOINTEGRAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KsΨMODEL_NOINTEGRAL(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
+		function KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
 			# Matrix ====	
 				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
@@ -137,7 +137,7 @@ module θψ_2_KsψModel
 					
 					# Tortuosity T3Mac
 						T3Mac = T3_Max * (1.0 - τ₃ₐMac)			 											
-			return KsΨMODEL_NOINTEGRAL(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
+			return KsΨMODEL_NOINTEGRAL( T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 				
 	
 			# MODEL 2 ====	
@@ -283,7 +283,7 @@ module θψ_2_KsψModel
 	#		FUNCTION : ROCKCORRECTION
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
-		function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.35, Rf_EndIncrease=0.9, θs_Amplify=1.2)
+		function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.4, Rf_EndIncrease=0.9, θs_Amplify=1.1)
 
 			Rf = min(Rf, Rf_EndIncrease)
 
@@ -296,13 +296,14 @@ module θψ_2_KsψModel
 					θs_NoRf = θs / (1.0 - Rf)
 					Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, θs_Amplify * θs_NoRf]
 					Fit_θs = Polynomials.fit(X, Y_θs, 1)
-					θs = max(min(Fit_θs(Rf), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
+					# θs = max(min(Fit_θs(Rf), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
+					θs = Fit_θs(Rf)
 
 				# θr ----
 					θr_NoRf = θr / (1.0 - Rf)
 					Y_θr = [(1.0 - Rf_StartIncrease) * θr_NoRf, θr_NoRf]
 					Fit_θr = Polynomials.fit(X, Y_θr, 1)
-					θr = max(min(Fit_θr(Rf), hydro.θr_Min[iZ]), hydro.θr_Max[iZ])
+					θr = max(min(Fit_θr(Rf), hydro.θr_Max[iZ]), hydro.θr_Min[iZ])
 
 				# θsMacMat ----
 					θsMacMat_NoRf =  θsMacMat / (1.0 - Rf)

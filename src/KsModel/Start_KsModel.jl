@@ -75,6 +75,8 @@ module startKsModel
  					plot.ksmodel.KSMODEL_TCLAY( path.plotSoilwater.Plot_KsModel, option, ksmodelτ, 1)
 
 					plot.ksmodel.KSMODEL_FUNCTIONS( path.plotSoilwater.Plot_KsModel, option, ksmodelτ, 1)
+
+					 plot.ksmodel.KSMODEL_RF( path.plotSoilwater.Plot_KsModel, hydro, option, ksmodelτ, 1)
 				end
 
 			# RUN KₛModel

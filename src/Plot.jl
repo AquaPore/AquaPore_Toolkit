@@ -112,8 +112,9 @@ module lab
 
 	# =============================================================
 	module ksmodel
-		import ...cst
+		import ...cst, ...θψ_2_KsψModel
 		using CairoMakie, ColorSchemes
+		import Polynomials
 		import SpecialFunctions: erfc, erfcinv
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -453,8 +454,143 @@ module lab
 		end  # function: KSMODEL_TCLAY
 		# ------------------------------------------------------------------
 
-	end  # module: ksmodel
 
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : KSMODEL_RF
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function KSMODEL_RF(Path, hydro, option, ksmodelτ, ipClass;τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass],τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass],τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass])
+
+				# DERIVING THE DATA TO PLOT
+					T2_Max = 3.0; T3_Max = 4.0
+					T1     = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
+					T2     = T2_Max * (1.0 - τ₂ₐ)
+				
+					T3     = T3_Max * (1.0 - τ₃ₐ)
+					T1Mac  = T1
+					T2Mac  = T2_Max * (1.0 - τ₂ₐMac)
+					T3Mac  = T3_Max * (1.0 - τ₃ₐMac)
+
+					ΨmacMat = 100.0
+					Ψ₁ = 0.0
+					σMac = hydro.σMac[1]
+					ΨmMac = hydro.ΨmMac[1]
+					ΨmMean = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
+
+					θr = [0.0,  0.0, 0.0]
+					σ = [0.7, 1.1, 3.5]
+					θs = [0.4, 0.4, 0.4]
+					θsMacMat = θs .* 0.8
+					Nsoil = length(θs)
+
+					Rf = collect(0.0:0.001:0.9)
+					Nrf = length(Rf)
+							
+
+					KsModel = fill(0.0::Float64, Nsoil, Nrf)
+					for iSoil=1:Nsoil 
+						for iRf=1:Nrf 							
+							Ψm = ΨmMean * exp(σ[iSoil] * 3.0)
+
+							θr₀, θs₀, θsMacMat₀ =  ROCKCORRECTION!(hydro, 1, Rf[iRf], θr[iSoil], θs[iSoil], θsMacMat[iSoil])
+
+							KsModel[iSoil, iRf] =  60.0 * 60.0 * θψ_2_KsψModel.KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr₀, θs₀, θsMacMat₀, σ[iSoil], σMac, Ψ₁, Ψm, ΨmMac)	
+						end 
+					end
+					
+				# PLOTTING
+					# Dimensions of figure
+						Height = 800 # Height of plot
+						Width  = 1000  # Width of plot
+
+					# Size of X and Y label
+						XlabelSize = 45
+						YlabelSize = 45
+						NumberSize = 40
+
+					# Title size
+						TitleSize = 60
+
+					# Labels size of colourbar
+						TickLabelSize = 35
+						TickSize      = 20
+						LabelSize     = 30
+				
+					# Colour map
+						ColourMap = :plasma # :thermal :plasma, :ice, :viridis, :plasma
+
+					# Activating the figure
+						CairoMakie.activate!(type = "svg")
+						Fig = Figure(font="Sans", fontsize=NumberSize)
+
+				# PLOTTING KsModel1	
+					Axis_KsModel1 = Axis(Fig[1,1], title="", width=Width, height=Height, xlabel=L"$Rock Fragments$ $[%]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false,  yscale=Makie.pseudolog10, yminorticksvisible=true, yminorticks=IntervalsBetween(10))
+
+					Axis_KsModel1.xticks =  [0, 0.2, 0.4, 0.6, 0.8, 1] 
+					Axis_KsModel1.yticks =  [0, 1, 5, 10, 20, 40, 80] 
+
+					Colormap = cgrad(colorschemes[ColourMap], Nsoil, categorical = true)
+					for iSoil=1:Nsoil
+						Fig_Model1 = lines!(Axis_KsModel1, Rf, KsModel[iSoil, :], linewidth=5, colormap =Colormap[iSoil], label =string(σ[iSoil]))
+					end
+		
+				Leg = Legend(Fig[1:2,2], Axis_KsModel1, "σ", framevisible=true, tellheight=true, tellwidth=true, labelsize=LabelSize, margin=(30, 30, 30, 30))
+
+
+			# Final adjustments
+				resize_to_layout!(Fig)
+				trim!(Fig.layout)
+				colgap!(Fig.layout, 20)
+				rowgap!(Fig.layout, 20)
+
+			Pathₛ = Path * "_" * "Func_RockFragment" * ".svg" 
+
+			save(Pathₛ, Fig)
+			# Displaying figure in VScode
+				if option.general.PlotVscode
+					display(Fig)
+				end
+			return nothing	
+			end  # function: KSMODEL_RF
+		# ------------------------------------------------------------------
+
+			""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
+					function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.4, Rf_EndIncrease=0.9, θs_Amplify=1.)
+
+						Rf = min(Rf, Rf_EndIncrease)
+
+						if Rf > Rf_StartIncrease
+							# X values
+								X = [Rf_StartIncrease, Rf_EndIncrease]
+		
+							# θs ----
+								θs_NoRf = θs * 1.0
+								Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, θs_Amplify * θs_NoRf]
+								Fit_θs = Polynomials.fit(X, Y_θs, 1)
+								# θs = max(min(Fit_θs(Rf), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
+								θs = Fit_θs(Rf)
+
+							# θr ----
+								θr_NoRf = θr * 1.0
+								Y_θr = [(1.0 - Rf_StartIncrease) * θr_NoRf, θr_NoRf]
+								Fit_θr = Polynomials.fit(X, Y_θr, 1)
+								θr = max(min(Fit_θr(Rf), hydro.θr_Max[iZ]), hydro.θr_Min[iZ])
+
+							# θsMacMat ----
+								θsMacMat_NoRf =  θsMacMat * 1.0
+								Y_θsMacMat = [min((1.0 - Rf_StartIncrease) * θsMacMat_NoRf, θs), 0.7 * (θs - θr) + θr]
+								Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)	
+								θsMacMat = min(Fit_θsMacMat(Rf), θs)
+
+						else
+							θs = θs * (1.0 - Rf)
+							θr = θr * (1.0 - Rf)
+							θsMacMat =  θsMacMat * (1.0 - Rf)
+						end
+					return θr, θs, θsMacMat
+					end  # function: ROCKCORRECTION
+				# ------------------------------------------------------------------
+
+	end  # module: ksmodel
 
 	
 	# ............................................................
