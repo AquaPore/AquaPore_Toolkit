@@ -37,14 +37,14 @@ module plotHypix
 
 			if optionHypix.Plot_HeatMap_YearMonth
 				PathInput = pathOutputHypix.Table_Statistic * "_SeZaver_YearMonth_" * string(iScenario) * ".csv"
-				PathOutput = pathOutputHypix.Plot_Heatmap_YearMonth * ".pdf"
+				PathOutput = pathOutputHypix.Plot_Heatmap_YearMonth * ".svg"
 
 				plotHypix.makkie.HEATMAP(SiteName[iScenario], paramHypix, PathInput, PathOutput)
 			end
 
 			if optionHypix.Plot_HeatMap_MonthCombine
 				PathInput = pathOutputHypix.Table_Statistic * "_SeZaver_YearMonth_Combine_" * string(iScenario) * ".csv"
-				PathOutput = pathOutputHypix.Plot_Heatmap_MonthCombine * ".pdf"
+				PathOutput = pathOutputHypix.Plot_Heatmap_MonthCombine * ".svg"
 
 				plotHypix.makkie.HEATMAP(SiteName[iScenario], paramHypix, PathInput, PathOutput)
 			end
@@ -153,14 +153,14 @@ module plotHypix
 		function TIMESERIES(∑T_Reduced::Vector{Float64}, ∑ΔQ_Obs_Reduced::Vector{Float64}, Date_Reduced::Vector{Dates.DateTime}, dateHypix, discret, iMultistep::Int64, iScenario::Int64, Nit_Reduced::Int64, Nz::Int64, optionHypix, paramHypix, pathOutputHypix, pathInputHypix, SiteName::Vector{Any}, ΔEvaporation_Reduced::Vector{Float64}, ΔPet_Reduced::Vector{Float64}, ΔPond_Reduced::Vector{Float64}, ΔPrGross_Reduced::Vector{Float64}, ΔPrThroughfall_Reduced::Vector{Float64}, ΔQ_Obs_Reduced, ΔQ_Reduced::Matrix{Float64}, ΔRunoff_Reduced::Vector{Float64}, ΔSink_Reduced::Vector{Float64}, θ_Reduced::Matrix{Float64}, θsim_Aver; obsθ=0, θobs_Reduced=[0 ; 0])
 
 			# Dimensions of figure
-				Height= 400
+				Height= 600
 				Width = 1000
 
 			# Number of days to print 
 				Nticks = 24
 
 			# PATH
-				Path = pathOutputHypix.Plot_HypixTime * "_" * string(iMultistep) * ".pdf"
+				Path = pathOutputHypix.Plot_HypixTime * "_" * string(iMultistep) * ".svg"
 				rm(Path, force=true, recursive=true)
 
 			# STYLE
@@ -204,7 +204,9 @@ module plotHypix
 			
 			# PLOTTING
 			# , resolution = (3000, 2500)
-				Fig = Figure(font="Sans", titlesize=50, fontsize=25, xlabelsize=10, ylabelsize=25, labelsize=25)
+				CairoMakie.activate!(type = "svg")
+				# fontsize=40,
+				Fig = Figure(font="Sans", titlesize=50,  xlabelsize=30, ylabelsize=30, labelsize=30, fontsize=30)
 			
 			# Plot Climate -------------------------------------------------	
 			iSubplot = 0
@@ -244,7 +246,7 @@ module plotHypix
 
 					# Label7= L"$\Delta Q$"
 					iSubplot += 1
-					Axis3  = Axis(Fig[iSubplot, 1], xgridvisible=true, ygridvisible=false, height=Height*0.75, width=Width, ylabel= L"$\Delta Q$ $[mm$ $day ^{-1}]$")
+					Axis3  = Axis(Fig[iSubplot, 1], xgridvisible=true, ygridvisible=false, height=Height*0.6, width=Width, ylabel= L"$\Delta Q$ $[mm$ $day ^{-1}]$")
 
 					if !(isempty(pathInputHypix.Drainage[iScenario]))
 						Axis3b = Axis(Fig[iSubplot, 1], yaxisposition=:right, xgridvisible=true, ygridvisible=false, ylabel= L"$\sum \Delta Q$ $[mm$ $day ^{-1}]$")
@@ -257,8 +259,8 @@ module plotHypix
 						# ylims!(Axis3, -maximum(ΔQ_Reduced[1:Nit_Reduced, Nz+1])-eps(), 0)
 
 						hidexdecorations!(Axis3, grid=false, ticks=true, ticklabels=true)
-						Label_7a = L"$\Delta Q _{Hypix}$"
-						Plot_Climate7a = barplot!(Axis3, ∑T_Reduced[1:Nit_Reduced], -ΔQ_Reduced[1:Nit_Reduced, Nz+1], strokecolor=:red1, strokewidth=1, color=:violet)
+						Label_7a = L"$\Delta Q hypix$"
+						Plot_Climate7a = barplot!(Axis3, ∑T_Reduced[1:Nit_Reduced], -ΔQ_Reduced[1:Nit_Reduced, Nz+1], strokecolor=:violetred, strokewidth=1, color=:violet)
 
 						if !(isempty(pathInputHypix.Drainage[iScenario]))
 							Label_7b = L"$\Delta Q _{Obs}$"
@@ -299,6 +301,7 @@ module plotHypix
 			if optionHypix.Plot_θ		
 				iSubplot += 1
 				Axis4 = Axis(Fig[iSubplot,1], ylabel=L"$\theta$ $[mm^3 mm^{-3}]$", xgridvisible=true, ygridvisible=false, height=Height, width=Width)
+
 				Axis4.xticks = (∑T_Reduced2[1:iGood], string.(Date_Reduced2[1:iGood]))
 				Axis4.xticklabelrotation = π/3
 				hidexdecorations!(Axis4, grid=false, ticks=true, ticklabels=true)
@@ -379,20 +382,26 @@ module plotHypix
 			if optionHypix.θavr_RootZone && optionHypix.θobs
 				iSubplot += 1
 
-				Axis5 = Axis(Fig[iSubplot,1], ylabel=L"$\theta _{MeanAdj}$ $[mm^3 mm^{-3}]$", xgridvisible=true, ygridvisible=false, height=Height, width=Width)
+				Axis5 = Axis(Fig[iSubplot,1], ylabel=L"$\theta _{MeanAdj}$ $[mm^3 mm^{-3}]$", xgridvisible=true, ygridvisible=false, height=Height, width=Width, xlabelsize=30)
+
 				xlims!(Axis5, ∑T_Reduced[1],∑T_Reduced[Nit_Reduced])
-				
-				Axis5.xticks = (∑T_Reduced2[1:iGood], string.(Date_Reduced2[1:iGood]))
-				hidexdecorations!(Axis5, grid=false, ticks=true, ticklabels=true)
+
+
+				if !optionHypix.Plot_Etp
+					Axis5.xticks = (∑T_Reduced2[1:iGood], string.(Date_Reduced2[1:iGood]))
+					Axis5.xticklabelrotation = π/3
+				else
+					hidexdecorations!(Axis5, grid=false, ticks=true, ticklabels=true)
+				end
 				
 				iZobs = 1
 
 				θsim_Aver_Mean    = mean(θsim_Aver[1:Nit_Reduced,1])
 				θobs_Reduced_Mean = mean(filter(.!isnan, θobs_Reduced[1:Nit_Reduced, 1]))
 
-				Plot_θobs = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θobs_Reduced[1:Nit_Reduced, iZobs] .- θobs_Reduced_Mean, linewidth=1.5, color=:red, label= L"$\theta _{MeanAdjObs}$")
+				Plot_θobs = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θobs_Reduced[1:Nit_Reduced, iZobs] .- θobs_Reduced_Mean, linewidth=3.0, color=:red, label= L"$\theta MeanAdjObs$")
 				
-				Plot_θsim = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θ_Reduced[1:Nit_Reduced, obsθ.ithetaObs[iZobs]] .- θsim_Aver_Mean , linewidth=1.5, color=:blue, label=L"$\theta _{MeanAdjHypix}$", linestyle = :dash)
+				Plot_θsim = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θ_Reduced[1:Nit_Reduced, obsθ.ithetaObs[iZobs]] .- θsim_Aver_Mean , linewidth=3.0, color=:blue, label=L"$\theta MeanAdjHypix$", linestyle = :dash)
 
 				Plot_Line = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], 0.0 .* ∑T_Reduced[1:Nit_Reduced] , linewidth=2, color=:silver,  linestyle = :dashdot)
 
@@ -403,6 +412,7 @@ module plotHypix
 			if optionHypix.Plot_Etp
 				iSubplot += 1
 				Axis2  = Axis(Fig[iSubplot, 1], yticklabelcolor=:black, yaxisposition=:left, rightspinecolor=:black, ytickcolor=:black, ylabel= L"$\Delta ET$ $[mm$ $day ^{-1}]$", xgridvisible=true, ygridvisible=false, height=Height, width=Width)
+
 				Axis2.xticks = (∑T_Reduced2[1:iGood], string.(Date_Reduced2[1:iGood]))
 				Axis2.xticklabelrotation = π/3
 
@@ -486,7 +496,7 @@ module plotHypix
 			for iT in 1:Nit, iZ in 1:N_θZₐᵥₑᵣ
 				txtcolor = θZₐᵥₑᵣ_2D[iT, iZ] > 0.5 ? :white : :black
 				text!(Ax2, "$(round(θZₐᵥₑᵣ_2D[iT,iZ], digits = 2))", position = (iT, iZ),
-					color = txtcolor, align = (:center, :center), textsize=18)
+					color = txtcolor, align = (:center, :center), fontsize=18)
 			end
 
 			Ax2.xticklabelalign = (:right, :center)

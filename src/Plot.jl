@@ -460,6 +460,44 @@ module lab
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function KSMODEL_RF(Path, hydro, option, ksmodelτ, ipClass;τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass],τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass],τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass])
 
+			
+			""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
+					function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.4, Rf_EndIncrease=0.9, θs_Amplify=1.)
+
+						Rf = min(Rf, Rf_EndIncrease)
+
+						if Rf > Rf_StartIncrease
+							# X values
+								X = [Rf_StartIncrease, Rf_EndIncrease]
+		
+							# θs ----
+								θs_NoRf = θs * 1.0
+								Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, θs_Amplify * θs_NoRf]
+								Fit_θs = Polynomials.fit(X, Y_θs, 1)
+								# θs = max(min(Fit_θs(Rf), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
+								θs = Fit_θs(Rf)
+
+							# θr ----
+								θr_NoRf = θr * 1.0
+								Y_θr = [(1.0 - Rf_StartIncrease) * θr_NoRf, θr_NoRf]
+								Fit_θr = Polynomials.fit(X, Y_θr, 1)
+								θr = max(min(Fit_θr(Rf), hydro.θr_Max[iZ]), hydro.θr_Min[iZ])
+
+							# θsMacMat ----
+								θsMacMat_NoRf =  θsMacMat * 1.0
+								Y_θsMacMat = [min((1.0 - Rf_StartIncrease) * θsMacMat_NoRf, θs), 0.7 * (θs - θr) + θr]
+								Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)	
+								θsMacMat = min(Fit_θsMacMat(Rf), θs)
+
+						else
+							θs = θs * (1.0 - Rf)
+							θr = θr * (1.0 - Rf)
+							θsMacMat =  θsMacMat * (1.0 - Rf)
+						end
+					return θr, θs, θsMacMat
+					end  # function: ROCKCORRECTION
+				# ------------------------------------------------------------------
+
 				# DERIVING THE DATA TO PLOT
 					T2_Max = 3.0; T3_Max = 4.0
 					T1     = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
@@ -476,9 +514,9 @@ module lab
 					ΨmMac = hydro.ΨmMac[1]
 					ΨmMean = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
 
-					θr = [0.0,  0.0, 0.0]
-					σ = [0.7, 1.1, 3.5]
-					θs = [0.4, 0.4, 0.4]
+					θr = [0.0,  0.0, 0.0, 0.0, 0.0]
+					σ = [0.7, 0.8, 1.0, 1.5, 3.0]
+					θs = [0.4, 0.4, 0.4, 0.4, 0.4]
 					θsMacMat = θs .* 0.8
 					Nsoil = length(θs)
 
@@ -523,10 +561,10 @@ module lab
 						Fig = Figure(font="Sans", fontsize=NumberSize)
 
 				# PLOTTING KsModel1	
-					Axis_KsModel1 = Axis(Fig[1,1], title="", width=Width, height=Height, xlabel=L"$Rock Fragments$ $[%]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false,  yscale=Makie.pseudolog10, yminorticksvisible=true, yminorticks=IntervalsBetween(10))
+					Axis_KsModel1 = Axis(Fig[1,1], title="", width=Width, height=Height, xlabel=L"$Rock Fragments$ $[%]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false,  yminorticksvisible=true, yminorticks=IntervalsBetween(10))
 
 					Axis_KsModel1.xticks =  [0, 0.2, 0.4, 0.6, 0.8, 1] 
-					Axis_KsModel1.yticks =  [0, 1, 5, 10, 20, 40, 80] 
+					Axis_KsModel1.yticks =  [0, 10, 20, 30, 40, 50, 60] 
 
 					Colormap = cgrad(colorschemes[ColourMap], Nsoil, categorical = true)
 					for iSoil=1:Nsoil
@@ -553,42 +591,6 @@ module lab
 			end  # function: KSMODEL_RF
 		# ------------------------------------------------------------------
 
-			""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
-					function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.4, Rf_EndIncrease=0.9, θs_Amplify=1.)
-
-						Rf = min(Rf, Rf_EndIncrease)
-
-						if Rf > Rf_StartIncrease
-							# X values
-								X = [Rf_StartIncrease, Rf_EndIncrease]
-		
-							# θs ----
-								θs_NoRf = θs * 1.0
-								Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, θs_Amplify * θs_NoRf]
-								Fit_θs = Polynomials.fit(X, Y_θs, 1)
-								# θs = max(min(Fit_θs(Rf), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
-								θs = Fit_θs(Rf)
-
-							# θr ----
-								θr_NoRf = θr * 1.0
-								Y_θr = [(1.0 - Rf_StartIncrease) * θr_NoRf, θr_NoRf]
-								Fit_θr = Polynomials.fit(X, Y_θr, 1)
-								θr = max(min(Fit_θr(Rf), hydro.θr_Max[iZ]), hydro.θr_Min[iZ])
-
-							# θsMacMat ----
-								θsMacMat_NoRf =  θsMacMat * 1.0
-								Y_θsMacMat = [min((1.0 - Rf_StartIncrease) * θsMacMat_NoRf, θs), 0.7 * (θs - θr) + θr]
-								Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)	
-								θsMacMat = min(Fit_θsMacMat(Rf), θs)
-
-						else
-							θs = θs * (1.0 - Rf)
-							θr = θr * (1.0 - Rf)
-							θsMacMat =  θsMacMat * (1.0 - Rf)
-						end
-					return θr, θs, θsMacMat
-					end  # function: ROCKCORRECTION
-				# ------------------------------------------------------------------
 
 	end  # module: ksmodel
 

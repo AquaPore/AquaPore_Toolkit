@@ -43,8 +43,8 @@ module kunsat
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	  function θ_2_KUNSAT(optionₘ, θ₁, iZ::Int64, hydroParam)
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				Se = wrc.θ_2_Se(θ₁, iZ, hydroParam)
-				return Se_2_KUNSAT(optionₘ, Se, iZ, hydroParam)
+				Ψ₁ = wrc.kg.θ_2_ΨDual(optionₘ, θ₁, iZ, hydroParam)
+				return Ψ_2_KUNSAT(optionₘ, Ψ₁, iZ, hydroParam)
 			else
 				error("$( optionₘ.HydroModel⍰) model for θ_2_KUNSAT is not yet available")
 			end
@@ -239,6 +239,8 @@ module kunsat
 	#		FUNCTION : Se_2_KUNSAT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function Se_2_KUNSAT(optionₘ, Se, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+
+		
 
 			Se_Mat = (0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0))) / (θs - θr)
 

@@ -307,7 +307,7 @@ module θψ_2_KsψModel
 
 				# θsMacMat ----
 					θsMacMat_NoRf =  θsMacMat / (1.0 - Rf)
-					Y_θsMacMat = [min((1.0 - Rf_StartIncrease) * θsMacMat_NoRf, θs), 0.75 * (θs - θr) + θr]
+					Y_θsMacMat = [min((1.0 - Rf_StartIncrease) * θsMacMat_NoRf, θs), 0.7 * (θs - θr) + θr]
 					Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)	
 					θsMacMat = min(Fit_θsMacMat(Rf), θs)					
 			end
