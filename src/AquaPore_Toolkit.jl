@@ -317,7 +317,7 @@ module AquaPore_Toolkit
 		# _______________________ START: Smap_2_HyPix ______________________
 		if option.run.Smap2Hypix
 		printstyled("\n----- START RUNNING Smap ➡ Smap_Hypix  ----------------------------------------------\n"; color=:green)
-			smap2hypix.SMAP_2_HYPIX(hydro, NiZ, option.hydro, param, path, Smap_Depth, Smap_MaxRootingDepth, Soilname)
+			smap2hypix.SMAP_2_HYPIX(hydro, NiZ, option.hydro, param, path, smap)
 		printstyled("\n----- END RUNNING  Smap ➡ Smap_Hypix  ----------------------------------------------- , \n"; color=:yellow)
 		end  # if: Smap2Hypix 
 
@@ -460,8 +460,6 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 
 	#  @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Convert")
 
-	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="TESTCASE", SiteName_Soilwater="Convert")
-	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapSmapNZSnapshot20210823")
 	
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
 

@@ -167,11 +167,13 @@ module plotHypix
 				Style_Color = [:red, :darkviolet, :orange, :teal, :blue,:brown]
 
 			# TICKS
+				Date_SimStart   = dateHypix.Date_SimStart  # since we need to compute the culmulative of the 1rst day
+				Date_End_Calibr = dateHypix.Date_End
 				if optionHypix.θobs
-					Date_SimStart   = obsθ.Date[1]  # since we need to compute the culmulativeof the 1rst day
-					Date_End_Calibr = obsθ.Date[end]
+					Date_SimStart   = max(obsθ.Date[1], dateHypix.Date_SimStart)  # since we need to compute the culmulative of the 1rst day
+					Date_End_Calibr = min(obsθ.Date[end], dateHypix.Date_End)
 				else
-					Date_SimStart   = dateHypix.Date_SimStart  # since we need to compute the culmulativeof the 1rst day
+					Date_SimStart   = dateHypix.Date_SimStart  # since we need to compute the culmulative of the 1rst day
 					Date_End_Calibr = dateHypix.Date_End
 				end
 				

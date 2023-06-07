@@ -142,16 +142,12 @@ module hypixStart
 							∑Pet_Net[iOpt_Count] = sum(clim.Pet[i∑T_CalibrStart_Day:clim.N_Climate])
 
 						# Soil water content for the rootzone at the end of simulation
-							N_Start = 21
-							N_End = 30
 							@fastmath @inbounds @simd for iT=1:Nit
-							# @fastmath @inbounds @simd for iZ=1:N_iRoot
-								@fastmath @inbounds @simd for iZ=N_Start:N_End
+							@fastmath @inbounds @simd for iZ=1:N_iRoot
 									θroot_Mean[iOpt_Count] += (θ[iT,iZ] / hydro.θs[iZ]) * discret.ΔZ[iZ]
 								end
 							end
-							# θroot_Mean[iOpt_Count] = θroot_Mean[iOpt_Count] / (Nit * sum(discret.ΔZ[1:N_iRoot]))
-							θroot_Mean[iOpt_Count] = θroot_Mean[iOpt_Count] / (Nit * sum(discret.ΔZ[N_Start:N_End]))
+							θroot_Mean[iOpt_Count] = θroot_Mean[iOpt_Count] / (Nit * sum(discret.ΔZ[1:N_iRoot]))
 
 						# Timing 
 							Time_End = now()

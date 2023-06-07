@@ -44,7 +44,12 @@ module hydroSmooth
 
                # Adding Zlayer
                   Zlayer₀[end] =  Zlayer₀[end] - ΔZfine_⬓
-                  append!(Zlayer₀, Zlayer[iZ] + ΔZfine_⬓) 
+
+                  if Zlayer[iZ] + ΔZfine_⬓ < Zlayer[iZ+1] - ΔZfine_⬓
+                     append!(Zlayer₀, Zlayer[iZ] + ΔZfine_⬓)
+                  else
+                     append!(Zlayer₀, Zlayer[iZ] + (Zlayer[iZ+1] - Zlayer[iZ]) / 3.0 )
+                  end
             end #if
          end #  for iZ=1:N_SoilLayer-1
          append!(θini_or_Ψini₀, θini_or_Ψini[N_SoilLayer])

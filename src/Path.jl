@@ -14,6 +14,7 @@ module paths
 		LookupTable_RockWetability::String
 		LookupTable_Impermeable::String
 		Smap::String
+		SoilProfile::String
 	end
 
 	@option mutable struct INPUT_SOILWATER
@@ -154,8 +155,9 @@ module paths
 		#		INPUT_SMAP
 		# =============================================================
          path.inputSmap.LookupTable_RockWetability = Path_Soilwater_Data * path.inputSmap.LookupTable_RockWetability
-         path.inputSmap.LookupTable_Impermeable = Path_Soilwater_Data * path.inputSmap.LookupTable_Impermeable
-			path.inputSmap.Smap                       = Path_Soilwater_Data * path.inputSmap.Smap
+         path.inputSmap.LookupTable_Impermeable    = Path_Soilwater_Data * path.inputSmap.LookupTable_Impermeable
+         path.inputSmap.Smap                       = Path_Soilwater_Data * path.inputSmap.Smap
+			path.inputSmap.SoilProfile                = Path_Soilwater_Data * path.inputSmap.SoilProfile
 
 
 		# =============================================================
