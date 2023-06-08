@@ -21,7 +21,7 @@ module readLinkingFile
       SoilLayer        ::Vector{String}
       Vegetation       ::Vector{String}
       θdata            ::Vector{String}
-      Optional         ::Vector{String}
+      Soilprofile         ::Vector{String}
       ∑RootDensityFunc ::Vector{String}
       Drainage         ::Vector{String}
       Lai              ::Vector{String}
@@ -152,12 +152,12 @@ module readLinkingFile
          SoilLayer        = READ_PATH(Data, Header, Path_Input, "SOILLAYER")
          Vegetation       = READ_PATH(Data, Header, Path_Input, "VEGETATION")
          θdata            = READ_PATH(Data, Header, Path_Input, "SOILMOISTURE", AllowMissing = true)
-         Optional         = READ_PATH(Data, Header, Path_Input, "OPTIONAL", AllowMissing = true)
+        Soilprofile         = READ_PATH(Data, Header, Path_Input, "SOILPROFILE", AllowMissing = true)
          ∑RootDensityFunc = READ_PATH(Data, Header, Path_Input, "ROOTDENSITY"; PathAdd = "VEGETATION\\ROOTDENSITY", AllowMissing = true)
          Drainage         = READ_PATH(Data, Header, Path_Input, "DRAINAGE", AllowMissing = true)
          Lai = READ_PATH(Data, Header, Path_Input, "LAI"; PathAdd = "VEGETATION\\LAI", AllowMissing = true)
       
-         pathInputHypix = PATHINPUT(Climate, Discretisation, HydroInput, HydroRange, KsModel, LookUpTable_Crop, LookUpTable_Lai, MultistepOpt, OptionHypix, ParamHypix, PathHypix, SoilLayer, Vegetation, θdata, Optional, ∑RootDensityFunc, Drainage, Lai)
+         pathInputHypix = PATHINPUT(Climate, Discretisation, HydroInput, HydroRange, KsModel, LookUpTable_Crop, LookUpTable_Lai, MultistepOpt, OptionHypix, ParamHypix, PathHypix, SoilLayer, Vegetation, θdata, Soilprofile, ∑RootDensityFunc, Drainage, Lai)
    
    return dateHypix, Id, N_Scenario, pathInputHypix, SiteName
    end  # function: LINKING_FILES

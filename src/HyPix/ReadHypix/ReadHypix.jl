@@ -128,10 +128,10 @@ module readHypix
             # end  # if: 🎏_ImpermeableLayer
 
 
-         # OPTIONAL DATA
+         # SOILPROFILE DATA
             # Reading roots
-               if  !(isempty(pathInputHypix.Optional[iScenario]))
-                  Zroot_Max = readHypix.OPTIONAL(pathInputHypix.Optional[iScenario])
+               if  !(isempty(pathInputHypix.Soilprofile[iScenario]))
+                  BottomBoundary, Zroot_Max = readHypix.SOILPROFILE(pathInputHypix.Soilprofile[iScenario])
                else
                   Zroot_Max = Inf
                end
@@ -153,7 +153,7 @@ module readHypix
                end
 
          # CORRECTING ROOTING DEPTH DEPENDING ON SOIL INFORMATION
-				# Maximum rooting depth should be smaller than the maximum depth of soil and the maximum soil depth given in the optional folder
+				# Maximum rooting depth should be smaller than the maximum depth of soil and the maximum soil depth given in the o folder
 				   veg.Zroot = min(veg.Zroot, Z[Nz], Zroot_Max)
 
          # MEMORY 
@@ -517,12 +517,15 @@ module readHypix
 
 
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   #		FUNCTION : OPTIONAL
+   #		FUNCTION : SOILPROFILE
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      function OPTIONAL(PathOptional)
-         Data₀ = CSV.File(PathOptional, header=true)
-         return Zroot_Max = convert(Vector{Int64}, Tables.getcolumn(Data₀, Symbol("RootingDepth[mm]")))[1]
-      end  # function: OPTIONAL
+      function SOILPROFILE(PathSoilprofile)
+         Data₀ = CSV.File(PathSoilprofile, header=true)
+            BottomBoundary = convert(Vector{String}, Tables.getcolumn(Data₀, Symbol("BottomBoundary")))[1]
+            Zroot_Max = convert(Vector{Int64}, Tables.getcolumn(Data₀, Symbol("RootingDepth[mm]")))[1]
+
+      return BottomBoundary, Zroot_Max
+      end  # function: SOILPROFILE
    # ------------------------------------------------------------------
 
    

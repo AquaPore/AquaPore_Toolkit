@@ -6,7 +6,7 @@
 	   import ..tool
    	import Polynomials
 		using CSV, Tables, DataFrames
-		export SMAP, ROCKFRAGMENT_WETTABLE_STRUCT, IMPERMEABLE_CLASS
+		export SMAP, ROCKFRAGMENT_WETTABLE_STRUCT, IMPERMEABLE_CLASS, BOUNDARY_BOTTOM
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		STRUCTURE : SMAP
@@ -76,7 +76,6 @@
 						end
 					end
 
-
 				# KS_IMPERMEABLE
 					# If impermeable than the value is greater than 0
 					KsImpClass_Dict = readSmap.IMPERMEABLE_CLASS(path.inputSmap.LookupTable_Impermeable)
@@ -89,6 +88,41 @@
 			return smap
 			end  # function: SMAP
 
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : BOUNDARY_BOTTOM
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function BOUNDARY_BOTTOM(path)
+				# Read data
+					Data           = CSV.read(path.inputSmap.SoilProfile, DataFrame, header=true)
+					BoundarySmap   = convert(Vector{String}, Data."Boundary")
+					Soilname 		= convert(Vector{String}, Data."Soilname")
+					
+					N_BoundarySmap = length(BoundarySmap)
+
+				# Dictionary of boundary
+					Dict_Boundary_Smap2Hypix = Dict{String, String}()
+
+					Terminology_SmapBoundary = ("FreeDrainage","LowImpRock","PermSoil_Fluid","HighImpRock")
+					Terminology_HypixBoundary = ("Free","Impermeable","WaterTable","Impermeable")
+
+					for i=1:length(Terminology_SmapBoundary)
+						Dict_Boundary_Smap2Hypix[Terminology_SmapBoundary[i]] = Terminology_HypixBoundary[i]
+					end
+
+				# Dictionary of names-> Hypix
+					Dict_SoilNames_2_HypixBottomBoundary = Dict{String, String}()
+
+				# Converting Smap boundary -> Hypix 
+					Hypix_BottomBoundary = fill("", N_BoundarySmap)
+					for i = 1:N_BoundarySmap
+						Hypix_BottomBoundary[i] = Dict_Boundary_Smap2Hypix[BoundarySmap[i]]
+
+						Dict_SoilNames_2_HypixBottomBoundary[Soilname[i]] = Hypix_BottomBoundary[i] 
+					end
+				
+			return Dict_SoilNames_2_HypixBottomBoundary
+			end  # function: BOUNDARY_BOTTOM
+		# ------------------------------------------------------------------ 
 
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

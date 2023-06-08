@@ -8,24 +8,35 @@ module smap2hypix
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    #		FUNCTION : SMAP_2_HYDRO
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      function SMAP_2_HYPIX(hydro, NiZ, optionₘ, param, path, smap)
+      function SMAP_2_HYPIX(Dict_SoilNames_2_HypixBottomBoundary, hydro, NiZ, optionₘ, param, path, smap)
     
          # Index of each soil profile in the spreadsheet
             iSoilProfile_End, iSoilProfile_Start, N_SoilProfile, Soilname_SoilProfile = SMAP_SOILPROFILE(NiZ, smap)
 
          # PATHS
             Path_OutputHydro = joinpath(path.smap2Hypix.Path_Smap2Hypix, "HYDRO_INPUT")
-            mkpath(Path_OutputHydro)
+               if isfile(Path_OutputHydro)
+                  rm(Path_OutputHydro; force=true, recursive=true)
+               else
+                  mkpath(Path_OutputHydro)
+               end
 
             Path_OutputSoilHorizon = joinpath(path.smap2Hypix.Path_Smap2Hypix, "SOILLAYER")
-            mkpath(Path_OutputSoilHorizon)
+               if isfile(Path_OutputSoilHorizon)
+                  rm(Path_OutputSoilHorizon; force=true, recursive=true)
+               else
+                  mkpath(Path_OutputSoilHorizon)
+               end
 
-            Path_OutputExtra = joinpath(path.smap2Hypix.Path_Smap2Hypix, "OPTIONAL")
-            mkpath(Path_OutputExtra)
+            Path_OutputExtra = joinpath(path.smap2Hypix.Path_Smap2Hypix, "SOILPROFILE")
+               if isfile(Path_OutputExtra)
+                  rm(Path_OutputExtra; force=true, recursive=true)
+               else
+                  mkpath(Path_OutputExtra)
+               end
 
          # For every soil profile
          for iSoilProfile=1:N_SoilProfile
-            
             # iStart and iEnd of Horizon
                iHorizon_Start= iSoilProfile_Start[iSoilProfile]
                iHorizon_End = iSoilProfile_End[iSoilProfile]
@@ -58,10 +69,12 @@ module smap2hypix
              #  The maximum rooting depth is a repeat between iHorizon_Start:iHorizon_End
                RootingDepth = min(smap.Smap_MaxRootingDepth[iHorizon_Start], maximum(Zhorizon))
 
-            # WRITTING TO OPTIONAL FILE
-               Path_OutputExtra₂ = joinpath(Path_OutputExtra, Soilname_SoilProfile[iSoilProfile] *  "_Optional.csv")
-               OPTIONAL(Path_OutputExtra₂, RootingDepth)
-            
+            # WRITTING TO SOILPROFILE FILE
+               Path_OutputExtra₂ = joinpath(Path_OutputExtra, Soilname_SoilProfile[iSoilProfile] *  "_Soilprofile.csv")
+
+               HypixBottomBoundary = Dict_SoilNames_2_HypixBottomBoundary[Soilname_SoilProfile[iSoilProfile]]
+
+               SOILPROFILE(HypixBottomBoundary, Path_OutputExtra₂, RootingDepth)        
          end #  iSoilProfile=1:N_SoilProfile      
    
       return nothing
@@ -139,47 +152,16 @@ module smap2hypix
          CSV.write(Path, Tables.table([Int64.(Id) Matrix]), writeheader=true, header=FieldName_String, bom=true)
       return nothing
 		end  # function: TABLE_HYDRO
-   #...................................................................
-
-
-   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   #		FUNCTION : BOUNDARY_BOTTOM
-   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      function BOUNDARY_BOTTOM(Path)
-
-         # Read data
-            Data           = CSV.read(Path, DataFrame, header=true)
-            BoundarySmap   = convert(Vector{String}, Data."Boundary")
-            N_BoundarySmap = length(BoundarySmap)
-
-         # Dictionary
-            Dict_Boundary_Smap2Hypix = Dict("FreeDrainage"=>"")
-
-            Terminology_SmapBoundary = ("FreeDrainage","LowImpRock","PermSoil_Fluid","HighImpRock")
-            Terminology_HypixBoundary = ("Free","Impermeable","WaterTable","Impermeable")
-
-            for i=1:length*(Terminology_SmapBoundary)
-					 Dict_Boundary_Smap2Hypix[Terminology_SmapBoundary[i]] = Terminology_HypixBoundary[i]
-				end
-
-         # COnverting Smap names -> Hypix 
-            Hypix_BottomBoundary = fill("", N_BoundarySmap)
-            for i = 1:N_BoundarySmap
-               Hypix_BottomBoundary[i] = Dict_Boundary_Smap2Hypix[BoundarySmap[i]]
-            end
-         
-      return Hypix_BottomBoundary
-      end  # function: BOUNDARY_BOTTOM
-   # ------------------------------------------------------------------        
+   #...................................................................  
 
 
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    #		FUNCTION : EXTRAS
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      function OPTIONAL(Path_OutputExtra₂, RootingDepth)
-         Header = ["RootingDepth[mm]"]
+      function SOILPROFILE(HypixBottomBoundary::String, Path_OutputExtra₂::String, RootingDepth::Float64)
+         Header = ["RootingDepth[mm]"; "BottomBoundary"]
 
-         CSV.write(Path_OutputExtra₂, Tables.table([RootingDepth]), writeheader=true, header=Header, bom=true)
+         CSV.write(Path_OutputExtra₂, Tables.table([RootingDepth HypixBottomBoundary]), writeheader=true, header=Header, bom=true)
          
       return nothing
       end  # function: EXTRAS

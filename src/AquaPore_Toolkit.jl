@@ -154,6 +154,7 @@ module AquaPore_Toolkit
 				
 				if option.data.Pedological⍰ == "Smap"
 					smap = readSmap.SMAP(IdSelect_True, NiZ, path)
+					 Dict_SoilNames_2_HypixBottomBoundary = readSmap.BOUNDARY_BOTTOM(path)
 
                RockFragment   = copy(smap.RockFragment)
                RockClass      = copy(smap.RockClass)
@@ -317,7 +318,8 @@ module AquaPore_Toolkit
 		# _______________________ START: Smap_2_HyPix ______________________
 		if option.run.Smap2Hypix
 		printstyled("\n----- START RUNNING Smap ➡ Smap_Hypix  ----------------------------------------------\n"; color=:green)
-			smap2hypix.SMAP_2_HYPIX(hydro, NiZ, option.hydro, param, path, smap)
+			smap2hypix.SMAP_2_HYPIX(Dict_SoilNames_2_HypixBottomBoundary::Dict, hydro, NiZ, option.hydro, param, path, smap)
+			
 		printstyled("\n----- END RUNNING  Smap ➡ Smap_Hypix  ----------------------------------------------- , \n"; color=:yellow)
 		end  # if: Smap2Hypix 
 
