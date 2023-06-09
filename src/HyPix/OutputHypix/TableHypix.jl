@@ -84,17 +84,15 @@ module tableHypix
             Convert_Yearly = 1.0
          end
 
-         Date=now()
-         CurrentDate ="_Year" * string(year(Date)) * "_Month" *  string(month(Date)) * "_Day" * string(day(Date)) 
+         # Date=now()
+         # CurrentDate ="_Year" * string(year(Date)) * "_Month" *  string(month(Date)) * "_Day" * string(day(Date)) 
 
-         Path = pathOutputHypix.Table_Performance * CurrentDate * ".csv"
+         # Path = pathOutputHypix.Table_Performance * CurrentDate * ".csv"
          Path = pathOutputHypix.Table_Performance * "Testing" * ".csv"
 
          Header = [ "Multisteps", "Wof[mm]", "NseBest[-]" ,"Ccc[-]", "Wilmot[-]", "∑Pr[mm year⁻¹]", "∑Pet[mm year⁻¹]","∑ΔSink[mm year⁻¹]","∑ΔQ_Bot[mm year⁻¹]" , "θroot_Mean[mm]" ,"Global_WaterBalance[mm]" ,"Global_WaterBalance_NormPr[-]", "ΔT_Average[second]","iNonConverge[count]" , "Efficiency[count/Hour]", "ΔRunTimeHypix[second]"] # "SiteName", 
 
          Id = 1:1:length(WofBest)
-
-
 
          CSV.write(Path, Tables.table([Id WofBest NseBest CccBest WilmotBest Convert_Yearly*∑Pr_Clim Convert_Yearly*∑Pet_Net Convert_Yearly*∑∑ΔSink Convert_Yearly*∑ΔQ_Bot θroot_Mean Global_WaterBalance Global_WaterBalance_NormPr ΔT_Average iNonConverge_iOpt Efficiency ΔRunTimeHypix]), writeheader=true, header=Header, bom=true)
       return nothing
