@@ -8,7 +8,7 @@ module smap2hypix
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    #		FUNCTION : SMAP_2_HYDRO
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      function SMAP_2_HYPIX(Dict_SoilNames_2_HypixBottomBoundary, hydro, NiZ, optionₘ, param, path, smap)
+      function SMAP_2_HYPIX(Dict_SoilNames_2_HypixBottomBoundary, hydro, NiZ, optionₘ, param, path, RockFragment, smap)
     
          # Index of each soil profile in the spreadsheet
             iSoilProfile_End, iSoilProfile_Start, N_SoilProfile, Soilname_SoilProfile = SMAP_SOILPROFILE(NiZ, smap)
@@ -69,12 +69,15 @@ module smap2hypix
              #  The maximum rooting depth is a repeat between iHorizon_Start:iHorizon_End
                RootingDepth = min(smap.Smap_MaxRootingDepth[iHorizon_Start], maximum(Zhorizon))
 
-            # WRITTING TO SOILPROFILE FILE
-               Path_OutputExtra₂ = joinpath(Path_OutputExtra, Soilname_SoilProfile[iSoilProfile] *  "_Soilprofile.csv")
+            # Maximum Rock Fragment of the soil profile
+               Rf_Max = maximum(RockFragment[iHorizon_Start:iHorizon_End])
 
+            # Boundary conditions
                HypixBottomBoundary = Dict_SoilNames_2_HypixBottomBoundary[Soilname_SoilProfile[iSoilProfile]]
 
-               SOILPROFILE(HypixBottomBoundary, Path_OutputExtra₂, RootingDepth)        
+            # WRITTING TO SOILPROFILE FILE
+               Path_OutputExtra₂ = joinpath(Path_OutputExtra, Soilname_SoilProfile[iSoilProfile] *  "_Soilprofile.csv")
+               SOILPROFILE(HypixBottomBoundary, Path_OutputExtra₂, Rf_Max, RootingDepth)   
          end #  iSoilProfile=1:N_SoilProfile      
    
       return nothing
@@ -156,12 +159,12 @@ module smap2hypix
 
 
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   #		FUNCTION : EXTRAS
+   #		FUNCTION : SOILPROFILES
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      function SOILPROFILE(HypixBottomBoundary::String, Path_OutputExtra₂::String, RootingDepth::Float64)
-         Header = ["RootingDepth[mm]"; "BottomBoundary"]
+      function SOILPROFILE(HypixBottomBoundary::String, Path_OutputExtra₂::String, Rf_Max::Float64, RootingDepth::Float64)
+         Header = ["RootingDepth[mm]"; "BottomBoundary"; "Rf_Max[%]"]
 
-         CSV.write(Path_OutputExtra₂, Tables.table([RootingDepth HypixBottomBoundary]), writeheader=true, header=Header, bom=true)
+         CSV.write(Path_OutputExtra₂, Tables.table([RootingDepth HypixBottomBoundary Rf_Max]), writeheader=true, header=Header, bom=true)
          
       return nothing
       end  # function: EXTRAS
