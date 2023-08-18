@@ -62,7 +62,7 @@ module bestFunc
 	#		FUNCTION : INFILTRATION_3D_TRANSIT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function INFILTRATION_3D_TRANSIT(A, B, Ks, Sorptivity, T)
-			return Sorptivity * (T ^ 0.5) + (A * (Sorptivity ^ 2.0) + B * Ks) * T
+			return Sorptivity * √T + (A * (Sorptivity ^ 2.0) + B * Ks) * T
 		end  # function: INFILTRATION_3D_TRANSIT
 	
 
@@ -85,7 +85,7 @@ module bestFunc
 				return (A * (Sorptivity ^ 2.0) + Ks) * T + bestFunc.C(B, infiltParam, iZ) * (Sorptivity ^ 2.0) / Ks
 			end
 		end  # function: INFILTRATION_3D_STEADY
-# 
+
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : INFILTRATION_1D_STEADY
@@ -95,7 +95,7 @@ module bestFunc
 				return bestFunc.INFILTRATION_1D_TRANSIT(B, Ks, Sorptivity, T_TransSteady)  + Ks * (T - T_TransSteady)
 				
 			elseif option.infilt.BestUniv_Continous == false
-				return Ks * T + bestFunc.C(B,  infiltParam, iZ) * (Sorptivity ^ 2.0) / Ks
+				return Ks * T + bestFunc.C(B, infiltParam, iZ) * (Sorptivity ^ 2.0) / Ks
 			end
 		end  # function: INFILTRATION_1D_STEADY
 
@@ -153,7 +153,7 @@ module bestFunc
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : B
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function B(iZ, Kr_θini,  infiltParam)
+		function B(iZ, Kr_θini, infiltParam)
 			return (2.0 -  infiltParam.β[iZ]) / 3.0 + Kr_θini * (1.0 + infiltParam.β[iZ]) / 3.0
 		end # function: B
 
@@ -162,7 +162,7 @@ module bestFunc
 	#		FUNCTION : C
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function C(B, infiltParam, iZ)
-			return log(1.0 /  infiltParam.β[iZ]) * (1.0 +  infiltParam.β[iZ]) / (6.0 * (1.0 -  infiltParam.β[iZ]) * (1.0 - B) )
+			return log(1.0 / infiltParam.β[iZ]) * (1.0 +  infiltParam.β[iZ]) / (6.0 * (1.0 -  infiltParam.β[iZ]) * (1.0 - B) )
 		end # function: C
 
 end # MODULE: bestFunc
