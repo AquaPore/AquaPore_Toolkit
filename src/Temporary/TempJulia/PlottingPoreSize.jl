@@ -69,8 +69,8 @@ function PLOTTING_PORESIZE()
 	ΨmMac = √ΨmacMat
 	σMac = log(ΨmacMat) / (2.0 * 3)
 	θs = 0.5
-	θr = 0
-	σ = 1.5
+	θr = 0.1
+	σ = 1.
 	Ψm = (√ΨmacMat + ΨmacMat) * 0.5 * exp(σ * Pσ)
 	θsMacMat = θs * 0.75
 	Ks = 0.008
@@ -125,23 +125,28 @@ function PLOTTING_PORESIZE()
 	CairoMakie.activate!(type = "svg")
 	Fig = Figure(resolution = (5000, 4000), font="Sans", fontsize=NumberSize)
 	
-	TableComplete_θΨ = [0.0, 1.0, 10.0, 50, 100.0, 250, 500.0, 1000.0, 2500, 5000.0,100_00.0, 250_00.0, 500_00.0, 1000_00.0,  2000_00.0]
+	TableComplete_θΨ = [0.0, 1.0, 10.0, 50, 100.0, 250, 500.0, 1000.0, 2500, 5000.0,100_00.0, 150_00.0,250_00.0, 500_00.0, 1000_00.0,  1500_00.0, 2000_00.0]
 
-	Axis1 = Axis(Fig[1,1], xlabel="Ψ [Kpa]", ylabel="Normalised ∂θ∂Ψ", xscale=Makie.log, titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false,xminorticksvisible=true, yminorticksvisible=true)
+	Axis1 = Axis(Fig[1,1], xlabel="Ψ [Kpa]", ylabel="Normalised ∂θ∂Ψ", xscale=log, titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false,xminorticksvisible=true, yminorticksvisible=true)
 		Axis1.xticks = (TableComplete_θΨ, string.( Int.(TableComplete_θΨ)))
-		
+
+		xlims!(Axis1, 0.01, 2500)
 		Plot1=lines!(Axis1, cst.Mm_2_kPa * Ψ , ∂θ∂Ψ_1,  color=:green, linewidth=Linewidth, label="")
 		Plot2=lines!(Axis1, cst.Mm_2_kPa * Ψ , ∂θ∂Ψ_2, color=:blue, linewidth=Linewidth, label="")
 
-	Axis2 = Axis(Fig[2,1], xlabel="Ψ [kPa]", ylabel="θ(Ψ)", xscale=Makie.log, titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false,xminorticksvisible=true, yminorticksvisible=true)
+	Axis2 = Axis(Fig[2,1], xlabel="Ψ [kPa]", ylabel="θ [L³ L⁻³]", xscale=log, titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false,xminorticksvisible=true, yminorticksvisible=true)
+
+		xlims!(Axis2, 0.01, 2500)
+		ylims!(Axis2, 0., 0.55)
 		Axis2.xticks = (TableComplete_θΨ, string.( Int.(TableComplete_θΨ)))
 		lines!(Axis2, cst.Mm_2_kPa .* Ψ , Ψ_2_θDual_1, color=:green, linewidth=Linewidth)
 		lines!(Axis2, cst.Mm_2_kPa .* Ψ , Ψ_2_θDual_2, color=:blue, linewidth=Linewidth)
 
-	Axis3 = Axis(Fig[3,1], xlabel="Ψ [kPa]", ylabel="K(Ψ)", xscale=Makie.log, titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, yminorticksvisible=true)
+	Axis3 = Axis(Fig[3,1], xlabel="Ψ [kPa]", ylabel="K(Ψ) [cm h⁻¹]", xscale=log, titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, yminorticksvisible=true)
 		Axis3.xticks = (TableComplete_θΨ, string.( Int.(TableComplete_θΨ)))
-		lines!(Axis3, cst.Mm_2_kPa .* Ψ , Ψ_2_KUNSAT_1, color=:green, linewidth=Linewidth)
-		lines!(Axis3, cst.Mm_2_kPa .* Ψ , Ψ_2_KUNSAT_2, color=:blue, linewidth=Linewidth)
+		lines!(Axis3, cst.Mm_2_kPa .* Ψ , cst.MmS_2_CmH .* Ψ_2_KUNSAT_1, color=:green, linewidth=Linewidth)
+		lines!(Axis3, cst.Mm_2_kPa .* Ψ , cst.MmS_2_CmH .* Ψ_2_KUNSAT_2, color=:blue, linewidth=Linewidth)
+		xlims!(Axis3, 0.01, 2500)
 
 		Legend(Fig[1, 2], Axis1, valign=:top, padding = (0, 0, 20, 0))
 
