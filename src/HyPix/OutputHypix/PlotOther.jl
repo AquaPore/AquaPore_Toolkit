@@ -196,7 +196,7 @@ module plotOther
 				Ψplot = exp.(range(log(Ψ_Min), stop=log(Ψ_Max), length=N_Se)) 
 				θplot = fill(0.0::Float64, N_Se)
 				for iΨ = 1:N_Se
-					θplot[iΨ] = wrc.Ψ_2_θDual(optionₘ, Ψplot[iΨ], 1, hydroHorizon₂)			
+					θplot[iΨ] = wrc.Ψ_2_θ(optionₘ, Ψplot[iΨ], 1, hydroHorizon₂)			
 				end # for iΨ
 
 			# INITIALIZING PLOT
@@ -229,7 +229,7 @@ module plotOther
 						Δθ = [θhalf-Δθ, θhalf+Δθ, hydroHorizon₂.θs[1], hydroHorizon₂.θs[1]-Δθ, hydroHorizon₂.θr[1], hydroHorizon₂.θr[1]+Δθ]
 
 						for iθ = 1:N_Δθ
-							Ψ_Δθ = wrc.θ_2_ΨDual(optionₘ, Δθ[iθ], 1, hydroHorizon₂)
+							Ψ_Δθ = wrc.θ_2_Ψ(optionₘ, Δθ[iθ], 1, hydroHorizon₂)
 
 							scatter!(Ax1, [-log(Ψ_Δθ),-log(Ψ_Δθ)], [Δθ[iθ],Δθ[iθ]], markersize=10, color=:blue)
 							# scatter!(Ax1, [log(hydroHorizon₂.Ψm[1])], [0.5 * (hydroHorizon₂.θsMacMat[1]+hydroHorizon₂.θr[1])], markersize=20,  color=:red)
@@ -267,7 +267,7 @@ module plotOther
 					for iΨ = 1:N_Ψ
 						Ψ_Δθ = exp(ΔLogΨ[iΨ])
 
-						Δθ[iΨ] = wrc.Ψ_2_θDual(optionₘ, Ψ_Δθ, 1, hydroHorizon₂)
+						Δθ[iΨ] = wrc.Ψ_2_θ(optionₘ, Ψ_Δθ, 1, hydroHorizon₂)
 
 						scatter!(Ax2, [-log(Ψ_Δθ),-log(Ψ_Δθ)], [Δθ[iΨ],Δθ[iΨ]], markersize=10,  color=:blue)
 						# scatter!(Ax2, [log(hydroHorizon₂.Ψm[1])], [0.5 * (hydroHorizon₂.θsMacMat[1]+hydroHorizon₂.θr[1])], marker = "x", markersize=15,  color=:red)

@@ -15,29 +15,28 @@ module sorptivity
 			# INITIALIZING
 				Ψ_Sat = 0.0
 
-				Se_Ini = wrc.θ_2_Se(θini, iZ, hydroInfilt)
+				Se_Ini = wrc.θ_2_Se(θ₁=θini, θs=hydroInfilt.θs[iZ], θr=hydroInfilt.θr[iZ])
 
-				# Ψini = wrc.θ_2_ΨDual(optionₘ, θini, iZ, hydroInfilt)
+				# Ψini = wrc.θ_2_Ψ(optionₘ, θini, iZ, hydroInfilt)
 
 				SeIni_⬙ = (1.0 + Se_Ini) / 2.0
 
-				θ⬙ = wrc.Se_2_θ(SeIni_⬙, iZ, hydroInfilt)
+				θ⬙ = wrc.Se_2_θ(Se₁=SeIni_⬙, θs=hydroInfilt.θs[iZ], θr=hydroInfilt.θr[iZ])
 
-				Ψ⬙ = wrc.θ_2_ΨDual(optionₘ, θ⬙, iZ, hydroInfilt)
+				Ψ⬙ = wrc.θ_2_Ψ(optionₘ, θ⬙, iZ, hydroInfilt)
 
 			# if option.infilt.SorptivitySplitModel⍰ == "Split"  # <>=<>=<>=<>=<>
 				# Sorptivity based on θ
 					function SORPTIVITY_θ²(hydroInfilt, iZ, θ, θini, optionₘ)
-						# Se = wrc.θ_2_Se(θ, iZ, hydroInfilt)
 
-					return  DIFFUSIVITY_θ(θ, iZ, hydroInfilt, optionₘ) * (hydroInfilt.θs[iZ] + θ - 2.0 * θini)
+						return  DIFFUSIVITY_θ(θ, iZ, hydroInfilt, optionₘ) * (hydroInfilt.θs[iZ] + θ - 2.0 * θini)
 					end # SORPTIVITY_θ² ~~~~~~~~~~~~~~~~~
 
 				Sorptivity_θ² = QuadGK.quadgk(θ -> SORPTIVITY_θ²(hydroInfilt, iZ, θ, θini, optionₘ), θini, θ⬙, rtol=Rtol)[1]
 
 				# Sorptivity based on Ψ₁
 					function SORPTIVITY_Ψ²(hydroInfilt, iZ, θini, Ψ₁)
-						θ = wrc.Ψ_2_θDual(optionₘ, Ψ₁, iZ, hydroInfilt)
+						θ = wrc.Ψ_2_θ(optionₘ, Ψ₁, iZ, hydroInfilt)
 					return kunsat.Ψ_2_KUNSAT(optionₘ, Ψ₁, iZ, hydroInfilt) * (hydroInfilt.θs[iZ] + θ - 2.0 * θini)
 					end # SORPTIVITY_Ψ² ~~~~~~~~~~~~~~~~~
 
@@ -47,7 +46,7 @@ module sorptivity
 
 			# elseif option.infilt.SorptivitySplitModel⍰ == "Split_η" # <>=<>=<>=<>=<>
 	
-			# 	Ψ⬙_η = wrc.θ_2_ΨDual(optionₘ, θ⬙, iZ, hydroInfilt) / hydroInfilt.Ψm[iZ] # dimensionless water potential
+			# 	Ψ⬙_η = wrc.θ_2_Ψ(optionₘ, θ⬙, iZ, hydroInfilt) / hydroInfilt.Ψm[iZ] # dimensionless water potential
 
 			# 	ΨSat_η = Ψ_Sat / hydroInfilt.Ψm[iZ]
 
@@ -62,9 +61,9 @@ module sorptivity
 			# 		function SORPTIVITY_Se_Ψ_η(Ψ_η, hydroInfilt, iZ, Se_Ini)
 			# 			Ψ₂ = Ψ_η * hydroInfilt.Ψm[iZ]
 
-			# 			Se = wrc.Ψ_2_SeDual(optionₘ, Ψ₂, iZ, hydroInfilt)
+			# 			Se = wrc.Ψ_2_Se(optionₘ, Ψ₂, iZ, hydroInfilt)
 
-			# 			return kunsat.Se_2_KR(optionₘ, Se, iZ, hydroInfilt) * FLUXCONC(option, Se, Se_Ini)
+			# 			return kunsat.Se_2_Kr(optionₘ, Se, iZ, hydroInfilt) * FLUXCONC(option, Se, Se_Ini)
 			# 		end # SORPTIVITY_Se_Ψ
 
 			# 		Sorptivity_Se_Ψ_η = QuadGK.quadgk(Ψ_η -> SORPTIVITY_Se_Ψ_η(Ψ_η, hydroInfilt, iZ, Se_Ini), ΨSat_η, Ψ⬙_η, rtol=Rtol)[1]
@@ -84,7 +83,7 @@ module sorptivity
 			function DIFFUSIVITY_θ(θ, iZ, hydroInfilt, optionₘ)
 				Kunsat = kunsat.θ_2_KUNSAT(optionₘ, θ, iZ, hydroInfilt)
 
-				# Ψ₁ = wrc.θ_2_ΨDual(optionₘ, θ, iZ, hydroInfilt)
+				# Ψ₁ = wrc.θ_2_Ψ(optionₘ, θ, iZ, hydroInfilt)
 
 			return - Kunsat * wrc.∂Ψ∂θ(optionₘ, θ, iZ, hydroInfilt)
 			end  # function: DIFFUSIVITY_θ ~~~~~~~~~~~~~~~~~
@@ -92,9 +91,9 @@ module sorptivity
 
 			# DIFFUSIVITY_Se_η
 			function DIFFUSIVITY_Se_η(Se, iZ, hydroInfilt, optionₘ)
-				Kr = kunsat.Se_2_KR(optionₘ, Se, iZ, hydroInfilt)
+				Kr = kunsat.Se_2_Kr(optionₘ, Se, iZ, hydroInfilt)
 
-				# Ψ₁ = wrc.Se_2_ΨDual(optionₘ, Se, iZ, hydroInfilt)
+				# Ψ₁ = wrc.Se_2_Ψ(optionₘ, Se, iZ, hydroInfilt)
 
 			return - Kr * wrc.∂Ψ∂Se(optionₘ, Se, iZ, hydroInfilt) / hydroInfilt.Ψm[iZ] # negative sign needed because Ψ₁ is set positive
 			end  # function: DIFFUSIVITY_Se_η ~~~~~~~~~~~~~~~~~

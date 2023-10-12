@@ -64,7 +64,7 @@ module quasiExact
 
 			Sorptivity = sorptivity.SORPTIVITY(infiltParam.θini[iZ], iZ, hydroInfilt, option, option.infilt)
 
-			Se_Ini = wrc.θ_2_Se(infiltParam.θini[iZ], iZ, hydroInfilt)
+			Se_Ini = wrc.θ_2_Se(θ₁=infiltParam.θini[iZ], θs=infiltParam.θs[iZ], θr=infiltParam.θr[iZ])
 
 			K_θini = kunsat.Se_2_KUNSAT(option.infilt, Se_Ini, iZ, hydroInfilt)
 
@@ -124,7 +124,7 @@ module quasiExact
 
 	function OF_QUASIEXACT(∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, T; W=0.8)
 
-		Se_Ini = wrc.θ_2_Se(infiltParam.θini[iZ], iZ, hydroInfilt)
+		Se_Ini = wrc.θ_2_Se(θ₁=infiltParam.θini[iZ], θs=infiltParam.θs[iZ], θr=infiltParam.θr[iZ])
 		
 		K_θini = kunsat.Se_2_KUNSAT(option.infilt, Se_Ini, iZ, hydroInfilt)
 

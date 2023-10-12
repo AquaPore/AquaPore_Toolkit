@@ -9,7 +9,8 @@ module kunsat
 			Ψ₁ = max(Ψ₁, 0.0)
 
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				return kunsat.kg.Ψ_2_KUNSAT(optionₘ, Ψ₁, iZ::Int64, hydroParam)
+				return kunsat.kg.Ψ_2_KUNSAT(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+
 			elseif  optionₘ.HydroModel⍰ == "Vangenuchten" ||  optionₘ.HydroModel⍰ == "VangenuchtenJules"
 				return kunsat.vg.Ψ_2_KUNSAT(optionₘ, Ψ₁, iZ::Int64, hydroParam)
 			elseif  optionₘ.HydroModel⍰ == "BrooksCorey"
@@ -24,17 +25,17 @@ module kunsat
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : ΨSE_2_KUNSAT
+	#		FUNCTION : ΨSe_2_KUNSAT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	  function ΨSE_2_KUNSAT(optionₘ, Ψ₁, Se, iZ::Int64, hydroParam)
+	  function ΨSe_2_KUNSAT(optionₘ, Ψ₁, Se₁, iZ::Int64, hydroParam)
 			Ψ₁ = max(Ψ₁, 0.0)
 
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				return kunsat.kg.ΨSE_2_KUNSAT(optionₘ, Ψ₁, Se, iZ::Int64, hydroParam)
+				return kunsat.kg.ΨSe_2_KUNSAT(Ψ₁=Ψ₁, Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
 			else
-				error("$( optionₘ.HydroModel⍰) model for ΨSE_2_KUNSAT is not yet available")
+				error("$( optionₘ.HydroModel⍰) model for ΨSe_2_KUNSAT is not yet available")
 			end
-		end # function Ψ_2_KUNSAT
+		end # function ΨSe_2_KUNSAT
 	#-------------------------------------------------------------------
 
 
@@ -42,9 +43,9 @@ module kunsat
 	#		FUNCTION : θ_2_KUNSAT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	  function θ_2_KUNSAT(optionₘ, θ₁, iZ::Int64, hydroParam)
+			
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				Ψ₁ = wrc.kg.θ_2_ΨDual(optionₘ, θ₁, iZ, hydroParam)
-				return Ψ_2_KUNSAT(optionₘ, Ψ₁, iZ, hydroParam)
+				return kunsat.kg.θ_2_KUNSAT(θ₁=θ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
 			else
 				error("$( optionₘ.HydroModel⍰) model for θ_2_KUNSAT is not yet available")
 			end
@@ -55,17 +56,19 @@ module kunsat
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : Se_2_KUNSAT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	  function Se_2_KUNSAT(optionₘ, Se, iZ::Int64, hydroParam)
-			Se = max(min(Se, 1.0), 0.0)
+	  function Se_2_KUNSAT(optionₘ, Se₁, iZ::Int64, hydroParam)
+			Se = max(min(Se₁, 1.0), 0.0)
 
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				return kunsat.kg.Se_2_KUNSAT(optionₘ, Se, iZ::Int64, hydroParam)
+
+				return kunsat.kg.Se_2_KUNSAT(Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+				
 			elseif  optionₘ.HydroModel⍰ == "Vangenuchten"
-				return kunsat.vg.Se_2_KUNSAT(optionₘ, Se, iZ::Int64, hydroParam)
+				return kunsat.vg.Se_2_KUNSAT(optionₘ, Se₁, iZ::Int64, hydroParam)
 			elseif  optionₘ.HydroModel⍰ == "BrooksCorey"
-				return kunsat.bc.Se_2_KUNSAT(optionₘ, Se, iZ::Int64, hydroParam)
+				return kunsat.bc.Se_2_KUNSAT(optionₘ, Se₁, iZ::Int64, hydroParam)
 			elseif  optionₘ.HydroModel⍰ == "ClappHornberger"
-				return kunsat.ch.Se_2_KUNSAT(optionₘ, Se, iZ::Int64, hydroParam)
+				return kunsat.ch.Se_2_KUNSAT(optionₘ, Se₁, iZ::Int64, hydroParam)
 			else
 				error("$( optionₘ.HydroModel⍰) model for Se_2_KUNSAT is not yet available")
 			end
@@ -74,17 +77,17 @@ module kunsat
 	
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : Se_2_KUNSAT
+	#		FUNCTION : Se_2_Kr
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	  function Se_2_KR(optionₘ, Se, iZ::Int64, hydroParam)
-			Se = max(min(Se, 1.0), 0.0)
+	  function Se_2_Kr(optionₘ, Se₁, iZ::Int64, hydroParam)
+			Se = max(min(Se₁, 1.0), 0.0)
 
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				return kunsat.kg.Se_2_KR(optionₘ, Se, iZ::Int64, hydroParam)
+				return Se_2_KUNSAT(optionₘ, Se₁, iZ::Int64, hydroParam) / hydroParam.Ks[iZ]
 			else
-				error("$( optionₘ.HydroModel⍰) model for Se_2_KR is not yet available")
+				error("$( optionₘ.HydroModel⍰) model for Se_2_Kr is not yet available")
 			end
-		end # function Se_2_KUNSAT
+		end # function Se_2_Kr
 	#-------------------------------------------------------------------
 
 
@@ -95,7 +98,8 @@ module kunsat
 			Ψ₁ = max(Ψ₁, 0.0)
 
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				return kunsat.kg.∂K∂ΨMODEL(optionₘ, Ψ₁, iZ::Int64, hydroParam)
+				return kunsat.kg.∂K∂ΨMODEL(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+
 			elseif  optionₘ.HydroModel⍰ == "Vangenuchten"
 				return kunsat.vg.∂K∂ΨMODEL(optionₘ, Ψ₁, iZ::Int64, hydroParam)
 			elseif  optionₘ.HydroModel⍰ == "BrooksCorey"
@@ -109,19 +113,6 @@ module kunsat
 	#-------------------------------------------------------------------
 
 
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# #		FUNCTION : ∂K∂θ
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#   function ∂K∂Se(optionₘ, Ψ₁, Se, iZ::Int64, hydroParam)
-	# 		if  optionₘ.HydroModel⍰ == "Kosugi"
-	# 			return kunsat.kg.∂K∂Se(optionₘ, Ψ₁, Se, iZ::Int64, hydroParam)
-	# 		else
-	# 			error("$( optionₘ.HydroModel⍰) model for ∂K∂θ is not yet available")
-	# 		end
-	# 	end # function ∂K∂θ
-	# #-------------------------------------------------------------------
-
-
 	# <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 	# <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 
@@ -133,53 +124,20 @@ module kunsat
 		import ...cst
 		import ForwardDiff, QuadGK
 		import SpecialFunctions: erfc, erfcinv
-		export Ψ_2_KUNSAT, Se_2_KUNSAT, ∂K∂ΨMODEL
-
-
-		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		#		FUNCTION : Ψ_2_KUNSAT
-		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_KUNSAT2(optionₘ, Ψ₁, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
-
-				Se = wrc.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydroParam)
-
-				ΨmacMat = exp(log(ΨmMac) + 3.0 * σMac)
-
-				SeMacMat = max((θsMacMat - θr) / (θs - θr), 0.0)
-
-				# Kr_ΨmacMat =  1.0 + √SeMacMat * (0.5 * erfc(((log(ΨmacMat / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-
-				Kr_ΨmacMat =  1.0 + √SeMacMat 
-				
-				KsMac = Ks * min(1.0 / Kr_ΨmacMat, 1.0)
-				KsMat = Ks - KsMac
-				# println( Ks, " , ", KsMac," , " ,KsMat)
-				
-				Kunsat_Mac =  KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-
-				Kunsat_Mat =  KsMat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
-
-			return Kunsat_Mat + Kunsat_Mac
-			end # function Ψ_2_KUNSAT
-		#-------------------------------------------------------------------
-
+		export Ψ_2_KUNSAT, ∂K∂ΨMODEL
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : Ψ_2_KUNSAT
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_KUNSAT(optionₘ, Ψ₁, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+			function Ψ_2_KUNSAT(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
 
-				Se = wrc.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydroParam)
+				Se = wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
 
 				KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)			
 				Kunsat_Mat =  KsMat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
-				# if θs - θsMacMat > cst.ΔθsθsMacMat 
 				KsMac = max(Ks - KsMat, 0.0)
 				Kunsat_Mac =  KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-				# else
-				# 	Kunsat_Mac = 0.0::Float64
-				# end
 
 			return Kunsat_Mat + Kunsat_Mac
 			end # function Ψ_2_KUNSAT
@@ -187,220 +145,217 @@ module kunsat
 
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		#		FUNCTION : Ψ_2_KUNSAT_SeMat_SeMac
+		#		FUNCTION : ΨSe_2_KUNSAT
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_KUNSAT_SeMat_SeMac(optionₘ, Ψ₁, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+			function ΨSe_2_KUNSAT(;Ψ₁, Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
+	
+				KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)			
+				Kunsat_Mat =  KsMat * √Se₁ * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
-				
-				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
-				Se_Mat = max(θ_Mat - θr, 0.0) / (θs - θr)  
-
-			# if θs - θsMacMat > cst.ΔθsθsMacMat
-				θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
-				Se_Mac = θ_Mac / (θs - θr)
-				# Se = wrc.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydroParam)
-
-				KsMat = Ks * (θsMacMat - θr) / (θs - θr)			
-				Kunsat_Mat =  KsMat * √Se_Mat * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
-
-				# if θs - θsMacMat > cst.ΔθsθsMacMat 
-					KsMac = Ks * max(θs - θsMacMat, 0.0) / (θs - θr)
-					Kunsat_Mac =  KsMac * √Se_Mac * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-				# else
-				# 	Kunsat_Mac = 0.0::Float64
-				# end
+				KsMac = max(Ks - KsMat, 0.0)
+				Kunsat_Mac =  KsMac * √Se₁ * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
 			return Kunsat_Mat + Kunsat_Mac
-			end # function Ψ_2_KUNSAT
-	#-------------------------------------------------------------------
+			end # function ΨSe_2_KUNSAT
+		#-------------------------------------------------------------------
 
 
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : Ψ_2_KUNSAT
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ΨSE_2_KUNSAT(optionₘ, Ψ₁, Se, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : θ_2_KUNSAT
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function θ_2_KUNSAT(;θ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
 
-			KsMat = Ks * (θsMacMat - θr) / (θs - θr)			
-			Kunsat_Mat =  KsMat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
+				Se₁ = wrc.θ_2_Se(θ₁=θ₁, θs=θs, θr=θr)
 
-			if θs - θsMacMat > cst.ΔθsθsMacMat
-				KsMac = Ks * (θs - θsMacMat) / (θs - θr)
-				Kunsat_Mac =  KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
-			else
-				Kunsat_Mac = 0.0::Float64
-			end
-			
-		return Kunsat_Mat + Kunsat_Mac
-		end # function ΨSE_2_KUNSAT
-	#-------------------------------------------------------------------
-
+				Ψ₁ = wrc.kg.θ_2_Ψ(θ₁=θ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac) 
 	
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : Se_2_KUNSAT
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function Se_2_KUNSAT(optionₘ, Se, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+				KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)			
+				Kunsat_Mat =  KsMat * √Se₁ * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
+
+				KsMac = max(Ks - KsMat, 0.0)
+				Kunsat_Mac =  KsMac * √Se₁ * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+
+			return Kunsat_Mat + Kunsat_Mac		
+			end # function θ_2_KUNSAT
+		#-------------------------------------------------------------------
 
 		
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : Se_2_KUNSAT
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function Se_2_KUNSAT(;Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
 
-			Se_Mat = (0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0))) / (θs - θr)
+				Ψ₁ = wrc.kg.Se_2_Ψ(Se₁=Se₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac) 
+	
+				KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)			
+				Kunsat_Mat = KsMat * √Se₁ * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
-			KsMat = Ks * (θsMacMat - θr) / (θs - θr)
-			Kunsat_Mat = KsMat * √Se * (0.5 * erfc( erfcinv(2.0 * Se_Mat) + σ / √2.0 )) ^ 2.0
+				KsMac = max(Ks - KsMat, 0.0)
+				Kunsat_Mac =  KsMac * √Se₁ * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
-			if θs - θsMacMat > cst.ΔθsθsMacMat
-				Se_Mac = (0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))) / (θs - θr)
-				KsMac = Ks * (θs - θsMacMat) / (θs - θr)
-				Kunsat_Mac = KsMac * √Se * (0.5 * erfc( erfcinv(2.0 * Se_Mac) + σMac / √2.0 )) ^ 2.0
-			else
-				Kunsat_Mac = 0.0::Float64
-			end
-
-		return Kunsat_Mat + Kunsat_Mac
-		end # function Se_2_KUNSAT
-	#-------------------------------------------------------------------------------
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : Se_2_Kr
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function Se_2_KR(optionₘ, Se, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
-
-		return Se_2_KUNSAT(optionₘ, Se, iZ, hydroParam) / Ks
-		end # function: Se_2_KR
-	#---------------------------------------------------------------------
+			return Kunsat_Mat + Kunsat_Mac			
+			end # function Se_2_KUNSAT
+		#-------------------------------------------------------------------
 
 
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# #		FUNCTION : ∂K∂ΨMODEL numerical
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# 	function ∂K∂Ψ_NUMERICAL(optionₘ, Ψ₁, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
-			
-	# 		ψ =fill(0.0::Float64, 1) 
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : ∂K∂ΨMODEL
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function ∂K∂ΨMODEL(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
 
-	# 		∂K∂Ψ_Numerical(ψ::Vector) = Ψ_2_KUNSAT(optionₘ, abs(ψ[1]), iZ, hydroParam)
-			
-	# 		ψ[1] = Ψ₁
-			
-	# 		Func_∂K∂Ψ_Numerical = ψ -> ForwardDiff.gradient(∂K∂Ψ_Numerical, ψ)			
-	# 		∂K∂Ψ = Func_∂K∂Ψ_Numerical(ψ)[1]
-			
-	# 		if isnan(∂K∂Ψ)
-	# 			error("∂K∂Ψ = NaN")
-	# 			∂K∂Ψ = 0.0
-	# 		end
-	# 	return ∂K∂Ψ 
-	# 	end # function: ∂K∂Ψ
+				if Ψ₁ > eps(100.0)
+					SeMat = (θsMacMat - θr) / (θs - θr)
+					SeMac =(θs - θsMacMat) / (θs - θr)
 
-		
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# #		FUNCTION : ∂K∂Ψ analitical
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# 	function ∂K∂Ψ_Jesus3(optionₘ, Ψ₁, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+					KsMat = Ks * SeMat 
+					KsMac = Ks * SeMac
 
-	# 		Se = wrc.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydroParam)
+					P₂ = 0.7071067811865475 # 1.0 / √(2.0) 
+					Pπ = 0.5641895835477563 # 1.0 / √(π)
+					Pc = 0.3989422804014327 # 1.0 / √(2.0*π) 
+					P8 = 0.125 # 1.0 / 8.0
 
-	# 		KsMat = Ks * (θsMacMat - θr) / (θs - θr)
-	# 		KsMac = Ks * (θs - θsMacMat)  / (θs - θr)
-
-	# 		Ψ₁Ψm = log(Ψ₁ / Ψm)
-	# 		Ψ₁ΨmMac = log(Ψ₁ / ΨmMac)
-
-	# 		A = Ψ₁Ψm / (σ * √2.0)
-	# 		B = Ψ₁ΨmMac / (σMac * √2.0)
-
-	# 	  ∂Kunsat_Mat∂Ψ = -(KsMat / (√(2.0*π)*Ψ₁*σ)) * (erfc(A+σ/√2.0)) * √Se * (exp(-(A+σ/√2.0)^2.0)) - (KsMat / 8*(√(2.0*π)*Ψ₁)) * ((erfc(A+σ/√2.0))^2.0) / √Se * ((θsMacMat-θr)/(θs-θr) * exp(-(A)^2.0)/σ + (θs-θsMacMat)/(θs-θr) * exp(-(B)^2.0)/σMac) 
-			
-	# 	  if isnan(∂Kunsat_Mat∂Ψ)
-	# 			∂Kunsat_Mat∂Ψ = 0.0
-	# 		end
-
-	# 		∂Kunsat_Mac∂Ψ = -(KsMac / (√(2.0*π)*Ψ₁*σMac)) * (erfc(B+σMac/√2.0)) * √Se * (exp(-(B+σMac/√2.0)^2.0)) - (KsMat / 8*(√(2.0*π)*Ψ₁)) * ((erfc(B+σMac/√2.0))^2.0) / √Se * ((θsMacMat-θr)/(θs-θr) * exp(-(A)^2.0)/σ + (θs-θsMacMat)/(θs-θr) * exp(-(B)^2.0)/σMac)
-
-	# 		if isnan(∂Kunsat_Mac∂Ψ)
-	# 			∂Kunsat_Mac∂Ψ = 0.0
-	# 		end
-
-	# 	return ∂Kunsat_Mat∂Ψ + ∂Kunsat_Mac∂Ψ
-	# 	end # function: ∂K∂ΨMODEL analitical
-	# #-----------------------------------------------------------------
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : ∂K∂ΨMODEL
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ∂K∂ΨMODEL(optionₘ, Ψ₁, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
-
-			if Ψ₁ > eps(100.0)
-				SeMat = (θsMacMat - θr) / (θs - θr)
-				SeMac =(θs - θsMacMat) / (θs - θr)
-
-				KsMat = Ks * SeMat 
-				KsMac = Ks * SeMac
-
-				P₂ = 0.7071067811865475 # 1.0 / √(2.0) 
-				Pπ = 0.5641895835477563 # 1.0 / √(π)
-				Pc = 0.3989422804014327 # 1.0 / √(2.0*π) 
-				P8 = 0.125 # 1.0 / 8.0
-
-				Ψmσ = Ψm * σ
-				ΨmMacσMac = ΨmMac * σMac
-				ΨmΨ₁ = Ψm / Ψ₁
-				ΨmMacΨ₁ = ΨmMac / Ψ₁
-				Ψ₁Ψm = Ψ₁ / Ψm
-				Ψ₁ΨmMac = Ψ₁ / ΨmMac
-				F_LOG = (P₂ * log(Ψ₁Ψm)) / σ
-				Erfc1_Mat = erfc(P₂ * σ + F_LOG)
-				ΨΨm = erfc(log(Ψ₁Ψm) / (√2.0 *σ))
-				ΨΨmσ = exp((-(log(Ψ₁Ψm) / (√2.0 *σ))*log(Ψ₁Ψm)) / (√2.0 *σ))
-				F_LOG_MAC = (P₂ * log(Ψ₁ΨmMac)) / σMac
-				Erfc1_Mac = erfc(P₂ * σMac + F_LOG_MAC)
-				ΨΨmMac = erfc(log(Ψ₁ΨmMac) / (√2.0 *σMac))
-				ΨΨmσ_Mac = exp((-(log(Ψ₁ΨmMac) / (√2.0 *σMac))*log(Ψ₁ΨmMac)) / (√2.0 *σMac))
-				Sqrt = sqrt(0.5*SeMat*ΨΨm+0.5*SeMac*ΨΨmMac)
-			
-				∂Kunsat_Mat∂Ψ = (-Pc * KsMat*(ΨmΨ₁)*Erfc1_Mat*Sqrt*exp(((-F_LOG) - P₂*σ) * (P₂*σ + F_LOG))) / (Ψmσ)+ P8*KsMat*(-Pπ)*((SeMac*(ΨmMacΨ₁)*ΨΨmσ_Mac) / (√2.0 *ΨmMacσMac) + (SeMat*(ΨmΨ₁)*ΨΨmσ) / (√2.0 *Ψmσ))*(Erfc1_Mat^2)*(Sqrt^-1)
+					Ψmσ = Ψm * σ
+					ΨmMacσMac = ΨmMac * σMac
+					ΨmΨ₁ = Ψm / Ψ₁
+					ΨmMacΨ₁ = ΨmMac / Ψ₁
+					Ψ₁Ψm = Ψ₁ / Ψm
+					Ψ₁ΨmMac = Ψ₁ / ΨmMac
+					F_LOG = (P₂ * log(Ψ₁Ψm)) / σ
+					Erfc1_Mat = erfc(P₂ * σ + F_LOG)
+					ΨΨm = erfc(log(Ψ₁Ψm) / (√2.0 *σ))
+					ΨΨmσ = exp((-(log(Ψ₁Ψm) / (√2.0 *σ))*log(Ψ₁Ψm)) / (√2.0 *σ))
+					F_LOG_MAC = (P₂ * log(Ψ₁ΨmMac)) / σMac
+					Erfc1_Mac = erfc(P₂ * σMac + F_LOG_MAC)
+					ΨΨmMac = erfc(log(Ψ₁ΨmMac) / (√2.0 *σMac))
+					ΨΨmσ_Mac = exp((-(log(Ψ₁ΨmMac) / (√2.0 *σMac))*log(Ψ₁ΨmMac)) / (√2.0 *σMac))
+					Sqrt = sqrt(0.5*SeMat*ΨΨm+0.5*SeMac*ΨΨmMac)
 				
-				if θs - θsMacMat > cst.ΔθsθsMacMat 
-					∂Kunsat_Mac∂Ψ =  (-Pc * KsMac*(ΨmMacΨ₁)*Erfc1_Mac*Sqrt*exp((-F_LOG_MAC - P₂*σMac)*(P₂ * σMac + F_LOG_MAC))) / (ΨmMacσMac) + P8 *(-Pπ)*KsMac*((SeMac*(ΨmMacΨ₁)*ΨΨmσ_Mac) / (√2.0 *ΨmMacσMac) + (SeMat*(ΨmΨ₁)*ΨΨmσ) / (√2.0 *Ψmσ))*(Erfc1_Mac^2)*(Sqrt^-1.0)
+					∂Kunsat_Mat∂Ψ = (-Pc * KsMat*(ΨmΨ₁)*Erfc1_Mat*Sqrt*exp(((-F_LOG) - P₂*σ) * (P₂*σ + F_LOG))) / (Ψmσ)+ P8*KsMat*(-Pπ)*((SeMac*(ΨmMacΨ₁)*ΨΨmσ_Mac) / (√2.0 *ΨmMacσMac) + (SeMat*(ΨmΨ₁)*ΨΨmσ) / (√2.0 *Ψmσ))*(Erfc1_Mat^2)*(Sqrt^-1)
+					
+					if θs - θsMacMat > cst.ΔθsθsMacMat 
+						∂Kunsat_Mac∂Ψ =  (-Pc * KsMac*(ΨmMacΨ₁)*Erfc1_Mac*Sqrt*exp((-F_LOG_MAC - P₂*σMac)*(P₂ * σMac + F_LOG_MAC))) / (ΨmMacσMac) + P8 *(-Pπ)*KsMac*((SeMac*(ΨmMacΨ₁)*ΨΨmσ_Mac) / (√2.0 *ΨmMacσMac) + (SeMat*(ΨmΨ₁)*ΨΨmσ) / (√2.0 *Ψmσ))*(Erfc1_Mac^2)*(Sqrt^-1.0)
+					else
+						∂Kunsat_Mac∂Ψ = 0.0::Float64
+					end
+					
+					return ∂Kunsat_Mac∂Ψ + ∂Kunsat_Mat∂Ψ
 				else
-					∂Kunsat_Mac∂Ψ = 0.0::Float64
-				end
+					return 0.0::Float64
+				end 
+			end
+		#--------------------------------------------------------------------------------
+
+
+		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		# #		FUNCTION : ∂K∂SE
+		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		# 	function ∂K∂SE(optionₘ, Ψ₁, Se, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
 				
-				return ∂Kunsat_Mac∂Ψ + ∂Kunsat_Mat∂Ψ
-			else
-				return 0.0::Float64
-			end 
-		end
-	#--------------------------------------------------------------------------------
+		# 		if Se < eps(100.0)
+		# 			Se += eps(10.0)
+		# 		end
 
+		# 		P1 = 1.0 / sqrt(2.0)
+		# 		P2 = 0.125
 
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# #		FUNCTION : ∂K∂SE
-	# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# 	function ∂K∂SE(optionₘ, Ψ₁, Se, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+		# 		KsMat = Ks * (θsMacMat - θr) / (θs - θr)
+
+		# 		∂Kunsat_Mat∂θ = KsMat * √Se * exp(-(σ / √2.0 + erfcinv( 2.0*Se )) ^ 2 + erfcinv(2.0*Se )^2.0)*erfc(σ/ √2.0 + erfcinv(2.0*Se)) + P2*KsMat*erfc(σ / √2.0 + erfcinv(2.0*Se)) ^2 / √Se
+
+		# 		if θs - θsMacMat > cst.ΔθsθsMacMat
+		# 			KsMac = Ks * (θs - θsMacMat) / (θs - θr)
+
+		# 			∂Kunsat_Mac∂θ = KsMac*sqrt(Se)*exp(-(σMac/ √2.0 + erfcinv(2.0*Se)) ^ 2 + erfcinv(2.0*Se) ^2.0)*erfc(σMac / √2.0 + erfcinv(2.0*Se)) + P2*KsMac*erfc(P1*σMac + erfcinv(2.0*Se)) ^ 2 / √Se
+		# 		else
+		# 			∂Kunsat_Mac∂θ = 0.0
+		# 		end
+
+		# 	return ∂Kunsat_Mat∂θ + ∂Kunsat_Mac∂θ
+		# 	end #  ∂K∂θ
+		# #--------------------------------------------------------------------------------
+
+		
+
+		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		# #		FUNCTION : ∂K∂ΨMODEL numerical
+		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		# 	function ∂K∂Ψ_NUMERICAL(optionₘ, Ψ₁, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
+				
+		# 		ψ =fill(0.0::Float64, 1) 
+
+		# 		∂K∂Ψ_Numerical(ψ::Vector) = Ψ_2_KUNSAT(optionₘ, abs(ψ[1]), iZ, hydroParam)
+				
+		# 		ψ[1] = Ψ₁
+				
+		# 		Func_∂K∂Ψ_Numerical = ψ -> ForwardDiff.gradient(∂K∂Ψ_Numerical, ψ)			
+		# 		∂K∂Ψ = Func_∂K∂Ψ_Numerical(ψ)[1]
+				
+		# 		if isnan(∂K∂Ψ)
+		# 			error("∂K∂Ψ = NaN")
+		# 			∂K∂Ψ = 0.0
+		# 		end
+		# 	return ∂K∂Ψ 
+		# 	end # function: ∂K∂Ψ
+
 			
-	# 		if Se < eps(100.0)
-	# 			Se += eps(10.0)
-	# 		end
+		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		# #		FUNCTION : ∂K∂Ψ analitical
+		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		# 	function ∂K∂Ψ_Jesus3(optionₘ, Ψ₁, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ])
 
-	# 		P1 = 1.0 / sqrt(2.0)
-	# 		P2 = 0.125
+		# 		Se = wrc.Ψ_2_Se(optionₘ, Ψ₁, iZ, hydroParam)
 
-	# 		KsMat = Ks * (θsMacMat - θr) / (θs - θr)
+		# 		KsMat = Ks * (θsMacMat - θr) / (θs - θr)
+		# 		KsMac = Ks * (θs - θsMacMat)  / (θs - θr)
 
-	# 		∂Kunsat_Mat∂θ = KsMat * √Se * exp(-(σ / √2.0 + erfcinv( 2.0*Se )) ^ 2 + erfcinv(2.0*Se )^2.0)*erfc(σ/ √2.0 + erfcinv(2.0*Se)) + P2*KsMat*erfc(σ / √2.0 + erfcinv(2.0*Se)) ^2 / √Se
+		# 		Ψ₁Ψm = log(Ψ₁ / Ψm)
+		# 		Ψ₁ΨmMac = log(Ψ₁ / ΨmMac)
 
-	# 		if θs - θsMacMat > cst.ΔθsθsMacMat
-	# 			KsMac = Ks * (θs - θsMacMat) / (θs - θr)
+		# 		A = Ψ₁Ψm / (σ * √2.0)
+		# 		B = Ψ₁ΨmMac / (σMac * √2.0)
 
-	# 			∂Kunsat_Mac∂θ = KsMac*sqrt(Se)*exp(-(σMac/ √2.0 + erfcinv(2.0*Se)) ^ 2 + erfcinv(2.0*Se) ^2.0)*erfc(σMac / √2.0 + erfcinv(2.0*Se)) + P2*KsMac*erfc(P1*σMac + erfcinv(2.0*Se)) ^ 2 / √Se
-	# 		else
-	# 			∂Kunsat_Mac∂θ = 0.0
-	# 		end
+		# 	  ∂Kunsat_Mat∂Ψ = -(KsMat / (√(2.0*π)*Ψ₁*σ)) * (erfc(A+σ/√2.0)) * √Se * (exp(-(A+σ/√2.0)^2.0)) - (KsMat / 8*(√(2.0*π)*Ψ₁)) * ((erfc(A+σ/√2.0))^2.0) / √Se * ((θsMacMat-θr)/(θs-θr) * exp(-(A)^2.0)/σ + (θs-θsMacMat)/(θs-θr) * exp(-(B)^2.0)/σMac) 
+				
+		# 	  if isnan(∂Kunsat_Mat∂Ψ)
+		# 			∂Kunsat_Mat∂Ψ = 0.0
+		# 		end
 
-	# 	return ∂Kunsat_Mat∂θ + ∂Kunsat_Mac∂θ
-	# 	end #  ∂K∂θ
-	# #--------------------------------------------------------------------------------
+		# 		∂Kunsat_Mac∂Ψ = -(KsMac / (√(2.0*π)*Ψ₁*σMac)) * (erfc(B+σMac/√2.0)) * √Se * (exp(-(B+σMac/√2.0)^2.0)) - (KsMat / 8*(√(2.0*π)*Ψ₁)) * ((erfc(B+σMac/√2.0))^2.0) / √Se * ((θsMacMat-θr)/(θs-θr) * exp(-(A)^2.0)/σ + (θs-θsMacMat)/(θs-θr) * exp(-(B)^2.0)/σMac)
+
+		# 		if isnan(∂Kunsat_Mac∂Ψ)
+		# 			∂Kunsat_Mac∂Ψ = 0.0
+		# 		end
+
+		# 	return ∂Kunsat_Mat∂Ψ + ∂Kunsat_Mac∂Ψ
+		# 	end # function: ∂K∂ΨMODEL analitical
+		# #-----------------------------------------------------------------
+
+				# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			# #		FUNCTION : Ψ_2_KUNSAT
+			# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			# 	function Ψ_2_KUNSAT2(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
+
+			# 		Se = wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
+
+			# 		ΨmacMat = exp(log(ΨmMac) + 3.0 * σMac)
+
+			# 		SeMacMat = max((θsMacMat - θr) / (θs - θr), 0.0)
+
+			# 		# Kr_ΨmacMat =  1.0 + √SeMacMat * (0.5 * erfc(((log(ΨmacMat / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+
+			# 		Kr_ΨmacMat =  1.0 + √SeMacMat 
+					
+			# 		KsMac = Ks * min(1.0 / Kr_ΨmacMat, 1.0)
+			# 		KsMat = Ks - KsMac
+					
+			# 		Kunsat_Mac =  KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+
+			# 		Kunsat_Mat =  KsMat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
+
+			# 	return Kunsat_Mat + Kunsat_Mac
+			# 	end # function Ψ_2_KUNSAT
+			# #-------------------------------------------------------------------
 	end # module kg
 
 
@@ -418,7 +373,7 @@ module kunsat
 			function  Ψ_2_KUNSAT(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψvg=hydroParam.Ψvg[iZ], N=hydroParam.N[iZ], Ks=hydroParam.Ks[iZ], Km=hydroParam.Km[iZ], L=0.5)
 				M = 1.0 - Km / N
 
-				Se = wrc.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydroParam)
+				Se = wrc.Ψ_2_Se(optionₘ, Ψ₁, iZ, hydroParam)
 				return Kunsat = Ks * (Se^L) * ( 1.0 - (1.0 - Se ^ (1.0 / M) ) ^ M ) ^ 2.0
 			end #function Ψ_2_KUNSAT
 

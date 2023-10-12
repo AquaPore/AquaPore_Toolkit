@@ -47,7 +47,7 @@ module timeStep
 
 				θ▽ = max(θ½ - paramHypix.Δθ_Max * 0.5, hydro.θr[iZ])
 
-				ΔLnΨmax[iZ] = (log1p(wrc.θ_2_ΨDual(optionHypix, θ▽, iZ, hydro)) - log1p(wrc.θ_2_ΨDual(optionHypix, θ△, iZ, hydro))) * 0.5	
+				ΔLnΨmax[iZ] = (log1p(wrc.θ_2_Ψ(optionHypix, θ▽, iZ, hydro)) - log1p(wrc.θ_2_Ψ(optionHypix, θ△, iZ, hydro))) * 0.5	
 			end # for iZ=1:Nz	
 		return ΔLnΨmax
 		end  # function: ΔΨMAX!
@@ -65,10 +65,10 @@ module timeStep
 			else
 				Ψ▽ = 0.0::Float64
 			end	
-			θ△ = wrc.Ψ_2_θDual(optionHypix, Ψ▽, iZ, hydro) + eps()
+			θ△ = wrc.Ψ_2_θ(optionHypix, Ψ▽, iZ, hydro) + eps()
 			
 			Ψ△  = expm1(log1p(Ψ₀) + ΔLnΨmax[iZ])
-			θ▽ = wrc.Ψ_2_θDual(optionHypix, Ψ△, iZ, hydro)
+			θ▽ = wrc.Ψ_2_θ(optionHypix, Ψ△, iZ, hydro)
 		return θ△ - θ▽
 		end  # function:  ΔθMAX
 	# ------------------------------------------------------------------

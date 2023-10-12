@@ -65,7 +65,7 @@ module θψ_2_KsψModel
 		function KsΨMODEL_CLAY(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
 			# Se ===
-				Se = wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydro)
+				Se = wrc.Ψ_2_Se(optionₘ, Ψ₁, iZ, hydro)
 
 			# Matrix ====	
 				Ks_Mat = T1 * cst.KunsatModel * π * (((θsMacMat - θr) ^ (Tclay / T3)) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
@@ -261,7 +261,7 @@ module θψ_2_KsψModel
 				# Ψ_Clay =  160000.0 * ( ( (cst.Y  / 0.002) - (cst.Y / 0.5) ) / ((cst.Y  / 0.001) - (cst.Y  / 0.5)) ) ^ 2.0
 				Ψ_Clay = param.psd.imp.Ψ_Max * (((cst.Y / 0.002) - (cst.Y / 0.5) ) / ((cst.Y / 0.002) - (cst.Y / 0.5))) ^ param.psd.imp.λ 
 
-				Clay = wrc.Ψ_2_SeDual(option.hydro, Ψ_Clay, iZ, hydro)
+				Clay = wrc.Ψ_2_Se(option.hydro, Ψ_Clay, iZ, hydro)
 			end # 🎏_Clay
 			
 			X_Clay₁ =  τclay₀

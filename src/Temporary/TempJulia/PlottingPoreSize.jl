@@ -1,7 +1,14 @@
 	using CairoMakie, ColorSchemes
 	import SpecialFunctions: erfc, erfcinv
 
-	include("D:\\MAIN\\MODELS\\AquaPore_Toolkit\\src\\Cst.jl")
+	cd("D:\\MAIN\\MODELS\\AquaPore_Toolkit\\src\\")
+
+	Path= pwd()
+	println(Path)
+
+	include("$Path" * "\\Cst.jl")
+	include("$Path" * "hydro\\Wrc.jl")
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #		FUNCTION : PLOTTING_PORESIZE
@@ -34,7 +41,7 @@ function PLOTTING_PORESIZE()
 	#-------------------------------------------------------------------
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : Ψ_2_θDual
+	#		FUNCTION : Ψ_2_θ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function Ψ_2_θDualMODEL(Ψ₁, θs, θr, Ψm, σ, θsMacMat, ΨmMac, σMac)
 
@@ -42,7 +49,7 @@ function PLOTTING_PORESIZE()
 
 			θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
 		return θ_Mac + θ_Mat
-		end # function Ψ_2_θDual
+		end # function Ψ_2_θ
 	#-----------------------------------------------------------------
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -160,7 +167,7 @@ function PLOTTING_PORESIZE()
 		colgap!(Fig.layout, 50)
 		rowgap!(Fig.layout, 50)
 
-		Path = raw"D:\TEMPORARY\Plots\DthetaH.svg"
+		Path = raw"D:\TEMP\Plots\DthetaH.svg"
 		save(Path, Fig)
 
 	display(Fig)

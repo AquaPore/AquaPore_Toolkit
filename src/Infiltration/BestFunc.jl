@@ -11,7 +11,7 @@ module bestFunc
 		function BEST_UNIVERSAL_START(∑Infilt_3D, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, T; θini=infiltParam.θini[iZ])
 
 			# Initializing
-				Se_Ini = wrc.θ_2_Se(θini, iZ, hydroInfilt)
+				Se_Ini = wrc.θ_2_Se(θ₁=θini, θs=hydroInfilt.θs[iZ], θr=hydroInfilt.θr[iZ])
 
 				Kr_θini = (kunsat.Se_2_KUNSAT(option.infilt, Se_Ini, iZ, hydroInfilt)) / hydroInfilt.Ks[iZ]
 

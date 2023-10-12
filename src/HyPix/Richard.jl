@@ -3,7 +3,7 @@
 # =============================================================
 module richard
 	import ..timeStep, ..flux, ..ponding, ..residual
-	import ..wrc: Ψ_2_θDual, ∂θ∂Ψ, θ_2_ΨDual
+	import ..wrc: Ψ_2_θ, ∂θ∂Ψ, θ_2_Ψ
 	import ..kunsat
 	using LinearAlgebra
 
@@ -72,7 +72,7 @@ module richard
 
 			# UPDATE Θ
 			@simd for iZ=1:Nz
-				θ[iT,iZ] = Ψ_2_θDual(optionHypix, Ψ[iT,iZ], iZ, hydro)
+				θ[iT,iZ] = Ψ_2_θ(optionHypix, Ψ[iT,iZ], iZ, hydro)
 			end
 
 			# Determine if the simulation is going to rerun with a different time step
@@ -240,7 +240,7 @@ module richard
 			if  sign(Ψ[iT,iZ]) * sign(Ψ₀) == -1
 				return Ωmin
 			else
-				θ₁ = Ψ_2_θDual(optionHypix, Ψ[iT,iZ], iZ, hydro)
+				θ₁ = Ψ_2_θ(optionHypix, Ψ[iT,iZ], iZ, hydro)
 				Δθ = abs(θ₁ - θ₀)
 				Δθₘₐₓ = timeStep.ΔθMAX(hydro, iT, iZ, optionHypix, ΔLnΨmax, Ψ) 
 				
@@ -270,7 +270,7 @@ module richard
 
 					θ[iT,iZ] = max(min(θ[iT,iZ], hydro.θs[iZ]), hydro.θr[iZ])
 
-					Ψ[iT,iZ] = θ_2_ΨDual(optionHypix, θ[iT,iZ] , iZ, hydro)
+					Ψ[iT,iZ] = θ_2_Ψ(optionHypix, θ[iT,iZ] , iZ, hydro)
 				end  # Ψ[iT,iZ] ≤ Ψwet && Ψ₀ ≥ Ψdry
 			return Ψ
 			end  # function:ZHA_WETING_DRYSOIL

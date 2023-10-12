@@ -2,36 +2,37 @@
 #		MODULE WRC
 # =============================================================
 module wrc
-	export ∂Se∂Ψ, ∂θ∂Ψ, ∂Ψ∂Se, ∂Ψ∂θ, Se_2_θ, θ_2_Se, θ_2_ΨDual, Ψ_2_SeDual, Ψ_2_θDual
+	export ∂Se∂Ψ, ∂θ∂Ψ, ∂Ψ∂Se, ∂Ψ∂θ, Se_2_θ, θ_2_Se, θ_2_Ψ, Ψ_2_Se, Ψ_2_θ
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : θ_2_Se
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function θ_2_Se(θ₂, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ])
-			Se = (θ₂ - θr) / (θs - θr)
-			return max( min(Se, 1.0), 0.0)
+		function θ_2_Se(;θ₁, θs, θr)
+			Se = (θ₁ - θr) / (θs - θr) 
+		return max( min(Se, 1.0), 0.0)
 		end # function θ_2_Se
 	#-----------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : Se_2_θ
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function Se_2_θ(Se, iZ::Int64, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ])
-			θ₂ = Se * (θs - θr) + θr
-			return max(min(θ₂, θs), θr)
-		end # function Se_2_θ`
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+		function Se_2_θ(;Se₁, θs, θr) 
+			θ₁ = Se₁ * (θs - θr) + θr
+		return max(min(θ₁, θs), θr)
+		end # function Se_2_θ
 	#-----------------------------------------------------------------
 
 		
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : Ψ_2_θDual
+	#		FUNCTION : Ψ_2_θ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function Ψ_2_θDual(optionₘ, Ψ₁, iZ, hydroParam)
+		function Ψ_2_θ(optionₘ, Ψ₁, iZ, hydroParam)
 			Ψ₁ = max(Ψ₁, 0.0)
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg. Ψ_2_θDual(optionₘ,Ψ₁, iZ::Int64, hydroParam)
+				return wrc.kg.Ψ_2_θ(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+
 			elseif optionₘ.HydroModel⍰ == "Vangenuchten"
 				return wrc.vg.Ψ_2_θ(Ψ₁, iZ::Int64, hydroParam)
 			elseif optionₘ.HydroModel⍰ == "VangenuchtenJules"
@@ -41,20 +42,21 @@ module wrc
 			elseif optionₘ.HydroModel⍰ == "ClappHornberger"
 				return wrc.ch.Ψ_2_θ(Ψ₁, iZ::Int64, hydroParam)
 			else
-				error("$(optionₘ.HydroModel⍰) model for Ψ_2_θDual is not yet available")
+				error("$(optionₘ.HydroModel⍰) model for Ψ_2_θ is not yet available")
 			end
-		end # function Ψ_2_θDual
+		end # function Ψ_2_θ
 	#-----------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : Ψ_2_SeDual
+	#		FUNCTION : Ψ_2_Se
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydroParam)
+		function Ψ_2_Se(optionₘ, Ψ₁, iZ, hydroParam)
 			Ψ₁ = max(Ψ₁, 0.0)
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.Ψ_2_SeDual(optionₘ, Ψ₁, iZ::Int64, hydroParam)
+				return wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+
 			elseif optionₘ.HydroModel⍰ == "Vangenuchten"
 				return wrc.vg.Ψ_2_Se(Ψ₁, iZ::Int64, hydroParam)
 			elseif optionₘ.HydroModel⍰ == "VangenuchtenJules"
@@ -64,18 +66,20 @@ module wrc
 			elseif optionₘ.HydroModel⍰ == "ClappHornberger"
 				return wrc.ch.Ψ_2_Se(Ψ₁, iZ::Int64, hydroParam)
 			else
-				error("$(optionₘ.HydroModel⍰) model for Ψ_2_SeDual is not yet available")
-			end # function Ψ_2_θDual
+				error("$(optionₘ.HydroModel⍰) model for Ψ_2_Se is not yet available")
+			end # function Ψ_2_Se
 		end
 	#-----------------------------------------------------------------
 		
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : θ_2_ΨDual
+	#		FUNCTION : θ_2_Ψ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function θ_2_ΨDual(optionₘ, θ₁, iZ, hydroParam)
+		function θ_2_Ψ(optionₘ, θ₁, iZ, hydroParam)
+
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.θ_2_ΨDual(optionₘ, θ₁, iZ, hydroParam)
+				return wrc.kg.θ_2_Ψ(θ₁=θ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+				
 			elseif optionₘ.HydroModel⍰ == "Vangenuchten"
 				return wrc.vg.θ_2_Ψ(θ₁, iZ, hydroParam)
 			elseif optionₘ.HydroModel⍰ == "BrooksCorey"
@@ -83,21 +87,22 @@ module wrc
 			elseif optionₘ.HydroModel⍰ == "ClappHornberger"
 				return wrc.ch.θ_2_Ψ(θ₁, iZ, hydroParam)
 			else
-				error("$(optionₘ.HydroModel⍰) model for θ_2_ΨDual is not yet available")
-			end # function θ_2_ΨDual
+				error("$(optionₘ.HydroModel⍰) model for θ_2_Ψ is not yet available")
+			end # function θ_2_Ψ
 		end
 	#-----------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : Se_2_ΨDual
+	#		FUNCTION : Se_2_Ψ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function Se_2_ΨDual(optionₘ, Se₁, iZ, hydroParam)
+		function Se_2_Ψ(optionₘ, Se₁, iZ, hydroParam)
+
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.Se_2_ΨDual(optionₘ, Se₁, iZ, hydroParam)
+				return wrc.kg.Se_2_Ψ(Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
 			else
-				error("$(optionₘ.HydroModel⍰) model for Se_2_ΨDual is not yet available")
-			end # function Se_2_ΨDual
+				error("$(optionₘ.HydroModel⍰) model for Se_2_Ψ is not yet available")
+			end # function Se_2_Ψ
 		end
 	#-----------------------------------------------------------------
 
@@ -109,7 +114,8 @@ module wrc
 			Ψ₁ = max(Ψ₁, 0.0)
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.∂θ∂Ψ(optionₘ, Ψ₁, iZ::Int64, hydroParam)
+				return wrc.kg.∂θ∂Ψ(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+
 			elseif optionₘ.HydroModel⍰ == "Vangenuchten"
 				return wrc.vg.∂θ∂Ψ(optionₘ, Ψ₁, iZ::Int64, hydroParam)
 			elseif optionₘ.HydroModel⍰ == "BrooksCorey"
@@ -127,8 +133,9 @@ module wrc
 	#		FUNCTION : ∂Ψ∂θ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function ∂Ψ∂θ(optionₘ, θ₁, iZ::Int64, hydroParam)	
+
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.∂Ψ∂θ(optionₘ, θ₁, iZ::Int64, hydroParam)
+				return wrc.kg.∂Ψ∂θ(θ₁=θ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
 			else
 				error("$(optionₘ.HydroModel⍰) model for ∂Ψ∂θ is not yet available")	
 			end
@@ -143,7 +150,7 @@ module wrc
 			Ψ₁ = max(Ψ₁, 0.0::Float64)
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.∂Se∂Ψ(optionₘ, Ψ₁, iZ::Int64, hydroParam)
+				return wrc.kg.∂Se∂Ψ(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
 			else
 				error("$(optionₘ.HydroModel⍰) model for ∂Se∂Ψ is not yet available")	
 			end
@@ -154,9 +161,10 @@ module wrc
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : ∂Se∂Ψ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ∂Ψ∂Se(optionₘ, Se₁, iZ::Int64, hydroParam)	
+		function ∂Ψ∂Se(optionₘ, Se₁, iZ::Int64, hydroParam)
+
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.∂Ψ∂Se(optionₘ, Se₁, iZ::Int64, hydroParam)
+				return wrc.kg.∂Ψ∂Se(Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
 			else
 				error("$(optionₘ.HydroModel⍰) model for ∂Ψ∂Se is not yet available")
 			end
@@ -189,87 +197,78 @@ module wrc
 		import ForwardDiff, Optim
 		import ...cst
 		import ..wrc
-		export ∂Se∂Ψ, ∂θ∂Ψ, ∂Ψ∂Se, ∂Ψ∂θ, Se_2_ΨDual, θ_2_ΨDual, Ψ_2_SeDual, Ψ_2_θDual
+		export ∂Se∂Ψ, ∂θ∂Ψ, ∂Ψ∂Se, ∂Ψ∂θ, Se_2_Ψ, θ_2_Ψ, Ψ_2_Se, Ψ_2_θ
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		#		FUNCTION : Ψ_2_θDual
+		#		FUNCTION : Ψ_2_θ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_θDual(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
-
+			function Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
 				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
 
-				# if θs - θsMacMat > cst.ΔθsθsMacMat
-					θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
-				# else
-				# 	θ_Mac = 0.0
-				# end
-
+				θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
 			return θ_Mac + θ_Mat
-			end # function Ψ_2_θDual
+			end # function Ψ_2_θ
 		#-----------------------------------------------------------------
 
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		#		FUNCTION : Ψ_2_SeDual
+		#		FUNCTION : Ψ_2_Se
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_SeDual(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+			function Ψ_2_Se(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
 
-				θ₂ = Ψ_2_θDual(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+				θ₁ = Ψ_2_θ(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
 
-			return wrc.θ_2_Se(θ₂, iZ::Int64, hydroParam)
-			end # function Ψ_2_SeDual
+			return wrc.θ_2_Se(θ₁=θ₁, θs=θs, θr=θr)
+			end # function Ψ_2_Se
 		#-----------------------------------------------------------------
 	
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		#		FUNCTION : θ_2_ΨDual
+		#		FUNCTION : θ_2_Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function θ_2_ΨDual(optionₘ, θ₂, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+			function θ_2_Ψ(;θ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
 
-				function OF(Ψ₁, iZ, hydroParam)
-					θmod = Ψ_2_θDual(optionₘ, Ψ₁, iZ, hydroParam)
-				return (θ₂ - θmod) ^ 4.0
+				function OF(Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
+					θmod = Ψ_2_θ(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
+				return (θ₁ - θmod) ^ 4.0
 				end # OF
 
-				if θs - θsMacMat > cst.ΔθsθsMacMat
-					Se = max( min((θ₂ - θr) / (θs - θr), 1.0) , 0.0)
+				if θs - θsMacMat < 0.0001
+					Se = max( min((θ₁ - θr) / (θs - θr), 1.0) , 0.0)
 					Ψ₀ = Ψm * exp(erfcinv(2.0 * Se) * σ * √2.0)
 				else 
-					Optimization = Optim.optimize(Ψ₁ -> OF(10.0 ^ Ψ₁, iZ, hydroParam), log10(0.0001), log10(1.0E6), Optim.GoldenSection())
+					Optimization = Optim.optimize(Ψ₁ -> OF(10.0 ^ Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac), log10(0.0001), log10(1.0E6), Optim.GoldenSection())
 					Ψ₀ = 10.0 ^ Optim.minimizer(Optimization)[1]
 				end
 			return max(Ψ₀, 0.0)
-			end # θ_2_ΨDual
+			end # θ_2_Ψ
 		#-------------------------------------------------------------------
 
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		#		FUNCTION : Se_2_ΨDual
+		#		FUNCTION : Se_2_Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Se_2_ΨDual(optionₘ, Se, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
-
-				θ₂ = wrc.Se_2_θ(Se, iZ, hydroParam)
-
-			return  θ_2_ΨDual(optionₘ, θ₂, iZ, hydroParam)
-			end # Se_2_ΨDual
+			function Se_2_Ψ(;Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac) 
+				θ₁ = wrc.Se_2_θ(Se₁=Se₁, θs=θs, θr=θr)
+			return  θ_2_Ψ(θ₁=θ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
+			end # Se_2_Ψ
 		#-------------------------------------------------------------------
 
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂θ∂Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂θ∂Ψ(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
-
+			function ∂θ∂Ψ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
 				# Ψ₁ = max(eps(10.0), Ψ₁)
 				if Ψ₁ > eps(100.0)
 					# If Ψ₁ is positive than ∂θ∂Ψ_Mat should be positive
-					∂θ∂Ψ_Mat = - (θsMacMat - θr) * exp( -((log(Ψ₁ / Ψm)) ^ 2.0) / (2.0 * σ^2.0)) / (Ψ₁ * σ * √(π * 2.0))
+					∂θ∂Ψ_Mat = -(θsMacMat - θr) * exp( -((log(Ψ₁ / Ψm)) ^ 2.0) / (2.0 * σ ^ 2.0)) / (Ψ₁ * σ * √(π * 2.0))
 
-					if θs - θsMacMat > cst.ΔθsθsMacMat
-						∂θ∂Ψ_Mac = - (θs - θsMacMat) * exp( -((log(Ψ₁ / ΨmMac)) ^ 2.0) / (2.0 * σMac^2.0)) / (Ψ₁ * σMac * √(π * 2.0))
-					else
-						∂θ∂Ψ_Mac = 0.0::Float64
-					end
+					# if θs - θsMacMat > cst.ΔθsθsMacMat
+						∂θ∂Ψ_Mac = - (θs - θsMacMat) * exp( -((log(Ψ₁ / ΨmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (Ψ₁ * σMac * √(π * 2.0))
+					# else
+					# 	∂θ∂Ψ_Mac = 0.0::Float64
+					# end
 					return ∂θ∂Ψ_Mat + ∂θ∂Ψ_Mac
 				else
 					return 0.0::Float64
@@ -277,30 +276,18 @@ module wrc
 			end # function ∂θ∂Ψ
 		#-------------------------------------------------------------------
 
-
-		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		#		FUNCTION : ∂θ∂Ψ Mode
-		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			# function ∂θ∂Ψ_Mode(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
-				
-			# 	Ψm_Mode = exp(log(Ψm)-σ^2)
-
-			# 	∂θ∂Ψ_Mode = ∂θ∂Ψ(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=Ψm_Mode, σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ]) 
-
-			# return Ψm_Mode, ∂θ∂Ψ_Mode
-			# end # function ∂θ∂Ψ_Mode
-		#-------------------------------------------------------------------
 		
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂Ψ∂θ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂Ψ∂θ(optionₘ, θ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+			function ∂Ψ∂θ(;θ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
 
 				θ₁ = max(min(θs - eps(1000.0), θ₁), θr + eps(1000.0))
 					
 				θ₂ = fill(0.0::Float64, 1)
 				
-				∂Ψ∂θ_Numerical(θ₂::Vector) = θ_2_ΨDual(optionₘ, abs(θ₂[1]), iZ, hydroParam)
+				∂Ψ∂θ_Numerical(θ₂::Vector) = θ_2_Ψ(θ₁=abs(θ₂[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
+
 				θ₂[1] = θ₁
 				Func_∂Ψ∂θ_Numerical = θ₂ -> ForwardDiff.gradient(∂Ψ∂θ_Numerical, θ₂)
 
@@ -319,24 +306,19 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂Ψ∂Se
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂Ψ∂Se(optionₘ, Se₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+			function ∂Ψ∂Se(;Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
 
 				Se₁ = max(min(Se₁, 1.0 - eps(1000.0)), eps(1000.0))
 				
 				Se₂ = fill(0.0::Float64, 1)
-				∂Ψ∂Se_Numerical(Se₂::Vector) = Se_2_ΨDual(optionₘ, abs(Se₂[1]), iZ, hydroParam)
+				# ∂Ψ∂Se_Numerical(Se₂::Vector) = Se_2_Ψ(optionₘ, abs(Se₂[1]), iZ, hydroParam)
+				∂Ψ∂Se_Numerical(Se₂::Vector) = Se_2_Ψ(Se₁=abs(Se₂[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
+
 				Se₂[1] = Se₁
 				Func_∂Ψ∂Se_Numerical = Se₂ -> ForwardDiff.gradient(∂Ψ∂Se_Numerical, Se₂)
 
 				# ∂Ψ∂Se₀ = Func_∂Ψ∂Se_Numerical(Se₂)[1]
-				return Func_∂Ψ∂Se_Numerical(Se₂)[1]
-
-				# if isnan(∂Ψ∂Se₀)
-				# 	println(" ======== wrc.kg.∂Ψ∂Se = NaN ====")
-				# 	return 1.0
-				# else
-				# 	return ∂Ψ∂Se₀
-				# end
+			return Func_∂Ψ∂Se_Numerical(Se₂)[1]
 			end # function ∂Se∂Ψ
 		#-------------------------------------------------------------------
 
@@ -344,26 +326,32 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂Se∂Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂Se∂Ψ(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+			function ∂Se∂Ψ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
 					
 				Ψ₁ = max(Ψ₁, eps(1000.0))
 				ψ = fill(0.0::Float64, 1)
 
-				∂Ψ∂Se_Numerical(ψ::Vector) = Ψ_2_SeDual(optionₘ, abs(ψ[1]), iZ, hydroParam)
+				# ∂Ψ∂Se_Numerical(ψ::Vector) = Ψ_2_Se(optionₘ, abs(ψ[1]), iZ, hydroParam)
+				 ∂Ψ∂Se_Numerical(ψ::Vector) = Ψ_2_Se(Ψ₁= abs(ψ[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
 				ψ[1] = Ψ₁
 				Func_∂Ψ∂Se_Numerical = ψ -> ForwardDiff.gradient(∂Ψ∂Se_Numerical, ψ)
 
-				return Func_∂Ψ∂Se_Numerical(ψ)[1]
-
-				# ∂Se∂Ψ₀ = Func_∂Ψ∂Se_Numerical(ψ)[1]
-
-				# if isnan(∂Se∂Ψ₀)
-				# 	println("======== wrc.kg.∂Se∂Ψ₀ = NaN ======== ")
-				# 	return 1.0
-				# else
-				# 	return ∂Se∂Ψ₀
-				# end
+			return Func_∂Ψ∂Se_Numerical(ψ)[1]
 			end # function ∂Ψ∂Se
+
+
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : ∂θ∂Ψ Mode
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			# function ∂θ∂Ψ_Mode(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ])
+				
+			# 	Ψm_Mode = exp(log(Ψm)-σ^2)
+
+			# 	∂θ∂Ψ_Mode = ∂θ∂Ψ(optionₘ, Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=Ψm_Mode, σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], σMac=hydroParam.σMac[iZ]) 
+
+			# return Ψm_Mode, ∂θ∂Ψ_Mode
+			# end # function ∂θ∂Ψ_Mode
+		#-------------------------------------------------------------------
 
 	end # module kg # ...............................................
 
@@ -382,7 +370,7 @@ module wrc
 			function Ψ_2_θ(Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψvg=hydroParam.Ψvg[iZ], N=hydroParam.N[iZ], Km=hydroParam.Km[iZ]) # van Genuchten WRC
 				M = 1.0 - Km / N
 				Se = (1.0 + (Ψ₁ / Ψvg) ^ N ) ^ (-M)
-			return θ₂ = wrc.Se_2_θ(Se, iZ, hydroParam)
+			return θ₂ = wrc.Se_2_θ(Se₁=Se, θs=θs, θr=θr)
 			end # function Ψ_2_θ
 
 
@@ -401,7 +389,7 @@ module wrc
 			function θ_2_Ψ(θ₂, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψvg=hydroParam.Ψvg[iZ], N=hydroParam.N[iZ], Km=hydroParam.Km[iZ]) # van Genuchten WRC
 				θ₂ = max(min(θ₂, θs), θr)
 
-				Se = wrc.θ_2_Se(θ₂, iZ, hydroParam) 
+				Se = wrc.θ_2_Se(θ₁=θ₂, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ])
 
 				M = 1. - Km / N
 			return Ψ₁ = Ψvg * exp(log(exp(log(Se) / -M) - 1.0) / N)
@@ -446,7 +434,7 @@ module wrc
 
 				θ₂ = Ψ_2_θ(Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψbc=hydroParam.Ψbc[iZ], λbc=hydroParam.λbc[iZ])
 
-				return Se = wrc.θ_2_Se(θ₂, iZ::Int64, hydroParam)
+				return Se = wrc.θ_2_Se(θ₁=θ₂, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ])
 			end # function Ψ_2_Se
 
 
@@ -455,7 +443,7 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function θ_2_Ψ(θ₂, iZ, hydroParam; θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψbc=hydroParam.Ψbc[iZ], λbc=hydroParam.λbc[iZ])
 
-				Se = wrc.θ_2_Se(θ₂, iZ, hydroParam)
+				Se = wrc.θ_2_Se(θ₁=θ₂, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ])
 				return Ψ₁ = Ψbc * (Se ^ -λbc)
 			end # θ_2_Ψ
 
@@ -505,7 +493,7 @@ module wrc
 
 				θ₂ = Ψ_2_θ(Ψ₁, iZ, hydroParam; θs=hydroParam.θs[iZ], Ψch=hydroParam.Ψch[iZ], λch=hydroParam.λch[iZ])
 
-			return wrc.θ_2_Se(θ₂, iZ::Int64, hydroParam)
+			return wrc.θ_2_Se(θ₁=θ₂, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ])
 			end # function Ψ_2_Se
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -513,7 +501,7 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function θ_2_Ψ(θ₂, iZ, hydroParam; θs=hydroParam.θs[iZ], Ψch=hydroParam.Ψch[iZ], λch=hydroParam.λch[iZ])
 
-				Se = wrc.θ_2_Se(θ₂, iZ, hydroParam)
+				Se = wrc.θ_2_Se(θ₁=θ₂, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ])
 			return Ψch * (Se ^ -λch)
 			end # θ_2_Ψ
 
@@ -556,7 +544,7 @@ module wrc
 				else
 					Se =1.0
 				end
-			return θ₂ = wrc.Se_2_θ(Se, iZ, hydroParam)
+			return θ₂ = wrc.Se_2_θ(Se₁=Se, θs=θs, θr=θr)
 			end # function Ψ_2_θ
 
 

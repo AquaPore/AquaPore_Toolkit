@@ -4,7 +4,7 @@
 module hypixModel
 
 	import ..evaporation, ..interception, ..interpolate, ..pet, ..richard, ..rootWaterUptake, ..sorptivity, ..timeStep, ..ΨminΨmax
-	import ..wrc: θ_2_ΨDual, Ψ_2_θDual
+	import ..wrc: θ_2_Ψ, Ψ_2_θ
 
 	export HYPIX_MODEL
 
@@ -83,24 +83,24 @@ module hypixModel
 			if 🎏_θΨini == :θini
 				for iZ = 1:Nz
                θ[1,iZ] = max( min(hydro.θs[iZ] * 0.9, θini_or_Ψini[iZ]), min(hydro.θr[iZ] * 1.1, hydro.θs[iZ] * 0.9) ) # Just in case
-               Ψ[1,iZ] = θ_2_ΨDual(optionHypix, θ[1,iZ], iZ, hydro)
+               Ψ[1,iZ] = θ_2_Ψ(optionHypix, θ[1,iZ], iZ, hydro)
 				end
 
 			elseif 🎏_θΨini == :Ψini
 				for iZ = 1:Nz
                Ψ[1,iZ] = θini_or_Ψini[iZ]
-               θ[1,iZ] = Ψ_2_θDual(optionHypix, Ψ[1,iZ], iZ, hydro)
+               θ[1,iZ] = Ψ_2_θ(optionHypix, Ψ[1,iZ], iZ, hydro)
 				end
 			end
 
 			if optionHypix.TopBoundary⍰ == "Ψ"
 				Ψ[1,1] = paramHypix.Ψ_Top
-				θ[1,1]  = Ψ_2_θDual(optionHypix, Ψ[1,1], 1, hydro)
+				θ[1,1]  = Ψ_2_θ(optionHypix, Ψ[1,1], 1, hydro)
 			end
 
 			if optionHypix.BottomBoundary⍰ == "Ψ"
 				Ψ[1,Nz] = paramHypix.Ψ_Botom
-				θ[1,Nz]  = Ψ_2_θDual(optionHypix, Ψ[1,Nz], Nz, hydro)	
+				θ[1,Nz]  = Ψ_2_θ(optionHypix, Ψ[1,Nz], Nz, hydro)	
 			end
 
 			for iZ = 1:Nz

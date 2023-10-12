@@ -218,7 +218,7 @@ module tableSmap
          for iZ=1:NiZ
             for iΨ =1:N_Ψ
                Ψ₂ = param.smap.Ψ_Table[iΨ]
-               θ₂[iZ, iΨ] = wrc.Ψ_2_θDual(optionₘ, Ψ₂, iZ, hydro)
+               θ₂[iZ, iΨ] = wrc.Ψ_2_θ(optionₘ, Ψ₂, iZ, hydro)
             end # iΨ
          end # iZ
 

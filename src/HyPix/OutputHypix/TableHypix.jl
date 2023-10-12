@@ -528,7 +528,7 @@ module tableHypix
             θ_Mod = fill(0.0::Float64, (N_SoilLayer, N_θΨobs))
             for iZ=1:N_SoilLayer, iΨ =1:N_θΨobs
                   Ψ_Mod =paramHypix.ploting.θΨ_Table[iΨ]
-                  θ_Mod[iZ, iΨ] = wrc.Ψ_2_θDual(optionₘ, Ψ_Mod, iZ, hydroHorizon)
+                  θ_Mod[iZ, iΨ] = wrc.Ψ_2_θ(optionₘ, Ψ_Mod, iZ, hydroHorizon)
             end # iZ
 
          # Concatenating the 2 matrices

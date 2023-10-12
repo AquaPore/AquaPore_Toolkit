@@ -146,7 +146,7 @@ module stats
 			for iZ = 1:NiZ	
 				θΨsim = zeros(Float64, N_Data[iZ])
 				for iΨ = 1:N_Data[iZ]
-					θΨsim[iΨ] = wrc.Ψ_2_θDual(optionₘ, Ψobs[iZ,iΨ], iZ, hydro)
+					θΨsim[iΨ] = wrc.Ψ_2_θ(optionₘ, Ψobs[iZ,iΨ], iZ, hydro)
 				end
 				Nse[iZ] = 1.0 - NSE_MINIMIZE( θobs[iZ,1:N_Data[iZ]], θΨsim[1:N_Data[iZ]])	
 			end
@@ -170,7 +170,7 @@ module stats
 			for iZ = 1:NiZ	
 				θΨsim = zeros(Float64, N_Data[iZ])
 				for iΨ = 1:N_Data[iZ]
-					θΨsim[iΨ] = wrc.Ψ_2_θDual(optionₘ, Ψobs[iZ,iΨ], iZ, hydro)
+					θΨsim[iΨ] = wrc.Ψ_2_θ(optionₘ, Ψobs[iZ,iΨ], iZ, hydro)
 				end
 				NseWilmot_θΨ[iZ] = NSE_WILMOT( θobs[iZ,1:N_Data[iZ]], θΨsim[1:N_Data[iZ]])	
 			end

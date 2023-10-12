@@ -2,7 +2,7 @@
 #		MODULE: plot
 #
 # =============================================================
-legendmodule plot
+module plot
 # =============================================================
 #		MODULE: lab
 # =============================================================
@@ -30,7 +30,7 @@ module lab
 
 					# Simulated 
 						for iΨ = 1:N_Se
-							θ_Sim[iΨ] = wrc.Ψ_2_θDual(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
+							θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 							Kunsat_Sim[iΨ] = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 						end # iΨ = 1:N_Se
 
@@ -765,7 +765,7 @@ module lab
 
 					# Simulated 
 						for iΨ = 1:N_Se
-							θ_θΨobs_Psd[iΨ] = wrc.Ψ_2_θDual(option.psd,Ψ_Sim[iΨ], iZ, hydroPsd)
+							θ_θΨobs_Psd[iΨ] = wrc.Ψ_2_θ(option.psd,Ψ_Sim[iΨ], iZ, hydroPsd)
 						end # iΨ 
 
 					# Plot_θ_Ψ: Psd model fitting for e.g. Kosugi model
@@ -897,12 +897,12 @@ module lab
 					end #  "Ks" ∈ optim.ParamOpt
 
 					for iΨ = 1:N_Se
-						θ_Infilt[iΨ] = wrc.Ψ_2_θDual(option.infilt,Ψ[iΨ], iZ, hydroInfilt)
+						θ_Infilt[iΨ] = wrc.Ψ_2_θ(option.infilt,Ψ[iΨ], iZ, hydroInfilt)
 
 						Kunsat_Infilt[iΨ] = kunsat.Ψ_2_KUNSAT(option.infilt, Ψ[iΨ], iZ, hydroInfilt)
 
 						if option.run.HydroLabθΨ⍰ ≠ "No"
-							θ_Obs[iΨ] = wrc.Ψ_2_θDual(option.infilt,Ψ[iΨ], iZ, hydro)
+							θ_Obs[iΨ] = wrc.Ψ_2_θ(option.infilt,Ψ[iΨ], iZ, hydro)
 
 							if option.run.HydroLabθΨ⍰ ≠ "No" && "Ks" ∈ optim.ParamOpt
 								Kunsat_Obs[iΨ] = kunsat.Ψ_2_KUNSAT(option.infilt, Ψ[iΨ], iZ, hydro)

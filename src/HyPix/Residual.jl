@@ -17,7 +17,7 @@ module residual
 
 			Q[iT,iZ+1] = flux.Q!(optionHypix, discret, hydro, iZ+1, iT, Nz, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ[iT, min(iZ+1, Nz)], Ψ[iT,iZ])
 
-			θ[iT,iZ] = wrc.Ψ_2_θDual(optionHypix, Ψ[iT,iZ], iZ, hydro)
+			θ[iT,iZ] = wrc.Ψ_2_θ(optionHypix, Ψ[iT,iZ], iZ, hydro)
 
 			Residual[iZ] = discret.ΔZ[iZ] * ((θ[iT,iZ] - θ[iT-1,iZ]) - hydro.So[iZ] * (Ψ[iT,iZ] - Ψ[iT-1,iZ]) * (θ[iT,iZ] / hydro.θs[iZ])) - ΔT[iT] * (Q[iT,iZ] - Q[iT,iZ+1]) + ΔSink[iT,iZ]
 
@@ -77,7 +77,7 @@ module residual
 			# Q[iT,iZ+1] format for ForwardDiff
 				Q₂ = flux.Q!(optionHypix,  discret, hydro, iZ+1, iT, Nz, paramHypix, Pkₐᵥₑᵣ, Hpond, ΔPr_Soil, ΔSink, ΔT, θ, Ψ▼, Ψ_)		
 			# θ[iT,iZ] format for ForwardDiff
-				θ₂ = wrc.Ψ_2_θDual(optionHypix, Ψ_, iZ, hydro)
+				θ₂ = wrc.Ψ_2_θ(optionHypix, Ψ_, iZ, hydro)
 
 		return discret.ΔZ[iZ] * ((θ₂ - θ[iT-1,iZ]) - hydro.So[iZ] * (Ψ_ - Ψ₀) * (θ[iT,iZ] / hydro.θs[iZ])) - ΔT[iT] * (Q₁ - Q₂) + ΔSink[iT,iZ] 
 		end  # function: RESIDUAL_DIFF

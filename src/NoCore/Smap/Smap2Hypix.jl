@@ -134,7 +134,7 @@ module smap2hypix
 
             # Assuming that all SoilProfiles have the same Se
             for iZ=1:N_Horizon
-               θᵢₙᵢ[iZ] = wrc.Se_2_θ(Seᵢₙᵢ, iZ, hydroSmap)
+               θᵢₙᵢ[iZ] = wrc.Se_2_θ(Se₁=Seᵢₙᵢ, θs=hydroSmap.θs[iZ], θr=hydroSmap.θr[iZ])
             end
 
          # WRITTING TO FILE

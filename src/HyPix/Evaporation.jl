@@ -26,6 +26,7 @@ module evaporation
 
 			# for iZ = 1:N_iEvapo
 			# 	Se = wrc.θ_2_Se(θ[iT-1,iZ], iZ, hydro)
+			# Se = wrc.θ_2_Se(θ₁=θ[iT-1,iZ], θs=hydro.θs[iZ], θr=hydro.θr[iZ])
 			# 	if Se > Se_Max
 			# 		Se_Max = Se
 			# 		iZ_Evapo = iZ
@@ -34,9 +35,9 @@ module evaporation
 
 			# iZ_Evapo = 1
 			
-			ΔEvaporation[iT] = ΔPet_Evap * wrc.θ_2_Se(θ[iT-1,1], 1, hydro)
+			ΔEvaporation[iT] = ΔPet_Evap * wrc.θ_2_Se(θ₁=θ[iT-1,1], θs=hydro.θs[1], θr=hydro.θr[1])
 			
-			return ΔEvaporation
+		return ΔEvaporation
 		end  # function EVAPORATION
 	
 end  # module evapo
