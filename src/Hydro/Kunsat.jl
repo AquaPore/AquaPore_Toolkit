@@ -145,6 +145,27 @@ module kunsat
 
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : Ψ_2_KUNSAT_BIMODAL
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function Ψ_2_KUNSAT2(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
+				
+				Kunsat_Mat = 0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0) 
+		
+				Kunsat_Mac = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)
+
+				W_Mat = (θsMacMat - θr) * exp((σ^2.0) / 2.0) / Ψm 
+	
+				W_Mac = max(θs - θsMacMat, 0.0) * exp((σMac^2.0) / 2.0) / ΨmMac
+
+				Se = wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
+
+			return Ks * √Se * ((W_Mat * Kunsat_Mat + W_Mac * Kunsat_Mac) / (W_Mat + W_Mac)) ^ 2.0
+			end # function Ψ_2_KUNSAT
+		#-------------------------------------------------------------------
+
+
+
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ΨSe_2_KUNSAT
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function ΨSe_2_KUNSAT(;Ψ₁, Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
