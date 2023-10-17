@@ -149,7 +149,7 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function Ψ_2_KUNSAT2(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
 				
-				Kunsat_Mat = 0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0) 
+				Kunsat_Mat = 0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)
 		
 				Kunsat_Mac = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)
 

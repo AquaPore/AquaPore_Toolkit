@@ -259,21 +259,64 @@ module wrc
 		#		FUNCTION : ∂θ∂Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function ∂θ∂Ψ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
-				# Ψ₁ = max(eps(10.0), Ψ₁)
+
 				if Ψ₁ > eps(100.0)
-					# If Ψ₁ is positive than ∂θ∂Ψ_Mat should be positive
+
 					∂θ∂Ψ_Mat = -(θsMacMat - θr) * exp( -((log(Ψ₁ / Ψm)) ^ 2.0) / (2.0 * σ ^ 2.0)) / (Ψ₁ * σ * √(π * 2.0))
 
-					# if θs - θsMacMat > cst.ΔθsθsMacMat
-						∂θ∂Ψ_Mac = - (θs - θsMacMat) * exp( -((log(Ψ₁ / ΨmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (Ψ₁ * σMac * √(π * 2.0))
-					# else
-					# 	∂θ∂Ψ_Mac = 0.0::Float64
-					# end
+					∂θ∂Ψ_Mac = - (θs - θsMacMat) * exp( -((log(Ψ₁ / ΨmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (Ψ₁ * σMac * √(π * 2.0))
+					
 					return ∂θ∂Ψ_Mat + ∂θ∂Ψ_Mac
 				else
 					return 0.0::Float64
 				end
 			end # function ∂θ∂Ψ
+		#-------------------------------------------------------------------
+
+
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : ∂θ∂Ψ_NORM
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function ∂θ∂Ψ_NORM(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
+
+				Ψmod_Mat = exp(log(Ψm) - σ^2)
+
+				Ψmod_Mac = exp(log(ΨmMac) - σMac^2)
+
+				if Ψ₁ > eps(100.0)
+					∂θ∂Ψ_Mat = (θsMacMat - θr) * exp( -((log(Ψ₁ / Ψm)) ^ 2.0) / (2.0 * σ^2.0)) / (Ψ₁ * σ * √(π * 2.0))
+
+					∂θ∂Ψ_Mat_Mod = (θsMacMat - θr) * exp( -((log(Ψmod_Mat / Ψm)) ^ 2.0) / (2.0 * σ^2.0)) / (Ψmod_Mat * σ * √(π * 2.0))
+
+					∂θ∂Ψ_Mac = (θs - θsMacMat) * exp( -((log(Ψ₁ / ΨmMac)) ^ 2.0) / (2.0 * σMac^2.0)) / (Ψ₁ * σMac * √(π * 2.0))
+
+					∂θ∂Ψ_Mac_Mod = (θs - θsMacMat) * exp( -((log(Ψmod_Mac / ΨmMac)) ^ 2.0) / (2.0 * σMac^2.0)) / (Ψmod_Mac * σMac * √(π * 2.0))
+		
+					return ∂θ∂Ψ_Mat / ∂θ∂Ψ_Mat_Mod + ∂θ∂Ψ_Mac / ∂θ∂Ψ_Mac_Mod 
+				else
+					return 0.0
+				end # function ∂θ∂Ψ_NORM
+			end
+		#-------------------------------------------------------------------
+
+
+
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : ∂θ∂R
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function ∂θ∂R(;R₁, θs, θsMacMat, θr, Rm, σ, RmMac, σMac)
+				# Ψ₁ = max(eps(10.0), Ψ₁)
+				if R₁ > eps(100.0)
+
+					∂θ∂R_Mat = -(θsMacMat - θr) * exp( -((log(R₁ / Rm)) ^ 2.0) / (2.0 * σ ^ 2.0)) / (R₁ * σ * √(π * 2.0))
+
+					∂θ∂R_Mac = - (θs - θsMacMat) * exp( -((log(R₁ / RmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (R₁ * σMac * √(π * 2.0))
+					
+					return ∂θ∂R_Mat + ∂θ∂R_Mac
+				else
+					return 0.0::Float64
+				end
+			end # function ∂θ∂R
 		#-------------------------------------------------------------------
 
 		
