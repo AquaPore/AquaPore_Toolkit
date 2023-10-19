@@ -184,7 +184,7 @@ module plotOther
 			hydroHorizon₂.θsMacMat[1] = 0.5
 			hydroHorizon₂.θr[1] = 0.00
 			hydroHorizon₂.σ[1] = 2.0
-			Ψσ = (paramHypix.hydro.ΨmacMat + √(paramHypix.hydro.ΨmacMat)) / 2.0
+			Ψσ = (paramHypix.hydro.ΨMacMat + √(paramHypix.hydro.ΨMacMat)) / 2.0
 			hydroHorizon₂.Ψm[1] = hydroRelation.σ_2_Ψm(hydroHorizon₂.σ[1], Ψσ,  hydro.Ψm_Min[1],  hydro.Ψm_Max[1])
 			hydroHorizon₂.ΨmMac[1] = 100.0
 			hydroHorizon₂.σMac[1] = 2.0

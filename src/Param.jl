@@ -18,7 +18,7 @@ module params
 	@option mutable struct HYDROS
 		Coeff_Φ_2_θs
 		θs_θsMacMat
-		ΨmacMat
+		ΨMacMat
 		Ψ_Max
 		TableComplete_θΨ
 		K_Table

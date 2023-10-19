@@ -145,7 +145,7 @@ module richard
 
 			🎏_Ψsmall = false
 			for iZ=1:Nz
-				if Ψ[iT-1,iZ] < paramHypix.opt.ΨmacMat / 2.0 # mm
+				if Ψ[iT-1,iZ] < paramHypix.opt.ΨMacMat / 2.0 # mm
 					🎏_Ψsmall = true
 					break
 				end
@@ -160,7 +160,7 @@ module richard
 			end
 
 		# 	@simd for iZ=1:Nz
-		# 		if Ψ[iT-1,iZ] < paramHypix.opt.ΨmacMat / 2.0 # mm
+		# 		if Ψ[iT-1,iZ] < paramHypix.opt.ΨMacMat / 2.0 # mm
 		# 			Ψ_Min[iZ] = paramHypix.Ψ_MinMin
 		# 		else
 		# 			Ψ_Min[iZ] = 0.0::Float64

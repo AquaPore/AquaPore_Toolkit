@@ -164,10 +164,10 @@ module lab
 				ylims!(Axis_Ks, 0, Ks_Max)
 
 				# KsTicks = (range(0.0, stop=Ks_Max, length=10)) 
-				Axis_Ks.xticks = [0.0, 0.0^0.0, 10.0^1.0, 10.0^2.0, 10.0^3.0, 10.0^4.0] 
+				Axis_Ks.xticks = [0, 1, 10, 10^2, 10^3, 10^4] 
 				# (KsTicks, string.( floor.(KsTicks, digits=1)))
 				# Axis_Ks.yticks = (KsTicks, string.(floor.(KsTicks, digits=1)))
-				Axis_Ks.yticks =  [0, 10.0^0.0, 10.0^1.0, 10.0^2.0, 10.0^3.0, 10.0^4.0] 
+				Axis_Ks.yticks =  [0, 1, 10, 10^2, 10^3, 10^4] 
 				# Axis_Ks.xticklabelrotation = π/3
 
 				ΔΘsMacΘr = θsₒᵦₛ .-  θrₒᵦₛ
@@ -252,7 +252,7 @@ module lab
 				NΘsΘr = length(ΘsMacMatΘr)
 				Func_Ks1=fill(0.0, (NΘsΘr, Nσ))
 				Func_Ks3=fill(0.0, (NΘsΘr, Nσ))
-				ΨmacMat = 100.0
+				ΨMacMat = 100.0
 				T2_Max = 3.0; T3_Max = 4.0
 				for iΘsΘr=1:NΘsΘr
 					for iσ =1:Nσ
@@ -260,7 +260,7 @@ module lab
 						T2 = T2_Max * (1.0 - τ₂ₐ)
 						T3 = T3_Max * (1.0 - τ₃ₐ)
 
-						ΨmMean = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
+						ΨmMean = exp((log(√ΨMacMat) + log(ΨMacMat)) * 0.5)
 						Ψm = ΨmMean * exp(σ[iσ] * 3.0)
 
 					# Ks model 1 not corrected for clay
@@ -508,11 +508,11 @@ module lab
 					T2Mac  = T2_Max * (1.0 - τ₂ₐMac)
 					T3Mac  = T3_Max * (1.0 - τ₃ₐMac)
 
-					ΨmacMat = 100.0
+					ΨMacMat = 100.0
 					Ψ₁ = 0.0
 					σMac = hydro.σMac[1]
 					ΨmMac = hydro.ΨmMac[1]
-					ΨmMean = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
+					ΨmMean = exp((log(√ΨMacMat) + log(ΨMacMat)) * 0.5)
 
 					θr = [0.0,  0.0, 0.0, 0.0, 0.0]
 					σ = [0.7, 0.8, 1.0, 1.5, 3.0]

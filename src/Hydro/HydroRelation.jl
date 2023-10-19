@@ -15,20 +15,39 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE
 		end # function: σ_2_Ψm
 	# ----------------------------------------------------------------
 
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : ΨMacMat_FUNC!
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function ΨMacMat_FUNC!(hydro₂, iZ; ΨMacMat_Max=100.0, ΨMacMat_Min=10.0, θsMacMat_η_Tresh=0.9)
+
+				θsMacMat_η = min(max((hydro₂.θsMacMat[iZ] - hydro₂.θr[iZ]) / ( hydro₂.θs[iZ] -  hydro₂.θr[iZ]), 0.0), 1.0)
+
+				if θsMacMat_η ≥ θsMacMat_η_Tresh
+					return (θsMacMat_η - 1.0) * (ΨMacMat_Max - ΨMacMat_Min) / (θsMacMat_η_Tresh - 1.0) + ΨMacMat_Min
+				else
+					return ΨMacMat_Max
+				end
+			end  # function: name
+		# ------------------------------------------------------------------
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNCTION_σ_2_Ψm_SOFTWARE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0)
-			if (option₂.σ_2_Ψm⍰ == "Constrained")
-				Ψm_Min = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], √(param.ΨmacMat), hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ];Pσ=Pσ)
 
-				Ψm_Max = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], param.ΨmacMat, hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ]; Pσ=Pσ)
+			# ΨMacMat = ΨMacMat_FUNC!(hydro₂, iZ; ΨMacMat_Max=100.0, ΨMacMat_Min=10.0, θsMacMat_η_Tresh=0.95)
+
+			ΨMacMat = 100.0
+
+			if (option₂.σ_2_Ψm⍰ == "Constrained")
+				Ψm_Min = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], √(ΨMacMat), hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ];Pσ=3)
+
+				Ψm_Max = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], ΨMacMat, hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ]; Pσ=3)
 				
 				hydro₂.Ψm[iZ] = tool.norm.∇NORM_2_PARAMETER(hydro₂.Ψm[iZ], Ψm_Min, Ψm_Max)
 
 			elseif (option₂.σ_2_Ψm⍰ == "UniqueRelationship") # <>=<>=<>=<>=<>
-				hydro₂.Ψm[iZ] = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], exp((log(√param.ΨmacMat) + log(param.ΨmacMat)) * 0.5), hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ]; Pσ=Pσ)
+				hydro₂.Ψm[iZ] = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], exp((log(√ΨMacMat) + log(ΨMacMat)) * 0.5), hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ]; Pσ=Pσ)
 
 			end #option.infilt.σ_2_Ψm⍰
 		return hydro₂
