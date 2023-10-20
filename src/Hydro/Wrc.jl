@@ -323,8 +323,7 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function ∂θ∂R(;R₁, θs, θsMacMat, θr, Rm, σ, RmMac, σMac)
 
-				if R₁ > eps(100.0)
-
+				if R₁ > eps()
 					∂θ∂R_Mat = -(θsMacMat - θr) * exp( -((log(R₁ / Rm)) ^ 2.0) / (2.0 * σ ^ 2.0)) / (R₁ * σ * √(π * 2.0))
 
 					∂θ∂R_Mac = - (θs - θsMacMat) * exp( -((log(R₁ / RmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (R₁ * σMac * √(π * 2.0))
@@ -342,20 +341,19 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function ∂θ∂R_NORM(;R₁, θs, θsMacMat, θr, Rm, σ, RmMac, σMac)
 
-				if R₁ > eps(100.0)
-					∂θ∂R_Mat(R₁) = -(θsMacMat - θr) * exp( -((log(R₁ / Rm)) ^ 2.0) / (2.0 * σ ^ 2.0)) / (R₁ * σ * √(π * 2.0))
-
-					∂θ∂R_Mac(R₁) = - max(θs - θsMacMat, 0.0) * exp( -((log(R₁ / RmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (R₁ * σMac * √(π * 2.0))
-
-					Rmod_Mat = exp(log(Rm) - σ^2)
-
-					Rmod_Mac = exp(log(RmMac) - σMac^2)
-	
-					return ∂θ∂R_Mat(R₁) / ∂θ∂R_Mat(Rmod_Mat) + ∂θ∂R_Mac(R₁) / (∂θ∂R_Mac(Rmod_Mac) + eps())
-					# + ∂θ∂R_Mac(R₁) / ∂θ∂R_Mac(Rmod_Mac)
-				else
-					return 0.0::Float64
+				if R₁ <  eps(100.0)
+					R₁ +=  eps()
 				end
+
+				∂θ∂R_Mat(R₁) = -(θsMacMat - θr) * exp( -((log(R₁ / Rm)) ^ 2.0) / (2.0 * σ ^ 2.0)) / (R₁ * σ * √(π * 2.0))
+
+				∂θ∂R_Mac(R₁) = - max(θs - θsMacMat, 0.0) * exp( -((log(R₁ / RmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (R₁ * σMac * √(π * 2.0))
+
+				Rmod_Mat = exp(log(Rm) - σ^2)
+
+				Rmod_Mac = exp(log(RmMac) - σMac^2)
+	
+			return ∂θ∂R_Mat(R₁) / ∂θ∂R_Mat(Rmod_Mat) + ∂θ∂R_Mac(R₁) / ∂θ∂R_Mac(Rmod_Mac)
 			end # function ∂θ∂R_NORM
 		#-------------------------------------------------------------------
 
