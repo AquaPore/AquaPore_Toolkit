@@ -4,29 +4,21 @@
 module hydroRelation
 import BlackBoxOptim
 import ..tool
-export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨMacMat_2_ΨmMac, FUNC_θsMacMatη_2_ΨMacMat, FUNC_ΨMacMat_2_σMac, FUNC_σ_2_Ψm, FUNC_ΨmMode
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : σ_2_Ψm⍰(iZ, hydro)
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function σ_2_Ψm(σ₁, Ψσ, Ψm_Min, Ψm_Max; Pσ=3.0)
-			Ψm = Ψσ * exp(σ₁ * Pσ)
-		return max(min(Ψm , Ψm_Max), Ψm_Min)
-		end # function: σ_2_Ψm
-	# ----------------------------------------------------------------
+export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨMacMat_2_ΨmMac, FUNC_θsMacMatη_2_ΨMacMat, FUNC_ΨMacMat_2_σMac, FUNC_σ_2_Ψm, FUNC_ΨmMode
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNC_θsMacMatη_2_ΨMacMat
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr, ΨMacMat_Max=100.0, ΨMacMat_Min=10.0, θsMacMat_η_Tresh=0.9) 
+		function FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr, ΨMacMat_Max=100.0, ΨMacMat_Min=0.0, θsMacMat_η_Tresh=0.9) 
 
 			θsMacMat_η = min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
 
 			if θsMacMat_η > θsMacMat_η_Tresh
-				ΨMacMat = (θsMacMat_η - 1.0) * (ΨMacMat_Max - ΨMacMat_Min) / (θsMacMat_η_Tresh - 1.0) + ΨMacMat_Min
+				ΨMacMat = ((θsMacMat_η - 1.0) / (θsMacMat_η_Tresh - 1.0)) * (ΨMacMat_Max - ΨMacMat_Min) + ΨMacMat_Min
+
 			else
-				ΨMacMat =ΨMacMat_Max
+				ΨMacMat = ΨMacMat_Max
 			end
 		return ΨMacMat
 		end  # function: FUNC_θsMacMatη_2_ΨMacMat
@@ -37,9 +29,8 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨMacMat_2_ΨmMac, F
 	#		FUNCTION : FUNC_ΨMacMat_2_σMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function FUNC_ΨMacMat_2_σMac(;ΨMacMat, Pσ=3)
-			# σMac = 0.5 * (-Pσ + √(Pσ^2.0 + 2.0 * log(ΨMacMat)))
-			σMac = log(ΨMacMat) / (2.0 * Pσ)
-		# @show σMac 	
+			σMac = 0.5 * (-Pσ + √(Pσ^2.0 + 2.0 * log1p(ΨMacMat)))
+			# σMac = log(ΨMacMat) / (2.0 * Pσ)
 		return σMac
 		end  # function: FUNC_ΨMacMat_2_σMac
 	# ------------------------------------------------------------------
@@ -49,8 +40,8 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨMacMat_2_ΨmMac, F
 	#		FUNCTION : FUNC_ΨMacMat_2_ΨmMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function FUNC_ΨMacMat_2_ΨmMac(;ΨMacMat, σMac)
-			# ΨmMac = exp(log(ΨMacMat) * 0.5 + σMac ^ 2.0)
-			# ΨmMac = exp(log(sqrt(ΨMacMat)) + σMac ^ 2.0)
+			# LONG: ΨmMac = exp(log(ΨMacMat) * 0.5 + σMac ^ 2.0)
+			# LONG2 ΨmMac = exp(log(sqrt(ΨMacMat)) + σMac ^ 2.0)
 			ΨmMac = √(ΨMacMat) * exp(σMac ^ 2.0)
 
 		# @show ΨmMac
@@ -67,7 +58,7 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨMacMat_2_ΨmMac, F
 			# Ψm = (1.0 + ΨMacMat) * exp(σ * Pσ + σ^2)
 			Ψm = (1.0 + ΨMacMat) * exp(σ * Pσ)
 
-			# Ψm = max(min(Ψm, Ψm_Max), Ψm_Min)
+			Ψm = max(min(Ψm, Ψm_Max), Ψm_Min)
 			#  Ψm = max(Ψm, Ψm_Min)
 		# @show Ψm
 		return Ψm
@@ -80,27 +71,26 @@ export σ_2_Ψm, σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨMacMat_2_ΨmMac, F
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0)
 
-			ΨMacMat = FUNC_θsMacMatη_2_ΨMacMat(θs=hydro₂.θs[iZ], θsMacMat=hydro₂.θsMacMat[iZ], θr=hydro₂.θr[iZ], ΨMacMat_Max=150.0, ΨMacMat_Min=80.0, θsMacMat_η_Tresh=0.9)
+			ΨMacMat = FUNC_θsMacMatη_2_ΨMacMat(θs=hydro₂.θs[iZ], θsMacMat=hydro₂.θsMacMat[iZ], θr=hydro₂.θr[iZ])
 
 			# ΨMacMat = 100.0
 						
-
 			# Deriving σMac
 				hydro₂.σMac[iZ] = hydroRelation.FUNC_ΨMacMat_2_σMac(;ΨMacMat, Pσ=2)
 
 			# Deriving ΨmMac
 				hydro₂.ΨmMac[iZ] =  hydroRelation.FUNC_ΨMacMat_2_ΨmMac(;ΨMacMat, σMac=hydro₂.σMac[iZ])
 
-
 			if (option₂.σ_2_Ψm⍰ == "Constrained")
 				# Deriving  Ψm 
 					# Ψm_Min = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], √(ΨMacMat), hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ];Pσ=2)
 					# Ψm_Min =  hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat=√ΨMacMat, σ=hydro₂.σ[iZ], Pσ=2.0, Ψm_Min=hydro₂.Ψm_Min[iZ], Ψm_Max=hydro₂.Ψm_Max[iZ])
+					ΨMacMat₂= 100.0
 
-					Ψm_Min =  hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat=ΨMacMat, σ=hydro₂.σ[iZ], Pσ=1.0, Ψm_Min=hydro₂.Ψm_Min[iZ], Ψm_Max=hydro₂.Ψm_Max[iZ])
+					Ψm_Min =  hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat=ΨMacMat₂ , σ=hydro₂.σ[iZ], Pσ=1.0, Ψm_Min=hydro₂.Ψm_Min[iZ], Ψm_Max=hydro₂.Ψm_Max[iZ])
 
 					# Ψm_Max = hydroRelation.σ_2_Ψm(hydro₂.σ[iZ], ΨMacMat, hydro₂.Ψm_Min[iZ], hydro₂.Ψm_Max[iZ]; Pσ=3)
-					Ψm_Max =  hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat=ΨMacMat, σ=hydro₂.σ[iZ], Pσ=3, Ψm_Min=hydro₂.Ψm_Min[iZ], Ψm_Max=hydro₂.Ψm_Max[iZ])
+					Ψm_Max =  hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat=ΨMacMat₂, σ=hydro₂.σ[iZ], Pσ=3, Ψm_Min=hydro₂.Ψm_Min[iZ], Ψm_Max=hydro₂.Ψm_Max[iZ])
 					
 					hydro₂.Ψm[iZ] = tool.norm.∇NORM_2_PARAMETER(hydro₂.Ψm[iZ], Ψm_Min, Ψm_Max)
 

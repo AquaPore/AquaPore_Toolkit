@@ -196,13 +196,13 @@ module wrc
 		import SpecialFunctions: erfc, erfcinv
 		import ForwardDiff, Optim
 		import ...cst
-		import ..wrc
+		import ..wrc, ...hydroRelation
 		export ∂Se∂Ψ, ∂θ∂Ψ, ∂Ψ∂Se, ∂Ψ∂θ, Se_2_Ψ, θ_2_Ψ, Ψ_2_Se, Ψ_2_θ
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : Ψ_2_θ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
+			function Ψ_2_θ2(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
 				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
 
 				θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
@@ -214,11 +214,9 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : Ψ_2_θ2
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_θ2(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, ΨMacMat=100.0)
+			function Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, ΨMacMat=100.0)
 
-				# if (θsMacMat - θr) / (θs - θr) >  0.9
-				# 	ΨMacMat = 0.0
-				# end
+				ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr)
 
 				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( max(Ψ₁ - ΨMacMat, 0.0) / Ψm)) / (σ * √2.0)) + θr
 

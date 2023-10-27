@@ -121,7 +121,7 @@ module kunsat
 	# =============================================================
 	module kg
 		import..wrc
-		import ...cst
+		import ...cst, ...hydroRelation
 		import ForwardDiff, QuadGK
 		import SpecialFunctions: erfc, erfcinv
 		export Ψ_2_KUNSAT, ∂K∂ΨMODEL
@@ -149,21 +149,20 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function Ψ_2_KUNSAT(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
 
-				# MATRICE
-					KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
+				ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr)
 
-					Se_Mat = 0.5 * erfc((log(Ψ₁ / Ψm)) / (σ * √2.0))
+				KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
 
-					Kunsat_Mat =  KsMat * √Se_Mat * (0.5 * erfc(((log(Ψ₁/ Ψm)) / σ + σ) / √2.0)) ^ 2.0
+				Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨMacMat, 0.0) / Ψm)) / (σ * √2.0))
 
-				# MACROPORE
-					KsMac = max(Ks - KsMat, 0.0)
+				Kunsat_Mat =  KsMat * √Se_Mat * (0.5 * erfc(((log( max(Ψ₁- ΨMacMat, 0.0)/ Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
-					Se = wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
-					
-					Kunsat_Mac =  KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+				Se = wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
 
-			return Kunsat_Mat + Kunsat_Mac
+				KsMac = max(Ks - KsMat, 0.0)
+				Kunsat_Mac =  KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+
+		return Kunsat_Mat + Kunsat_Mac
 			end # function Ψ_2_KUNSAT
 		#-------------------------------------------------------------------
 

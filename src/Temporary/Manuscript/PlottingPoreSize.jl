@@ -24,8 +24,8 @@
 
 			# Input hydro parameters
 				θs = 0.4
-				θr = 0.1
-				σ = 0.7
+				θr = 0.
+				σ = 3.75
 				θsMacMat_η = 0.75
 				Ks = 0.008
 
@@ -34,7 +34,7 @@
 			# Deriving macropore hydraulic parameters from ΨMacMat
 				ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr, ΨMacMat_Max=100.0, ΨMacMat_Min=10.0, θsMacMat_η_Tresh=0.9)
 
-				σMac = hydroRelation.FUNC_ΨMacMat_2_σMac(;ΨMacMat, Pσ=3)
+				σMac = hydroRelation.FUNC_ΨMacMat_2_σMac(;ΨMacMat, Pσ=2)
 
 				ΨmMac = hydroRelation.FUNC_ΨMacMat_2_ΨmMac(;ΨMacMat, σMac) 
 
@@ -159,8 +159,6 @@
 
 				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₃_Plus,0), Point(ΨmMac_Pσ₃_Plus, 0.8)], color=:red)
 				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₃_Minus,0), Point(ΨmMac_Pσ₃_Minus, 0.8)], color=:red)
-
-				
 
 
 			Axis_θΨ = Axis(Fig[3,1], xlabel="Ψ [mm]", ylabel="θ [L³ L⁻³]", xscale=log, xminorticksvisible=true, xminorgridvisible=true, xminorticks=IntervalsBetween(5))
