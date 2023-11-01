@@ -57,7 +57,7 @@ module reading
 			println("    ~  $(Path) ~")
 
 			# Read data
-				Data = readdlm(Path, ',')
+				Data = DelimitedFiles.readdlm(Path, ',')
 			# Read header
 				Header = Data[1,1:end]
 			# Remove first READ_ROW_SELECT

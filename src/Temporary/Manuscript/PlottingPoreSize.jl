@@ -25,35 +25,30 @@
 			# Input hydro parameters
 				θs = 0.4
 				θr = 0.
-				σ = 3.75
+				σ = 0.75
 				θsMacMat_η = 0.75
 				Ks = 0.008
 
 			θsMacMat = (θs - θr) * θsMacMat_η + θr
 
 			# Deriving macropore hydraulic parameters from ΨMacMat
-				ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr, ΨMacMat_Max=100.0, ΨMacMat_Min=10.0, θsMacMat_η_Tresh=0.9)
+            ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr, ΨMacMat_Max=100.0, ΨMacMat_Min=0, θsMacMat_η_Tresh=0.95)
 
-				σMac = hydroRelation.FUNC_ΨMacMat_2_σMac(;ΨMacMat, Pσ=2)
+            σMac    = hydroRelation.FUNC_ΨMacMat_2_σMac(;ΨMacMat, Pσ_Mac=2)
 
-				ΨmMac = hydroRelation.FUNC_ΨMacMat_2_ΨmMac(;ΨMacMat, σMac) 
+				@show σMac
 
-				Ψm_Min = hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat, σ, Pσ=1)
+            ΨmMac   = hydroRelation.FUNC_ΨMacMat_2_ΨmMac(;ΨMacMat=100, σMac)
+
+            Ψm_Min  = hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat= √70, σ, Pσ=Pσ₃)
 			
-				Ψm_Max = hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat, σ, Pσ=3)
+            Ψm_Max  = hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat=70, σ, Pσ=Pσ₃)
 
 			# Modes
-				Ψm_Min_Mode =hydroRelation.FUNC_ΨmMode(;Ψm₀=Ψm_Min , σ₀=σ)
-				Ψm_Max_Mode = hydroRelation.FUNC_ΨmMode(;Ψm₀=Ψm_Max , σ₀=σ)
-				ΨmMac_Mode =  hydroRelation.FUNC_ΨmMode(;Ψm₀=ΨmMac , σ₀=σMac) 
-
-			# R 
-				Rm_Min = cst.Y / Ψm_Min
-				Rm_Max = cst.Y / Ψm_Max
-
-				Rmₐ_Mode = Rm_Min * exp(- σ^2)
-				Rmᵦ_Mode = Rm_Max * exp(- σ^2)
-				RmMac = cst.Y / ΨmMac
+            Ψm_Min_Mode = hydroRelation.FUNC_ΨmMode(;Ψm₀=Ψm_Min, σ₀=σ)
+            Ψm_Max_Mode = hydroRelation.FUNC_ΨmMode(;Ψm₀=Ψm_Max, σ₀=σ)
+            ΨmMac_Mode  = hydroRelation.FUNC_ΨmMode(;Ψm₀=ΨmMac, σ₀=σMac)
+				Ψm_Mode     = hydroRelation.FUNC_ΨmMode(;Ψm₀=Ψm_Max, σ₀=σ)
 
 			# For plotting
 				ΨmMac_Pσ₂_Plus = exp(log(ΨmMac_Mode) + Pσ₂ * σMac)
@@ -61,6 +56,12 @@
 
 				ΨmMac_Pσ₃_Plus = exp(log(ΨmMac_Mode) + Pσ₃ * σMac)
 				ΨmMac_Pσ₃_Minus = exp(log(ΨmMac_Mode) - Pσ₃ * σMac)
+
+				Ψm_Pσ₂_Plus = exp(log(Ψm_Mode) + Pσ₂ * σ)
+				Ψm_Pσ₂_Minus = exp(log(Ψm_Mode) - Pσ₂ * σ)
+
+				Ψm_Pσ₃_Plus = exp(log(Ψm_Mode) + Pσ₃ * σ)
+				Ψm_Pσ₃_Minus = exp(log(Ψm_Mode) - Pσ₃ * σ)
 			
 				KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
 
@@ -69,8 +70,10 @@
 			# filling the data -----------------------
 
 				Ψ_Max_Log = log10(exp(log(Ψm_Max) + 3.0 * σ))
+				Ψ_Min_Log = log10(exp(log(ΨmMac) - 3.0 * σMac))
+				
 
-				Ψ = 10.0.^(collect(-1:0.001:Ψ_Max_Log))
+				Ψ = 10.0.^(collect(Ψ_Min_Log:0.001:Ψ_Max_Log))
 				N = length(Ψ)
 
 				∂θ∂Ψ_1 = fill(0.0::Float64 , N)
@@ -82,14 +85,9 @@
 				Ψ_2_KUNSAT_1 = fill(0.0::Float64 , N)
 				Ψ_2_KUNSAT_2 = fill(0.0::Float64 , N)
 
-				∂θ∂R_1 = fill(0.0::Float64 , N) 
-				∂θ∂R_2 = fill(0.0::Float64 , N)  
-
+		
 				for iΨ=1:N
-					∂θ∂R_1[iΨ] = wrc.kg.∂θ∂R_NORM(R₁= cst.Y/Ψ[iΨ], θs=θs, θr=θr, Rm=Rm_Min , σ=σ, θsMacMat=θsMacMat, RmMac=RmMac, σMac=σMac)
-
-					∂θ∂R_2[iΨ] = wrc.kg.∂θ∂R_NORM(R₁=cst.Y/Ψ[iΨ], θs=θs, θr=θr,  Rm=Rm_Max, σ=σ, θsMacMat=θsMacMat, RmMac=RmMac, σMac=σMac)
-
+			
 					∂θ∂Ψ_1[iΨ] = wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
 
 					∂θ∂Ψ_2[iΨ] =  wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
@@ -132,36 +130,44 @@
 			
 			# TableComplete_θΨ = [0.001, 1.0, 10.0, 50, 100.0, 250, 500.0, 1000.0, 2500, 5000.0,100_00.0, 150_00.0,250_00.0, 500_00.0, 1000_00.0,  1500_00.0, 2000_00.0]
 			
-			Axis_∂θ∂R = Axis(Fig[1,1], xlabel="R [mm]", ylabel="∂θ∂R", xscale=log,  xminorticksvisible = true, xminorgridvisible = true, xminorticks = IntervalsBetween(5))
+			# Axis_∂θ∂R = Axis(Fig[1,1], xlabel="R [mm]", ylabel="∂θ∂R", xscale=log,  xminorticksvisible = true, xminorgridvisible = true, xminorticks = IntervalsBetween(5))
 
-			# , yscale=log10, titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=true, xticklabelrotation = pi/2, 
-				# Axis_∂θ∂R.xticks = (cst.Y ./ TableComplete_θΨ, string.((round.(cst.Y ./ TableComplete_θΨ, digits = 2))))
+			# # , yscale=log10, titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=true, xticklabelrotation = pi/2, 
+			# 	# Axis_∂θ∂R.xticks = (cst.Y ./ TableComplete_θΨ, string.((round.(cst.Y ./ TableComplete_θΨ, digits = 2))))
 
-				# xlims!(Axis_∂θ∂R, cst.Y / Ψ_Max, cst.Y / Ψ_Min)
-				Plot1=lines!(Axis_∂θ∂R, cst.Y ./  Ψ , ∂θ∂R_1,  color=:green, linewidth=Linewidth, label="")
-				Plot2=lines!(Axis_∂θ∂R,  cst.Y ./ Ψ , ∂θ∂R_2, color=:blue, linewidth=Linewidth, label="")
+			# 	# xlims!(Axis_∂θ∂R, cst.Y / Ψ_Max, cst.Y / Ψ_Min)
+			# 	Plot1=lines!(Axis_∂θ∂R, cst.Y ./  Ψ , ∂θ∂R_1,  color=:green, linewidth=Linewidth, label="")
+			# 	Plot2=lines!(Axis_∂θ∂R,  cst.Y ./ Ψ , ∂θ∂R_2, color=:blue, linewidth=Linewidth, label="")
 
-			Axis_∂θ∂Ψ = Axis(Fig[2,1], xlabel="Ψ [mm]", ylabel="∂θ∂Ψ", xscale=log)
+			Axis_∂θ∂Ψ = Axis(Fig[1,1], xlabel="Ψ [mm]", ylabel="∂θ∂Ψ", xscale=log)
 				# titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false,xminorticksvisible=true, yminorticksvisible=true, xticklabelrotation = pi/2
 				
 				# Axis_∂θ∂Ψ.xticks = (TableComplete_θΨ, string.(round.(TableComplete_θΨ, digits=1)))
 				# xlims!(Axis_∂θ∂Ψ, Ψ_Min, Ψ_Max)
-				lines!(Axis_∂θ∂Ψ, Ψ , ∂θ∂Ψ_1,  color=:green, linewidth=Linewidth, label="")
-				lines!(Axis_∂θ∂Ψ, Ψ , ∂θ∂Ψ_2, color=:blue, linewidth=Linewidth, label="")
-				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Min_Mode,0), Point(Ψm_Min_Mode, 1)], color=:green)
-				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Max_Mode,0), Point(Ψm_Max_Mode, 1)], color=:blue)
-				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Mode,0), Point(ΨmMac_Mode, 1)], color=:brown)
+				Plot3 = lines!(Axis_∂θ∂Ψ, Ψ , ∂θ∂Ψ_1,  color=:green, linewidth=Linewidth, label="")
+				Plot4 = lines!(Axis_∂θ∂Ψ, Ψ , ∂θ∂Ψ_2, color=:blue, linewidth=Linewidth, label="")
 
+				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Min_Mode,0), Point(Ψm_Min_Mode, 1)], color=:green, linewidth=Linewidth)
+				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Max_Mode,0), Point(Ψm_Max_Mode, 1)], color=:blue, linewidth=Linewidth)
+				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Mode,0), Point(ΨmMac_Mode, 1)], color=:brown, linewidth=Linewidth)
 				lines!(Axis_∂θ∂Ψ, [Point(ΨMacMat,0), Point(ΨMacMat, 0.5)], color=:red, linewidth=Linewidth)
 
-				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₂_Plus,0), Point(ΨmMac_Pσ₂_Plus, 0.5)], color=:violet)
-				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₂_Minus,0), Point(ΨmMac_Pσ₂_Minus, 0.5)], color=:violet)
+				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₂_Plus,0), Point(ΨmMac_Pσ₂_Plus, 1.0)], color=:violet)
+				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₂_Minus,0), Point(ΨmMac_Pσ₂_Minus, 1.0)], color=:violet)
 
-				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₃_Plus,0), Point(ΨmMac_Pσ₃_Plus, 0.8)], color=:red)
-				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₃_Minus,0), Point(ΨmMac_Pσ₃_Minus, 0.8)], color=:red)
+				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₃_Plus,0), Point(ΨmMac_Pσ₃_Plus, 0.8)], color=:violet)
+				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₃_Minus,0), Point(ΨmMac_Pσ₃_Minus, 0.8)], color=:violet)
 
 
-			Axis_θΨ = Axis(Fig[3,1], xlabel="Ψ [mm]", ylabel="θ [L³ L⁻³]", xscale=log, xminorticksvisible=true, xminorgridvisible=true, xminorticks=IntervalsBetween(5))
+				
+				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Pσ₂_Plus,0), Point(Ψm_Pσ₂_Plus, 1.0)], color=:blue)
+				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Pσ₂_Minus,0), Point(Ψm_Pσ₂_Minus, 1.0)], color=:blue)
+
+				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Pσ₃_Plus,0), Point(Ψm_Pσ₃_Plus, 0.8)], color=:blue)
+				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Pσ₃_Minus,0), Point(Ψm_Pσ₃_Minus, 0.8)], color=:blue)
+
+
+			Axis_θΨ = Axis(Fig[2,1], xlabel="Ψ [mm]", ylabel="θ [L³ L⁻³]", xscale=log, xminorticksvisible=true, xminorgridvisible=true, xminorticks=IntervalsBetween(5))
 
 			# titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, yminorticksvisible=true, xticklabelrotation = pi/2
 
@@ -186,11 +192,11 @@
 
 				
 				
-				Legend(Fig[1, 2], Axis_∂θ∂Ψ, valign=:top, padding = (0, 0, 20, 0))
+				Legend(Fig[1, 3], Axis_∂θ∂Ψ, valign=:top, padding = (0, 0, 20, 0))
 				Ψm1 = Int(floor(Ψm_Min))
 				Ψm2 = Int(floor(Ψm_Max))
 
-				axislegend(Axis_∂θ∂Ψ, [Plot1, Plot2], ["σ=$σ; Ψm =$Ψm1 mm", "σ=$σ; Ψm =$Ψm2 Kpa"], position = :rt)
+				# axislegend(Axis_∂θ∂Ψ, [Axis_∂θ∂Ψ], ["σ=$σ; Ψm =$Ψm1 mm", "σ=$σ; Ψm =$Ψm2 Kpa"], position = :rt)
 
 				resize_to_layout!(Fig)
 				trim!(Fig.layout)
