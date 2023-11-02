@@ -31,18 +31,18 @@
 
 			θsMacMat = (θs - θr) * θsMacMat_η + θr
 
-			# Deriving macropore hydraulic parameters from ΨMacMat
-            ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr, ΨMacMat_Max=100.0, ΨMacMat_Min=0, θsMacMat_η_Tresh=0.95)
+			# Deriving macropore hydraulic parameters from ΨmacMat
+            ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr, ΨmacMat_Max=100.0, ΨmacMat_Min=0, θsMacMat_η_Tresh=0.95)
 
-            σMac    = hydroRelation.FUNC_ΨMacMat_2_σMac(;ΨMacMat, Pσ_Mac=2)
+            σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac=2)
 
 				@show σMac
 
-            ΨmMac   = hydroRelation.FUNC_ΨMacMat_2_ΨmMac(;ΨMacMat=100, σMac)
+            ΨmMac   = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=100, σMac)
 
-            Ψm_Min  = hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat= √70, σ, Pσ=Pσ₃)
+            Ψm_Min  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat= √70, σ, Pσ=Pσ₃)
 			
-            Ψm_Max  = hydroRelation.FUNC_σ_2_Ψm(;ΨMacMat=70, σ, Pσ=Pσ₃)
+            Ψm_Max  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat=70, σ, Pσ=Pσ₃)
 
 			# Modes
             Ψm_Min_Mode = hydroRelation.FUNC_ΨmMode(;Ψm₀=Ψm_Min, σ₀=σ)
@@ -150,7 +150,7 @@
 				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Min_Mode,0), Point(Ψm_Min_Mode, 1)], color=:green, linewidth=Linewidth)
 				lines!(Axis_∂θ∂Ψ, [Point(Ψm_Max_Mode,0), Point(Ψm_Max_Mode, 1)], color=:blue, linewidth=Linewidth)
 				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Mode,0), Point(ΨmMac_Mode, 1)], color=:brown, linewidth=Linewidth)
-				lines!(Axis_∂θ∂Ψ, [Point(ΨMacMat,0), Point(ΨMacMat, 0.5)], color=:red, linewidth=Linewidth)
+				lines!(Axis_∂θ∂Ψ, [Point(ΨmacMat,0), Point(ΨmacMat, 0.5)], color=:red, linewidth=Linewidth)
 
 				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₂_Plus,0), Point(ΨmMac_Pσ₂_Plus, 1.0)], color=:violet)
 				lines!(Axis_∂θ∂Ψ, [Point(ΨmMac_Pσ₂_Minus,0), Point(ΨmMac_Pσ₂_Minus, 1.0)], color=:violet)
@@ -177,7 +177,7 @@
 				lines!(Axis_θΨ, Ψ, Ψ_2_θDual_1, color=:green, linewidth=Linewidth)
 				lines!(Axis_θΨ,Ψ, Ψ_2_θDual_2, color=:blue, linewidth=Linewidth)
 				lines!(Axis_θΨ, Ψ, (Ψ ./ Ψ ) .* θ_Inlection , color=:yellow, linewidth=Linewidth/2.0)
-				lines!(Axis_θΨ,[Point(ΨMacMat,0), Point(ΨMacMat,θsMacMat)], color=:brown, linewidth=Linewidth/2.0)
+				lines!(Axis_θΨ,[Point(ΨmacMat,0), Point(ΨmacMat,θsMacMat)], color=:brown, linewidth=Linewidth/2.0)
 				lines!(Axis_θΨ, Ψ, (Ψ ./ Ψ ) .* θsMacMat , color=:grey, linewidth=Linewidth/2.0)
 
 			Axis_KΨ = Axis(Fig[4,1], xlabel="Ψ [mm]", ylabel="K(Ψ) [cm h⁻¹]", xscale=log, xminorticksvisible=true, xminorgridvisible=true, xminorticks=IntervalsBetween(5))
@@ -187,7 +187,7 @@
 				lines!(Axis_KΨ, Ψ , cst.MmS_2_CmH .* Ψ_2_KUNSAT_1, color=:green, linewidth=Linewidth)
 				lines!(Axis_KΨ, Ψ , cst.MmS_2_CmH .* Ψ_2_KUNSAT_2, color=:blue, linewidth=Linewidth)
 				lines!(Axis_KΨ, Ψ, (Ψ ./ Ψ ) .* cst.MmS_2_CmH .* KsMat, color=:grey, linewidth=Linewidth/2.0)
-				lines!(Axis_KΨ,[Point(ΨMacMat,0), Point(ΨMacMat,cst.MmS_2_CmH * KsMat)], color=:brown, linewidth=Linewidth/2.0)
+				lines!(Axis_KΨ,[Point(ΨmacMat,0), Point(ΨmacMat,cst.MmS_2_CmH * KsMat)], color=:brown, linewidth=Linewidth/2.0)
 				# xlims!(Axis_KΨ, Ψ_Min, Ψ_Max)
 
 				

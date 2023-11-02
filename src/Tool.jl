@@ -152,6 +152,11 @@ module tool
 					error("READ_ROW_SELECT error: iSelect=$iSelect ≠ NiZ=$NiZ")
 				end
 
+				# Transforming Matrix into vector
+					if N_Point_Max==1
+						Data_Select = vec(Data_Select)
+					end
+
 					# Since there are many Data_Output with the same Id only update IdSelect if we are changing soils and IdSelect[iSelect] == Id_Data[i]
 					# if i ≤ N_X - 1
 					# 	if (Id_Data[i+1] > Id_Data[i]) && (IdSelect[iSelect] == Id_Data[i]) && (iSelect ≤ NiZ -1)

@@ -7,7 +7,8 @@ module rockFragment
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION :  ρᵦ_2_Φ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ρᵦ_2_Φ(NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
+		function ρᵦ_2_Φ(NiZ::Int64, option, RockFragment::Vector{Float64}, ρₚ_Fine::Vector{Float64}, ρₚ_Rock::Vector{Float64}, ρᵦ_Soil::Vector{Float64})
+
 			if option.rockFragment.RockInjectedIncluded⍰  == "InjectRock"
 				return Φ = rockFragment.injectRock.ρᵦ_2_Φ(NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
 
@@ -110,6 +111,8 @@ module rockFragment
 		#		FUNCTION :  ρᵦ_2_Φ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function ρᵦ_2_Φ(NiZ::Int64, option, RockFragment::Vector{Float64}, ρₚ_Fine::Vector{Float64}, ρₚ_Rock::Vector{Float64}, ρᵦ_Soil::Vector{Float64})
+
+			
 				Φ = fill(0.0::Float64, NiZ)
 
 				for iZ=1:NiZ

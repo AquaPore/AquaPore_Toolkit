@@ -63,7 +63,7 @@ module lab
 						xlims!(Axis2, log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Min), log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Max))
 
 						ylims!(Axis2, 0.0, log1p(hydro.Ks[iZ]*cst.MmS_2_MmH))
-						
+
 						Axis2.xticks = (log1p.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]), string.(floor.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]], digits=1)))
 						Yticks = 1:1:6
 						Axis2.yticks = (Yticks,string.(Yticks))
@@ -157,6 +157,8 @@ module lab
 
             Ks_Min = minimum([minimum(Ksₒᵦₛ), minimum(KₛModel)])
             Ks_Max = maximum([maximum(Ksₒᵦₛ), maximum(KₛModel)])
+
+				@show Ks_Min, Ks_Max
 
 				# Ks_Max = 0.099371778 # mm/s
 				
@@ -252,7 +254,7 @@ module lab
 				NΘsΘr = length(ΘsMacMatΘr)
 				Func_Ks1=fill(0.0, (NΘsΘr, Nσ))
 				Func_Ks3=fill(0.0, (NΘsΘr, Nσ))
-				ΨMacMat = 100.0
+				ΨmacMat = 100.0
 				T2_Max = 3.0; T3_Max = 4.0
 				for iΘsΘr=1:NΘsΘr
 					for iσ =1:Nσ
@@ -260,7 +262,7 @@ module lab
 						T2 = T2_Max * (1.0 - τ₂ₐ)
 						T3 = T3_Max * (1.0 - τ₃ₐ)
 
-						ΨmMean = exp((log(√ΨMacMat) + log(ΨMacMat)) * 0.5)
+						ΨmMean = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
 						Ψm = ΨmMean * exp(σ[iσ] * 3.0)
 
 					# Ks model 1 not corrected for clay
@@ -508,11 +510,11 @@ module lab
 					T2Mac  = T2_Max * (1.0 - τ₂ₐMac)
 					T3Mac  = T3_Max * (1.0 - τ₃ₐMac)
 
-					ΨMacMat = 100.0
+					ΨmacMat = 100.0
 					Ψ₁ = 0.0
 					σMac = hydro.σMac[1]
 					ΨmMac = hydro.ΨmMac[1]
-					ΨmMean = exp((log(√ΨMacMat) + log(ΨMacMat)) * 0.5)
+					ΨmMean = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
 
 					θr = [0.0,  0.0, 0.0, 0.0, 0.0]
 					σ = [0.7, 0.8, 1.0, 1.5, 3.0]

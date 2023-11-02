@@ -5,7 +5,7 @@ module reading
 	import ..tool, ..table, ..ksModel
 	import  DelimitedFiles
 	using CSV, Tables, DataFrames
-	export ID, θΨ, KUNSATΨ, INFILTRATION, PSD
+	export ID, θΨ, KUNSATΨ, INFILTRATION, PSD, BULKDENSITY, Φ
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : ID
@@ -48,6 +48,7 @@ module reading
 	
 		return IdSelect, IdSelect_True, Soilname, NiZ
 		end  # function: ID
+	#----------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,15 +66,41 @@ module reading
 			# Sort data
 				Data = sortslices(Data, dims=1)
 
-			ρᵦ_Soil, ~  = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "BulkDensitySoil[g_cm-3]",  NiZ, N_Point_Max=1)
+			# Reading data
+				ρᵦ_Soil, ~  = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "BulkDensitySoil[g_cm-3]",  NiZ, N_Point_Max=1)
 
-			ρₚ_Fine, ~ = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "ParticleDensity_Fine[g_cm-3]",  NiZ, N_Point_Max=1)
+				ρₚ_Fine, ~ = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "ParticleDensity_Fine[g_cm-3]",  NiZ, N_Point_Max=1)
 
-			ρₚ_Rock, ~  = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "Density_Rock[g_cm-3]", NiZ, N_Point_Max=1)
-			
-			RockFragment, ~   = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header,"RockFragment[0-1]", NiZ, N_Point_Max=1)
+				ρₚ_Rock, ~  = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "Density_Rock[g_cm-3]", NiZ, N_Point_Max=1)
+				
+				RockFragment, ~   = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header,"RockFragment[0-1]", NiZ, N_Point_Max=1)
+
 		return RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil
 		end # function: BulkDensity
+	#----------------------------------------------------------------------
+
+		
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : total porosity
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function Φ(IdSelect, NiZ, Path)
+			println("    ~  $(Path) ~")
+
+			# Read data
+				Data = DelimitedFiles.readdlm(Path, ',')
+			# Read header
+				Header = Data[1,1:end]
+			# Remove first READ_ROW_SELECT
+				Data = Data[2:end,begin:end]
+			# Sort data
+				Data = sortslices(Data, dims=1)
+
+			Φ, ~  = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "TotalPorosity[0-1]", NiZ, N_Point_Max=1)
+			
+			RockFragment, ~   = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header,"RockFragment[0-1]", NiZ, N_Point_Max=1)
+		return RockFragment, Φ
+		end # function: Φ
+	#----------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,28 +270,6 @@ module reading
 		end # function: SOIL_INOFRMATION
 	#----------------------------------------------------------------------
 
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : bulk density
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function Φ(IdSelect, NiZ, Path)
-			println("    ~  $(Path) ~")
-
-			# Read data
-				Data = DelimitedFiles.readdlm(Path, ',')
-			# Read header
-				Header = Data[1,1:end]
-			# Remove first READ_ROW_SELECT
-				Data = Data[2:end,begin:end]
-			# Sort data
-				Data = sortslices(Data, dims=1)
-
-			Φ, ~  = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "TotalPorosity[0-1]", NiZ, N_Point_Max=1)
-			
-			RockFragment, ~   = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header,"RockFragment[0-1]", NiZ, N_Point_Max=1)
-		return RockFragment, Φ
-		end # function: BulkDensity
-	#----------------------------------------------------------------------
 
 		
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

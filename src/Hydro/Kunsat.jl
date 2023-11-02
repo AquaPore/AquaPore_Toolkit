@@ -149,13 +149,13 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function Ψ_2_KUNSAT(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks)
 
-				ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr)
+				ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
 
 				KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
 
-				Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨMacMat, 0.0) / Ψm)) / (σ * √2.0))
+				Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0))
 
-				Kunsat_Mat =  KsMat * √Se_Mat * (0.5 * erfc(((log( max(Ψ₁- ΨMacMat, 0.0)/ Ψm)) / σ + σ) / √2.0)) ^ 2.0
+				Kunsat_Mat =  KsMat * √Se_Mat * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
 				Se = wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
 
@@ -381,15 +381,15 @@ module kunsat
 
 			# 		Se = wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac)
 
-			# 		ΨMacMat = exp(log(ΨmMac) + 3.0 * σMac)
+			# 		ΨmacMat = exp(log(ΨmMac) + 3.0 * σMac)
 
 			# 		SeMacMat = max((θsMacMat - θr) / (θs - θr), 0.0)
 
-			# 		# Kr_ΨMacMat =  1.0 + √SeMacMat * (0.5 * erfc(((log(ΨMacMat / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+			# 		# Kr_ΨmacMat =  1.0 + √SeMacMat * (0.5 * erfc(((log(ΨmacMat / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
-			# 		Kr_ΨMacMat =  1.0 + √SeMacMat 
+			# 		Kr_ΨmacMat =  1.0 + √SeMacMat 
 					
-			# 		KsMac = Ks * min(1.0 / Kr_ΨMacMat, 1.0)
+			# 		KsMac = Ks * min(1.0 / Kr_ΨmacMat, 1.0)
 			# 		KsMat = Ks - KsMac
 					
 			# 		Kunsat_Mac =  KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0

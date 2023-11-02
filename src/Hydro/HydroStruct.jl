@@ -18,6 +18,7 @@ module hydroStruct
          θsMacMat_ƞ     ::	Vector{Float64}
          σMac           :: Vector{Float64}
          ΨmMac          ::	Vector{Float64}
+         ΨmacMat        :: Vector{Float64}
          So             :: Vector{Float64}
          θsMacMat       ::	Vector{Float64}
          Φ              ::	Vector{Float64}
@@ -30,6 +31,7 @@ module hydroStruct
          θsMacMat_ƞ_Min ::	Vector{Float64}
          σMac_Min       :: Vector{Float64}
          ΨmMac_Min      ::	Vector{Float64}
+         ΨmacMat_Min    :: Vector{Float64}
          So_Min         :: Vector{Float64}
          θsMacMat_Min   ::	Vector{Float64}
          Φ_Min          ::	Vector{Float64}
@@ -42,6 +44,7 @@ module hydroStruct
          θsMacMat_ƞ_Max ::	Vector{Float64}
          σMac_Max       :: Vector{Float64}
          ΨmMac_Max      ::	Vector{Float64}
+         ΨmacMat_Max    :: Vector{Float64}
          So_Max         :: Vector{Float64}
          θsMacMat_Max   ::	Vector{Float64}
          Φ_Max          ::	Vector{Float64}
@@ -53,6 +56,7 @@ module hydroStruct
          θr      ::	Vector{Float64}
          N       ::	Vector{Float64}
          Ψvg     ::	Vector{Float64}
+         ΨmacMat :: Vector{Float64}
          Ks      ::	Vector{Float64}
          Km      ::	Vector{Float64}
          Φ       ::	Vector{Float64}
@@ -61,6 +65,7 @@ module hydroStruct
          θr_Min  ::	Vector{Float64}
          N_Min   ::	Vector{Float64}
          Ψvg_Min ::	Vector{Float64}
+         ΨmacMat_Min  :: Vector{Float64}
          Ks_Min  ::	Vector{Float64}
          Km_Min  ::	Vector{Float64}
          Φ_Min   ::	Vector{Float64}
@@ -69,6 +74,7 @@ module hydroStruct
          θr_Max  ::	Vector{Float64}
          N_Max   ::	Vector{Float64}
          Ψvg_Max ::	Vector{Float64}
+         ΨmacMat_Max  :: Vector{Float64}
          Ks_Max  ::	Vector{Float64}
          Km_Max  ::	Vector{Float64}
          Φ_Max   ::	Vector{Float64}
@@ -80,6 +86,7 @@ module hydroStruct
          θr      ::	Vector{Float64}
          λbc     ::	Vector{Float64}
          Ψbc     ::	Vector{Float64}
+         ΨmacMat :: Vector{Float64}
          Ks      ::	Vector{Float64}
          Φ       ::	Vector{Float64}
          Ψga     ::	Vector{Float64}
@@ -88,6 +95,7 @@ module hydroStruct
          θr_Min  ::	Vector{Float64}
          λbc_Min ::	Vector{Float64}
          Ψbc_Min ::	Vector{Float64}
+         ΨmacMat_Min  :: Vector{Float64}         
          Ks_Min  ::	Vector{Float64}
          Φ_Min   ::	Vector{Float64}
 			
@@ -95,6 +103,7 @@ module hydroStruct
          θr_Max  ::	Vector{Float64}
          λbc_Max ::	Vector{Float64}
          Ψbc_Max ::	Vector{Float64}
+         ΨmacMat_Max  :: Vector{Float64}         
          Ks_Max  ::	Vector{Float64}
          Φ_Max   ::	Vector{Float64}
 		end # struct BROOKS COREY
@@ -105,6 +114,7 @@ module hydroStruct
          θr        ::	Vector{Float64}
          λch       ::	Vector{Float64}
          Ψch       ::	Vector{Float64}
+         ΨmacMat   :: Vector{Float64}               
          Ks        ::	Vector{Float64}
 			Φ         ::	Vector{Float64}
          Ψga       ::	Vector{Float64}
@@ -113,6 +123,7 @@ module hydroStruct
          θr_Min        ::	Vector{Float64}
          λch_Min       ::	Vector{Float64}
          Ψch_Min       ::	Vector{Float64}
+         ΨmacMat_Min  :: Vector{Float64}               
          Ks_Min        ::	Vector{Float64}
 			Φ_Min         ::	Vector{Float64}
 			
@@ -120,6 +131,7 @@ module hydroStruct
          θr_Max        ::	Vector{Float64}
          λch_Max       ::	Vector{Float64}
          Ψch_Max       ::	Vector{Float64}
+         ΨmacMat_Max  :: Vector{Float64}         
          Ks_Max        ::	Vector{Float64}
          Φ_Max         ::	Vector{Float64}
 		end # struct CLAPP_HORNBERGER
@@ -142,25 +154,28 @@ module hydroStruct
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function HYDROSTRUCT(optionₘ, NiZ::Int64)
 			# For all models
-         θs         = fill(0.0::Float64, NiZ)
-         θr         = fill(0.0::Float64, NiZ)
-         Ks         = fill(0.0::Float64, NiZ)
-         θsMacMat   = fill(0.0::Float64, NiZ)
-         θsMacMat_ƞ = fill(0.0::Float64, NiZ)
-         Φ          = fill(0.0::Float64, NiZ)
-         So         = fill(0.0::Float64, NiZ)
+         θs          = fill(0.0::Float64, NiZ)
+         θr          = fill(0.0::Float64, NiZ)
+         Ks          = fill(0.0::Float64, NiZ)
+         θsMacMat    = fill(0.0::Float64, NiZ)
+         θsMacMat_ƞ  = fill(0.0::Float64, NiZ)
+         ΨmacMat     = fill(0.0::Float64, NiZ)
+         Φ           = fill(0.0::Float64, NiZ)
+         So          = fill(0.0::Float64, NiZ)
 
-         θs_Min     = fill(0.0::Float64, NiZ)
-         θr_Min     = fill(0.0::Float64, NiZ)
-			Ks_Min     = fill(0.0::Float64, NiZ)
-			Φ_Min      = fill(0.0::Float64, NiZ)
-			So_Min     = fill(0.0::Float64, NiZ)
+         θs_Min      = fill(0.0::Float64, NiZ)
+         θr_Min      = fill(0.0::Float64, NiZ)
+         Ks_Min      = fill(0.0::Float64, NiZ)
+         ΨmacMat_Min = fill(0.0::Float64, NiZ)
+         Φ_Min       = fill(0.0::Float64, NiZ)
+         So_Min      = fill(0.0::Float64, NiZ)
 			
-         θs_Max     = fill(0.0::Float64, NiZ)
-         θr_Max     = fill(0.0::Float64, NiZ)
-			Ks_Max     = fill(0.0::Float64, NiZ)
-			Φ_Max      = fill(0.0::Float64, NiZ)
-			So_Max     = fill(0.0::Float64, NiZ)
+         θs_Max      = fill(0.0::Float64, NiZ)
+         θr_Max      = fill(0.0::Float64, NiZ)
+         Ks_Max      = fill(0.0::Float64, NiZ)
+         ΨmacMat_Max = fill(0.0::Float64, NiZ)
+         Φ_Max       = fill(0.0::Float64, NiZ)
+         So_Max      = fill(0.0::Float64, NiZ)
 			
 			if optionₘ.HydroModel⍰ == "Kosugi" # <>=<>=<>=<>=<>
 				σ              = fill(0.0::Float64, NiZ)
@@ -182,7 +197,7 @@ module hydroStruct
             ΨmMac_Max      = fill(0.0::Float64, NiZ)
             θsMacMat_Max   = fill(0.0::Float64, NiZ)
           
-				hydro = KOSUGI(θs, θr, Ks, σ, Ψm, θsMacMat_ƞ, σMac, ΨmMac, So, θsMacMat, Φ, θs_Min, θr_Min, Ks_Min, σ_Min,Ψm_Min, θsMacMat_ƞ_Min, σMac_Min, ΨmMac_Min, So_Min, θsMacMat_Min, Φ_Min, θs_Max, θr_Max, Ks_Max, σ_Max, Ψm_Max, θsMacMat_ƞ_Max, σMac_Max, ΨmMac_Max, So_Max, θsMacMat_Max, Φ_Max)
+				hydro = KOSUGI(θs, θr, Ks, σ, Ψm, θsMacMat_ƞ, σMac, ΨmMac, ΨmacMat, So, θsMacMat, Φ, θs_Min, θr_Min, Ks_Min, σ_Min,Ψm_Min, θsMacMat_ƞ_Min, σMac_Min, ΨmMac_Min, ΨmacMat_Min, So_Min, θsMacMat_Min, Φ_Min, θs_Max, θr_Max, Ks_Max, σ_Max, Ψm_Max, θsMacMat_ƞ_Max, σMac_Max, ΨmMac_Max, ΨmacMat_Max, So_Max, θsMacMat_Max, Φ_Max)
 				return hydro
 
 			elseif optionₘ.HydroModel⍰=="Vangenuchten" || optionₘ.HydroModel⍰=="VangenuchtenJules" # <>=<>=<>=<>=<>
@@ -204,7 +219,7 @@ module hydroStruct
             Ks_Max  = fill(0.0::Float64, NiZ)
             Km_Max  = fill(0.0::Float64, NiZ)
 
-				hydro = VANGENUCHTEN(θs, θr, N, Ψvg, Ks, Km, Φ, θs_Min,θr_Min, N_Min, Ψvg_Min, Ks_Min, Km_Min, Φ_Min, θs_Max, θr_Max, N_Max, Ψvg_Max, Ks_Max, Km_Max, Φ_Max) 
+				hydro = VANGENUCHTEN(θs, θr, N, Ψvg, ΨmacMat, Ks, Km, Φ, θs_Min,θr_Min, N_Min, Ψvg_Min, ΨmacMat_Min, Ks_Min, Km_Min, Φ_Min, θs_Max, θr_Max, N_Max, Ψvg_Max, ΨmacMat_Max, Ks_Max, Km_Max, Φ_Max) 
 				return hydro
 
 
@@ -217,7 +232,7 @@ module hydroStruct
             Ψbc_Max = fill(0.0::Float64, NiZ)
             Ψga     = fill(0.0::Float64, NiZ)
 
-				hydro = BROOKS_COREY(θs, θr, λbc, Ψbc, Ks, Φ, Ψga, θs_Min, θr_Min, λbc_Min, Ψbc_Min, Ks_Min, Φ_Min, θs_Max, θr_Max, λbc_Max, Ψbc_Max, Ks_Max, Φ_Max)
+				hydro = BROOKS_COREY(θs, θr, λbc, Ψbc, ΨmacMat, Ks, Φ, Ψga, θs_Min, θr_Min, λbc_Min, Ψbc_Min, ΨmacMat_Min, Ks_Min, Φ_Min, θs_Max, θr_Max, λbc_Max, Ψbc_Max, ΨmacMat_Max, Ks_Max, Φ_Max)
 				return hydro
 
 			elseif optionₘ.HydroModel⍰ == "ClappHornberger" # <>=<>=<>=<>=<>=<>
@@ -231,7 +246,7 @@ module hydroStruct
 				λch_Max = fill(0.0::Float64, NiZ)
 				Ψch_Max  = fill(0.0::Float64, NiZ)
 
-				hydro = CLAPP_HORNBERGER(θs, θr, λch, Ψch, Ks, Φ, Ψga, θs_Min, θr_Min, λch_Min, Ψch_Min, Ks_Min, Φ_Max, θs_Max, θr_Max, λch_Max, Ψch_Max, Ks_Max, Φ_Max)
+				hydro = CLAPP_HORNBERGER(θs, θr, λch, Ψch, ΨmacMat, Ks, Φ, Ψga, θs_Min, θr_Min, λch_Min, Ψch_Min, ΨmacMat_Min, Ks_Min, Φ_Max, θs_Max, θr_Max, λch_Max, Ψch_Max, ΨmacMat_Max, Ks_Max, Φ_Max)
 				return hydro
 			end # optionₘ.HydroModel⍰
 

@@ -67,6 +67,11 @@ module startKsModel
 					ksmodelτ = STATISTICS_KSMODEL(ClassBool_All, hydro, 0, KₛModel, ksmodelτ, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, optimKsmodel, option)
 				end
 
+				# Checking the Ks model is withing boundaries
+					for iZ=1:NiZ
+						KₛModel[iZ] = max(min(KₛModel[iZ], hydro.Ks_Max[iZ]), hydro.Ks_Min[iZ])
+					end
+
 				# PLOTTING ALL SOILS
 				if option.ksModel.Plot_KsModel && sum(optimKsmodel.NparamOpt) ≥ 1
 					NameSim = "All soils"
@@ -106,6 +111,7 @@ module startKsModel
 
 			# CHECKING FOR CONSISTENCY
 			for iZ=1:NiZ
+	
 				KₛModel[iZ] = max(min(KₛModel[iZ], hydro.Ks_Max[iZ]), hydro.Ks_Min[iZ])
 
 				if option.run.Smap

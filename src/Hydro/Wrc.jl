@@ -214,11 +214,11 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : Ψ_2_θ2
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, ΨMacMat=100.0)
+			function Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, ΨmacMat=100.0)
 
-				ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr)
+				ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
 
-				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( max(Ψ₁ - ΨMacMat, 0.0) / Ψm)) / (σ * √2.0)) + θr
+				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0)) + θr
 
 				θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
 
@@ -295,14 +295,14 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function ∂θ∂Ψ_NORM(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
 
-				ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr)
+				ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
 
 				Ψmod_Mat = exp(log(Ψm) - σ^2)
 
 				Ψmod_Mac = exp(log(ΨmMac) - σMac^2)
 
 				if Ψ₁ > eps(100.0)
-					∂θ∂Ψ_Mat(Ψ₁) = (θsMacMat - θr) * exp( -((log(max(Ψ₁-ΨMacMat , 0.0) / Ψm)) ^ 2.0) / (2.0 * σ^2.0)) / (Ψ₁ * σ * √(π * 2.0))
+					∂θ∂Ψ_Mat(Ψ₁) = (θsMacMat - θr) * exp( -((log(max(Ψ₁-ΨmacMat , 0.0) / Ψm)) ^ 2.0) / (2.0 * σ^2.0)) / (Ψ₁ * σ * √(π * 2.0))
 
 					∂θ∂Ψ_Mat_Mod = (θsMacMat - θr) * exp( -((log(Ψmod_Mat / Ψm)) ^ 2.0) / (2.0 * σ^2.0)) / (Ψmod_Mat * σ * √(π * 2.0))
 
@@ -342,9 +342,9 @@ module wrc
 			function ∂θ∂R_NORM(;R₁, θs, θsMacMat, θr, Rm, σ, RmMac, σMac)
 
 			
-				ΨMacMat = hydroRelation.FUNC_θsMacMatη_2_ΨMacMat(;θs, θsMacMat, θr)
+				ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
 
-				RMacMat = cst.Y / ΨMacMat
+				RMacMat = cst.Y / ΨmacMat
 
 				if R₁ <  eps(100.0)
 					R₁ +=  eps()
