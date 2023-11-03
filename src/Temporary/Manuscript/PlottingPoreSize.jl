@@ -25,7 +25,7 @@
 			# Input hydro parameters
 				θs = 0.4
 				θr = 0.
-				σ = 0.75
+				σ = 3
 				θsMacMat_η = 0.75
 				Ks = 0.008
 
