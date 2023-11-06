@@ -40,8 +40,8 @@ module options
 	@option mutable struct HYDRO
 		HydroModel⍰::String
 		HydroModel_List::Vector{String}
-		KosugiVariant_θΨ::String
-   	KosugiVariant_KΨ::String
+		KosugiModel_θΨ⍰::String
+   	KosugiModel_KΨ⍰::String
 		θrOpt⍰::String
 		σ_2_Ψm⍰::String
 		ΨmacMat_2_σMac_ΨmMac::Bool

@@ -96,9 +96,9 @@
 					
 					Ψ_2_θDual_2[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
 
-					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.Ψ_2_KUNSAT(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, Ks=Ks)
+					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.Ψ_2_KUNSAT(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, Ks=Ks,Option_KosugiModel_KΨ⍰="Traditional")
 
-					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.Ψ_2_KUNSAT(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σMac=σMac, Ks=Ks)
+					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.Ψ_2_KUNSAT(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σMac=σMac, Ks=Ks, Option_KosugiModel_KΨ⍰="Traditional")
 				end
 
 			# ---------------

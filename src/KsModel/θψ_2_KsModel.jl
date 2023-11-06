@@ -112,7 +112,7 @@ module θψ_2_KsψModel
 				# Ks model
 					KₛModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψm, ΨmMac), 0.0, 0.9999; rtol=1.0E-3)[1]
 
-					return Kunsat = KₛModel * kunsat.kg.Ψ_2_KUNSAT(option.hydro, Ψ₁, iZ, hydro) / hydro.Ks[iZ]
+					return Kunsat = KₛModel * kunsat.Ψ_2_KUNSAT(option.hydro, Ψ₁, iZ, hydro) / hydro.Ks[iZ]
 				
 			# MODEL 2 ====	
 			# Rekationship between macro and matrix		
