@@ -566,7 +566,7 @@ module tableHypix
             K_Mod = fill(0.0::Float64, (N_SoilLayer, N_θΨobs))
             for iZ=1:N_SoilLayer, iΨ =1:N_θΨobs
                Ψ_Mod =paramHypix.ploting.θΨ_Table[iΨ]
-               K_Mod[iZ, iΨ] = kunsat.Ψ_2_KUNSAT(optionₘ, Ψ_Mod, iZ, hydroHorizon) .* cst.MmS_2_MmH
+               K_Mod[iZ, iΨ] = kunsat.KUNSAT_θΨSe(optionₘ, Ψ_Mod, iZ, hydroHorizon) .* cst.MmS_2_MmH
             end # iZ
 
          # Concatenating the 2 matrices

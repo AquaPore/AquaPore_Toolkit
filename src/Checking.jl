@@ -27,8 +27,8 @@ module checking
 			elseif option.run.HydroLabθΨ⍰≠"No" && !option.data.θΨ
 				error("*** If option.run.HydroLabθΨ⍰ ⇒ option.data.θΨ ***")
 			
-			elseif option.hydro.ΨmacMat_2_σMac_ΨmMac && ("ΨmMac" ∈ optim.ParamOpt || "σMac" ∈ optim.ParamOpt)
-				error("*** If option..hydro.ΨmacMat_2_σMac_ΨmMac ⇒ ΨmMac || σMac param should not be optimised pls change in GUI_HydroParam.csv ***")
+			elseif option.hydro.ΨmacMat_2_σmac_ΨmMac && ("ΨmMac" ∈ optim.ParamOpt || "σmac" ∈ optim.ParamOpt)
+				error("*** If option..hydro.ΨmacMat_2_σmac_ΨmMac ⇒ ΨmMac || σmac param should not be optimised pls change in GUI_HydroParam.csv ***")
 
 
 

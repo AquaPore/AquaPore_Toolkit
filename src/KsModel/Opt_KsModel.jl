@@ -59,7 +59,7 @@ module optKsModel
 						Kθ_Log_Sim[iΨ] = log(Kθ_Sim)
 
 					# K(Ψ) oberved
-						Kθ_Obs = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Obs[iΨ], iZ, hydro)
+						Kθ_Obs = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Obs[iΨ], iZ, hydro)
 						Kθ_Log_Obs[iΨ] = log(Kθ_Obs)
 				end # for iΨ =1:N_ΨObs
 

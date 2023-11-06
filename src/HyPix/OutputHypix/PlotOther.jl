@@ -187,7 +187,7 @@ module plotOther
 			Ψσ = (paramHypix.hydro.ΨmacMat + √(paramHypix.hydro.ΨmacMat)) / 2.0
 			hydroHorizon₂.Ψm[1] = hydroRelation.σ_2_Ψm(hydroHorizon₂.σ[1], Ψσ,  hydro.Ψm_Min[1],  hydro.Ψm_Max[1])
 			hydroHorizon₂.ΨmMac[1] = 100.0
-			hydroHorizon₂.σMac[1] = 2.0
+			hydroHorizon₂.σmac[1] = 2.0
 
 			# Feasible range 
 				Ψ_Max= exp(16.0)

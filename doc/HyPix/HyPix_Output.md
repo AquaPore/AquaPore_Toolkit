@@ -21,7 +21,7 @@ These are the optimal Kosugi hydraulic parameters for every layers:
 | Ψm           | [mm]                   | Mean of ln ψ in the matrix domaine.                                                                                          |
 | σ            | [-]                    | Standard deviation of ln ψ in the matrix domaine.                                                                            |
 | θsMacMat\_ƞ | [mm$^3$ mm$^{-3}$] | Normalized volumetric saturated water content that differentiates inter-aggregate pores and matrix domains.                   |
-| σMac         | [-]                    | Standard deviation of ln ψ in the macropore domaine.                                                                         |
+| σmac         | [-]                    | Standard deviation of ln ψ in the macropore domaine.                                                                         |
 | ΨmMac        | [mm]                   | Mean of ln ψ in the macropore domain.                                                                                        |
 | So            | [mm$^{-1}$]        | Fluid compressibility.                                                                                                        |
 | θsMacMat     | [mm$^3$ mm$^{-3}$] | Volumetric saturated water content that differentiates inter-aggregate pores and matrix domains with θr<θsMacMat$\le$θs. |

@@ -194,7 +194,7 @@ module stats
 			for iZ = 1:NiZ	
 				KΨsim = zeros(Float64, N_Data[iZ])
 				for iΨ = 1:N_Data[iZ]
-					KΨsim[iΨ] = kunsat.Ψ_2_KUNSAT(optionₘ, Ψobs[iZ,iΨ], iZ, hydro)
+					KΨsim[iΨ] = kunsat.KUNSAT_θΨSe(optionₘ, Ψobs[iZ,iΨ], iZ, hydro)
 				end
 				Nse_KΨ[iZ] = 1.0 - NSE_MINIMIZE(log.(Kobs[iZ,1:N_Data[iZ]]), log.(KΨsim[1:N_Data[iZ]]))	
 			end
@@ -218,7 +218,7 @@ module stats
 			for iZ = 1:NiZ	
 				KΨsim = zeros(Float64, N_Data[iZ])
 				for iΨ = 1:N_Data[iZ]
-					KΨsim[iΨ] = kunsat.Ψ_2_KUNSAT(optionₘ, Ψobs[iZ,iΨ], iZ, hydro)
+					KΨsim[iΨ] = kunsat.KUNSAT_θΨSe(optionₘ, Ψobs[iZ,iΨ], iZ, hydro)
 				end
 				NseWilmot_KΨ[iZ] = NSE_WILMOT(log.(Kobs[iZ,1:N_Data[iZ]]), log.(KΨsim[1:N_Data[iZ]]))	
 			end

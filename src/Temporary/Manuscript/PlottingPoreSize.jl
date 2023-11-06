@@ -34,11 +34,11 @@
 			# Deriving macropore hydraulic parameters from ΨmacMat
             ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr, ΨmacMat_Max=100.0, ΨmacMat_Min=0, θsMacMat_η_Tresh=0.95)
 
-            σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac=2)
+            σmac    = hydroRelation.FUNC_ΨmacMat_2_σmac(;ΨmacMat, Pσ_Mac=2)
 
-				@show σMac
+				@show σmac
 
-            ΨmMac   = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=100, σMac)
+            ΨmMac   = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=100, σmac)
 
             Ψm_Min  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat= √70, σ, Pσ=Pσ₃)
 			
@@ -47,15 +47,15 @@
 			# Modes
             Ψm_Min_Mode = hydroRelation.FUNC_ΨmMode(;Ψm₀=Ψm_Min, σ₀=σ)
             Ψm_Max_Mode = hydroRelation.FUNC_ΨmMode(;Ψm₀=Ψm_Max, σ₀=σ)
-            ΨmMac_Mode  = hydroRelation.FUNC_ΨmMode(;Ψm₀=ΨmMac, σ₀=σMac)
+            ΨmMac_Mode  = hydroRelation.FUNC_ΨmMode(;Ψm₀=ΨmMac, σ₀=σmac)
 				Ψm_Mode     = hydroRelation.FUNC_ΨmMode(;Ψm₀=Ψm_Max, σ₀=σ)
 
 			# For plotting
-				ΨmMac_Pσ₂_Plus = exp(log(ΨmMac_Mode) + Pσ₂ * σMac)
-				ΨmMac_Pσ₂_Minus = exp(log(ΨmMac_Mode) - Pσ₂ * σMac)
+				ΨmMac_Pσ₂_Plus = exp(log(ΨmMac_Mode) + Pσ₂ * σmac)
+				ΨmMac_Pσ₂_Minus = exp(log(ΨmMac_Mode) - Pσ₂ * σmac)
 
-				ΨmMac_Pσ₃_Plus = exp(log(ΨmMac_Mode) + Pσ₃ * σMac)
-				ΨmMac_Pσ₃_Minus = exp(log(ΨmMac_Mode) - Pσ₃ * σMac)
+				ΨmMac_Pσ₃_Plus = exp(log(ΨmMac_Mode) + Pσ₃ * σmac)
+				ΨmMac_Pσ₃_Minus = exp(log(ΨmMac_Mode) - Pσ₃ * σmac)
 
 				Ψm_Pσ₂_Plus = exp(log(Ψm_Mode) + Pσ₂ * σ)
 				Ψm_Pσ₂_Minus = exp(log(Ψm_Mode) - Pσ₂ * σ)
@@ -70,7 +70,7 @@
 			# filling the data -----------------------
 
 				Ψ_Max_Log = log10(exp(log(Ψm_Max) + 3.0 * σ))
-				Ψ_Min_Log = log10(exp(log(ΨmMac) - 3.0 * σMac))
+				Ψ_Min_Log = log10(exp(log(ΨmMac) - 3.0 * σmac))
 				
 
 				Ψ = 10.0.^(collect(Ψ_Min_Log:0.001:Ψ_Max_Log))
@@ -88,17 +88,17 @@
 		
 				for iΨ=1:N
 			
-					∂θ∂Ψ_1[iΨ] = wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
+					∂θ∂Ψ_1[iΨ] = wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σmac=σmac)
 
-					∂θ∂Ψ_2[iΨ] =  wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
+					∂θ∂Ψ_2[iΨ] =  wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σmac=σmac)
 
-					Ψ_2_θDual_1[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
+					Ψ_2_θDual_1[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σmac=σmac)
 					
-					Ψ_2_θDual_2[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
+					Ψ_2_θDual_2[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σmac=σmac)
 
-					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.Ψ_2_KUNSAT(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, Ks=Ks,Option_KosugiModel_KΨ⍰="Traditional")
+					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σmac=σmac, Ks=Ks,Option_KosugiModel_KΨ⍰="Traditional")
 
-					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.Ψ_2_KUNSAT(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σMac=σMac, Ks=Ks, Option_KosugiModel_KΨ⍰="Traditional")
+					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σmac=σmac, Ks=Ks, Option_KosugiModel_KΨ⍰="Traditional")
 				end
 
 			# ---------------

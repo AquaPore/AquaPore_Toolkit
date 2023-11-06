@@ -69,26 +69,26 @@ module plotSmap
                   for iΨ = 1:N_Se
                      option.hydro.HydroModel⍰ = "Vangenuchten"
                       θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro,Ψ_Sim[iΨ], iZ, hydro)
-                      Kunsat_Sim[iΨ] = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
+                      Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 
                      if 🎏_OtherData1
                         # ClappHornberger model Smap_Hydro
                         option.hydro.HydroModel⍰ = "ClappHornberger"
                            θ_OtherData[iΨ] = wrc.Ψ_2_θ(option.hydro,Ψ_Sim[iΨ], iZ, hydroData)
                            option.hydro.HydroModel⍰ = "ClappHornberger"
-                           Kunsat_OtherData[iΨ] = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Sim[iΨ], iZ, hydroData)
+                           Kunsat_OtherData[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydroData)
 
                         # ClappHornberger Loam
                         option.hydro.HydroModel⍰ = "ClappHornberger"
                            θ_OtherData2[iΨ] = wrc.Ψ_2_θ(option.hydro,Ψ_Sim[iΨ], iZ, hydroData2)
                             option.hydro.HydroModel⍰ = "ClappHornberger"
-                           Kunsat_OtherData2[iΨ] = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Sim[iΨ], iZ, hydroData2)
+                           Kunsat_OtherData2[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydroData2)
           
                         # VanGenuchten_Jules
                         option.hydro.HydroModel⍰ = "VangenuchtenJules"
                          θ_OtherData3[iΨ] = wrc.Ψ_2_θ(option.hydro,Ψ_Sim[iΨ], iZ, hydroData3)
                          option.hydro.HydroModel⍰ = "VangenuchtenJules"
-                        Kunsat_OtherData3[iΨ] =  kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Sim[iΨ], iZ, hydroData3)
+                        Kunsat_OtherData3[iΨ] =  kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydroData3)
 
                          θobs₀ =[ [ 0.456,	0.35,	0.28,	0.16],
                         [0.4465,	0.32,	0.25,	0.15],
@@ -103,7 +103,7 @@ module plotSmap
                          θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro,Ψ_Sim[iΨ], iZ, hydro)
 
                          option.hydro.HydroModel⍰ = "VangenuchtenJules"
-                        Kunsat_Sim[iΨ] = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
+                        Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
                      end
                   end # iΨ
 

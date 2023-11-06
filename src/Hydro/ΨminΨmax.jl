@@ -6,11 +6,11 @@ module ΨminΨmax
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : ΨMINΨMAX
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ΨMINΨMAX(θs, θsMacMat, σ, σMac, Ψm, ΨmMac; Pσ=5.0)
+		function ΨMINΨMAX(θs, θsMacMat, σ, σmac, Ψm, ΨmMac; Pσ=5.0)
 			# Ψ_Min
 				# Have we got macropore ?
 				if θs - θsMacMat > 0.001
-					Ψ_Min = exp( log(ΨmMac) - σMac * Pσ) 
+					Ψ_Min = exp( log(ΨmMac) - σmac * Pσ) 
 				else
 					Ψ_Min = exp( log(Ψm) - σ * Pσ)
 				end  # if: θs -θsMacMat > 0.01

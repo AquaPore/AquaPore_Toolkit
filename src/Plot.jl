@@ -31,7 +31,7 @@ module lab
 					# Simulated 
 						for iΨ = 1:N_Se
 							θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
-							Kunsat_Sim[iΨ] = kunsat.Ψ_2_KUNSAT(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
+							Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 						end # iΨ = 1:N_Se
 
 					# _______________________ START: Plotting _______________________
@@ -512,7 +512,7 @@ module lab
 
 					ΨmacMat = 100.0
 					Ψ₁ = 0.0
-					σMac = hydro.σMac[1]
+					σmac = hydro.σmac[1]
 					ΨmMac = hydro.ΨmMac[1]
 					ΨmMean = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
 
@@ -533,7 +533,7 @@ module lab
 
 							θr₀, θs₀, θsMacMat₀ =  ROCKCORRECTION!(hydro, 1, Rf[iRf], θr[iSoil], θs[iSoil], θsMacMat[iSoil])
 
-							KsModel[iSoil, iRf] =  60.0 * 60.0 * θψ_2_KsψModel.KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr₀, θs₀, θsMacMat₀, σ[iSoil], σMac, Ψ₁, Ψm, ΨmMac)	
+							KsModel[iSoil, iRf] =  60.0 * 60.0 * θψ_2_KsψModel.KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr₀, θs₀, θsMacMat₀, σ[iSoil], σmac, Ψ₁, Ψm, ΨmMac)	
 						end 
 					end
 					
@@ -901,13 +901,13 @@ module lab
 					for iΨ = 1:N_Se
 						θ_Infilt[iΨ] = wrc.Ψ_2_θ(option.infilt,Ψ[iΨ], iZ, hydroInfilt)
 
-						Kunsat_Infilt[iΨ] = kunsat.Ψ_2_KUNSAT(option.infilt, Ψ[iΨ], iZ, hydroInfilt)
+						Kunsat_Infilt[iΨ] = kunsat.KUNSAT_θΨSe(option.infilt, Ψ[iΨ], iZ, hydroInfilt)
 
 						if option.run.HydroLabθΨ⍰ ≠ "No"
 							θ_Obs[iΨ] = wrc.Ψ_2_θ(option.infilt,Ψ[iΨ], iZ, hydro)
 
 							if option.run.HydroLabθΨ⍰ ≠ "No" && "Ks" ∈ optim.ParamOpt
-								Kunsat_Obs[iΨ] = kunsat.Ψ_2_KUNSAT(option.infilt, Ψ[iΨ], iZ, hydro)
+								Kunsat_Obs[iΨ] = kunsat.KUNSAT_θΨSe(option.infilt, Ψ[iΨ], iZ, hydro)
 							end # "Ks" ∈ optim.ParamOpt		
 						end # option.run.HydroLabθΨ⍰ ≠ :No
 					end # iΨ 

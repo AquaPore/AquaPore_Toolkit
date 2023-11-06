@@ -143,7 +143,7 @@ module infiltStart
          hydroInfilt.Ψm[iZ]       = Ψm
          hydroInfilt.θsMacMat[iZ] = θs
          hydroInfilt.ΨmMac[iZ]    = Ψm
-         hydroInfilt.σMac[iZ]     = σ
+         hydroInfilt.σmac[iZ]     = σ
 
 			hydroInfilt = hydroRelation.FUNCTION_σ_2_Ψm_SOFTWARE(hydroInfilt, iZ, option.infilt, param.hydro)
 

@@ -30,7 +30,7 @@ module startKsModel
 				KΨ_Obs₁₀ₖₚₐ = fill(0.0::Float64, NiZ)
 				KΨ_Sim₁₀ₖₚₐ = fill(0.0::Float64, NiZ)
 				for iZ=1:NiZ
-					KΨ_Obs₁₀ₖₚₐ[iZ] = kunsat.Ψ_2_KUNSAT(option.hydro, 1000.0, iZ, hydro)
+					KΨ_Obs₁₀ₖₚₐ[iZ] = kunsat.KUNSAT_θΨSe(option.hydro, 1000.0, iZ, hydro)
 				end
 
 			# PERFORM OPTIMISATION OF KsModel ====

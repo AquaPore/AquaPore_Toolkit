@@ -27,7 +27,7 @@ module ofHydrolab
 				for iΨ = 1:N_KΨobs[iZ]
 					Kunsat_Obs_Ln[iΨ] = log1p(K_KΨobs[iZ,iΨ])
 						
-					Kunsat_Sim_Ln[iΨ] = log1p(kunsat.Ψ_2_KUNSAT(optionₘ, Ψ_KΨobs[iZ,iΨ], iZ, hydro))
+					Kunsat_Sim_Ln[iΨ] = log1p(kunsat.KUNSAT_θΨSe(optionₘ, Ψ_KΨobs[iZ,iΨ], iZ, hydro))
 				end # for iΨ = 1:N_KΨobs[iZ]
 
 				Of_Kunsat = stats.NSE_MINIMIZE(Kunsat_Obs_Ln[1:N_KΨobs[iZ]], Kunsat_Sim_Ln[1:N_KΨobs[iZ]])			
@@ -71,7 +71,7 @@ module ofHydrolab
 				for iΨ = iStart:N_KΨobs[iZ]
 					Kunsat_Obs_Ln[iΨ] = log10(K_KΨobs[iZ,iΨ])
 						
-					Kunsat_Sim_Ln[iΨ] = log10(kunsat.Ψ_2_KUNSAT(optionₘ, Ψ_KΨobs[iZ,iΨ], iZ, hydro))
+					Kunsat_Sim_Ln[iΨ] = log10(kunsat.KUNSAT_θΨSe(optionₘ, Ψ_KΨobs[iZ,iΨ], iZ, hydro))
 				end # for iΨ = 1:N_KΨobs[iZ]
 
 				Rmse_KΨ = stats.RMSE(Kunsat_Obs_Ln[iStart:N_KΨobs[iZ]], Kunsat_Sim_Ln[iStart:N_KΨobs[iZ]])

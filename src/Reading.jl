@@ -2,7 +2,7 @@
 #		MODULE: reading
 # =============================================================
 module reading
-	import ..tool, ..table, ..ksModel
+	import ..tool, ..table, ..ksModel, ..hydroRelation
 	import  DelimitedFiles
 	using CSV, Tables, DataFrames
 	export ID, θΨ, KUNSATΨ, INFILTRATION, PSD, BULKDENSITY, Φ
@@ -407,7 +407,6 @@ module reading
 	
 			# ParamValue to optimize. The complication is that there are different layers of hydraulic parameters which can be optimized.  
 			if Opt[i] == 1
-
 				# appending the values of the parameters
 				append!(ParamOpt, [Param_Name[i]])
 
@@ -429,6 +428,16 @@ module reading
 
 			i += 1
 		end # for loop
+
+
+		# Compute σmac & ΨmMac from ΨmacMat
+		if optionₘ.ΨmacMat_2_σmac_ΨmMac
+			for iZ=1:NiZ 
+            hydro.σmac[iZ]    = hydroRelation.FUNC_ΨmacMat_2_σmac(ΨmacMat=hydro.ΨmacMat[iZ])
+            hydro.ΨmacMat[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σmac=hydro.σmac[iZ])
+			end
+		end
+
 
 		# Number of parameters to be optimised
 			NparamOpt = length(ParamOpt)

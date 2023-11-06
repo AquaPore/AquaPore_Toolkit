@@ -4,7 +4,7 @@
 # =============================================================
 module ponding
 	import  ..cst
-	import ..kunsat:Ψ_2_KUNSAT
+	import ..kunsat:KUNSAT_θΨSe
 	export PONDING_RUNOFF_SORPTIVITY
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -15,7 +15,7 @@ module ponding
 			# CONDITION FOR PONDING
 			if optionHypix.Ponding && (ΔPrThroughfall[iT] > eps(100.) || Hpond[iT-1] > eps(100.))
 				# PONDING
-					Bparam = (2.0 - cst.β) / 3.0 + (Ψ_2_KUNSAT(optionHypix, Ψ[iT-1,1], 1, hydro) / hydro.Ks[1]) * (1.0 + cst.β) / 3.0
+					Bparam = (2.0 - cst.β) / 3.0 + (KUNSAT_θΨSe(optionHypix, Ψ[iT-1,1], 1, hydro) / hydro.Ks[1]) * (1.0 + cst.β) / 3.0
 					
 					Infilt_Max =  (Sorptivity * √ΔT[iT] + Bparam * hydro.Ks[1] * ΔT[iT]) * paramHypix.Cosα
 

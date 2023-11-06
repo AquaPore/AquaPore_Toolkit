@@ -222,6 +222,12 @@ module hydrolabOpt
 
 			# ==================== SPECIAL CASES ====================
 
+			# RELATIONSHIP BETWEEN ΨmacMat ➡ σmac & ΨmMac
+				if optionₘ.ΨmacMat_2_σmac_ΨmMac
+				   hydro.σmac[iZ]    = hydroRelation.FUNC_ΨmacMat_2_σmac(ΨmacMat=hydro.ΨmacMat[iZ])
+            	hydro.ΨmacMat[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σmac=hydro.σmac[iZ])
+				end
+
 			# RELATIONSHIP BETWEEN σ AND Ψm
 				if (optionₘ.σ_2_Ψm⍰ ≠ "No") && ("Ψm" ∈ optim.ParamOpt)
 					hydro = hydroRelation.FUNCTION_σ_2_Ψm_SOFTWARE(hydro, iZ, optionₘ, param.hydro)

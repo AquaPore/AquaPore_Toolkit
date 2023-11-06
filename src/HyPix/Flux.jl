@@ -1,6 +1,6 @@
 module flux
 	import ..cst
-	import ..kunsat:Ψ_2_KUNSAT 
+	import ..kunsat:KUNSAT_θΨSe 
 	export Q!, K_AVER!
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,14 +52,14 @@ module flux
 				K_Aver = 0.0::Float64
 
 			elseif optionHypix.TopBoundary⍰  == "Ψ" # <> = <> = <> = <> = <>
-				K_Aver = Ψ_2_KUNSAT(optionHypix, ψ_, 1, hydro)
+				K_Aver = KUNSAT_θΨSe(optionHypix, ψ_, 1, hydro)
 
 			else 	# <> = <> = <> = <> = <>
 				error("K_AVER! optionHypix.TopBoundary⍰ not found")
 			end	
 
 		elseif 2 ≤ iZ ≤ Nz # <>=<>=<>=<>=<>
-			K_Aver₀ = discret.ΔZ_W[iZ] * Ψ_2_KUNSAT(optionHypix, ψ_, iZ, hydro) ^ Pkₐᵥₑᵣ[iZ] + (1.0 - discret.ΔZ_W[iZ]) * Ψ_2_KUNSAT(optionHypix, ψ▲, iZ-1, hydro) ^ Pkₐᵥₑᵣ[iZ]
+			K_Aver₀ = discret.ΔZ_W[iZ] * KUNSAT_θΨSe(optionHypix, ψ_, iZ, hydro) ^ Pkₐᵥₑᵣ[iZ] + (1.0 - discret.ΔZ_W[iZ]) * KUNSAT_θΨSe(optionHypix, ψ▲, iZ-1, hydro) ^ Pkₐᵥₑᵣ[iZ]
 
 			K_Aver₀ = max(K_Aver₀, cst.Kθ_Min ^ Pkₐᵥₑᵣ[iZ])
 			InvPkₐᵥₑᵣ = inv(Pkₐᵥₑᵣ[iZ])
@@ -67,7 +67,7 @@ module flux
 			K_Aver₀ = K_Aver₀ ^ (InvPkₐᵥₑᵣ - 1.0)
 
 		else # iZ = Nz+1
-			K_Aver = Ψ_2_KUNSAT(optionHypix, ψ_, Nz, hydro)
+			K_Aver = KUNSAT_θΨSe(optionHypix, ψ_, Nz, hydro)
 			K_Aver₀ = K_Aver
 		end
 	return K_Aver₀, K_Aver
@@ -82,7 +82,7 @@ module flux
 	module ∂q∂Ψ
 		import ..flux
 		export ∂Q∂Ψ, ∂Q∂Ψ△, ∂Q▽∂Ψ, ∂Q▽∂Ψ▽
-		import ...kunsat:Ψ_2_KUNSAT 
+		import ...kunsat:KUNSAT_θΨSe 
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂Q∂Ψ
@@ -103,7 +103,7 @@ module flux
 				else # elseif 2 ≤ iZ ≤ Nz 	<>=<>=<>=<>=<>		
 					# A1= discret.ΔZ_W[iZ] * ∂K∂Ψ[iZ] * ((Ψ[iT,iZ] - Ψ[iT,iZ-1]) / discret.ΔZ_Aver[iZ] + paramHypix.Cosα) + K_Aver / discret.ΔZ_Aver[iZ]
 
-					return discret.ΔZ_W[iZ] * (Ψ_2_KUNSAT(optionHypix, Ψ[iT,iZ], iZ, hydro) ^ (Pkₐᵥₑᵣ[iZ] - 1.0)) * K_Aver₀_Vect[iZ] * ∂K∂Ψ[iZ] * ((Ψ[iT,iZ] - Ψ[iT,iZ-1]) / discret.ΔZ_Aver[iZ] + paramHypix.Cosα) + K_Aver_Vect[iZ] / discret.ΔZ_Aver[iZ]	
+					return discret.ΔZ_W[iZ] * (KUNSAT_θΨSe(optionHypix, Ψ[iT,iZ], iZ, hydro) ^ (Pkₐᵥₑᵣ[iZ] - 1.0)) * K_Aver₀_Vect[iZ] * ∂K∂Ψ[iZ] * ((Ψ[iT,iZ] - Ψ[iT,iZ-1]) / discret.ΔZ_Aver[iZ] + paramHypix.Cosα) + K_Aver_Vect[iZ] / discret.ΔZ_Aver[iZ]	
 				end # if iZ
 			end  # function: ∂Q∂Ψ
 		#-----------------------------------------------------------------
@@ -120,7 +120,7 @@ module flux
 				else # elseif 2 ≤ iZ ≤ Nz 	# <>=<>=<>=<>=<>
 					# A1 =  (1.0 - discret.ΔZ_W[iZ]) * ∂K∂Ψ[iZ-1] *  ((Ψ[iT,iZ] - Ψ[iT,iZ-1]) / discret.ΔZ_Aver[iZ] + paramHypix.Cosα) - K_Aver / discret.ΔZ_Aver[iZ]
 
-					return  (1.0 - discret.ΔZ_W[iZ]) * (Ψ_2_KUNSAT(optionHypix, Ψ[iT,iZ-1], iZ, hydro) ^ (Pkₐᵥₑᵣ[iZ] - 1.0)) * K_Aver₀_Vect[iZ] * ∂K∂Ψ[iZ-1] * ((Ψ[iT,iZ] - Ψ[iT,iZ-1]) / discret.ΔZ_Aver[iZ] + paramHypix.Cosα) - K_Aver_Vect[iZ] / discret.ΔZ_Aver[iZ]
+					return  (1.0 - discret.ΔZ_W[iZ]) * (KUNSAT_θΨSe(optionHypix, Ψ[iT,iZ-1], iZ, hydro) ^ (Pkₐᵥₑᵣ[iZ] - 1.0)) * K_Aver₀_Vect[iZ] * ∂K∂Ψ[iZ-1] * ((Ψ[iT,iZ] - Ψ[iT,iZ-1]) / discret.ΔZ_Aver[iZ] + paramHypix.Cosα) - K_Aver_Vect[iZ] / discret.ΔZ_Aver[iZ]
 				end # if iZ
 			end  # function: ∂Q∂Ψ△
 		#-----------------------------------------------------------------
@@ -134,7 +134,7 @@ module flux
 				if iZ ≤ Nz-1 	# <>=<>=<>=<>=<>
 					# A1 =   (1.0 - discret.ΔZ_W[iZ+1]) * ∂K∂Ψ[iZ] * ((Ψ[iT,iZ+1] - Ψ[iT,iZ]) / discret.ΔZ_Aver[iZ+1] + paramHypix.Cosα) - K_Aver▽ / discret.ΔZ_Aver[iZ+1		
 
-					return (1.0 - discret.ΔZ_W[iZ+1]) * ∂K∂Ψ[iZ] * (Ψ_2_KUNSAT(optionHypix, Ψ[iT,iZ], iZ, hydro) ^ (Pkₐᵥₑᵣ[iZ+1] - 1.0)) * K_Aver₀_Vect[iZ+1] * ((Ψ[iT,iZ+1] - Ψ[iT,iZ]) / discret.ΔZ_Aver[iZ+1] + paramHypix.Cosα) - K_Aver_Vect[iZ+1] / discret.ΔZ_Aver[iZ+1]	
+					return (1.0 - discret.ΔZ_W[iZ+1]) * ∂K∂Ψ[iZ] * (KUNSAT_θΨSe(optionHypix, Ψ[iT,iZ], iZ, hydro) ^ (Pkₐᵥₑᵣ[iZ+1] - 1.0)) * K_Aver₀_Vect[iZ+1] * ((Ψ[iT,iZ+1] - Ψ[iT,iZ]) / discret.ΔZ_Aver[iZ+1] + paramHypix.Cosα) - K_Aver_Vect[iZ+1] / discret.ΔZ_Aver[iZ+1]	
 				
 				else # iZ = Nz <>=<>=<>=<>=<>
 					if optionHypix.BottomBoundary⍰ == "Free" # <>=<>=<>=<>=<>
@@ -157,7 +157,7 @@ module flux
 			function ∂Q▽∂Ψ▽(∂K∂Ψ, discret, hydro, iT::Int64, iZ::Int64, K_Aver_Vect, K_Aver₀_Vect, Nz::Int64, optionHypix, paramHypix, Pkₐᵥₑᵣ, Ψ)
 				if iZ ≤ Nz-1 	# <>=<>=<>=<>=<>
 					# A1 = discret.ΔZ_W[iZ+1] * ∂K∂Ψ[iZ+1] * ((Ψ[iT,iZ+1] - Ψ[iT,iZ]) / discret.ΔZ_Aver[iZ+1] + paramHypix.Cosα) + K_Aver▽ / discret.ΔZ_Aver[iZ+1]
-					return discret.ΔZ_W[iZ+1] * (Ψ_2_KUNSAT(optionHypix, Ψ[iT,iZ+1], iZ, hydro) ^ (Pkₐᵥₑᵣ[iZ+1] - 1.0)) * K_Aver₀_Vect[iZ+1] * ∂K∂Ψ[iZ+1] * ((Ψ[iT,iZ+1] - Ψ[iT,iZ]) / discret.ΔZ_Aver[iZ+1] + paramHypix.Cosα) + K_Aver_Vect[iZ+1] / discret.ΔZ_Aver[iZ+1]
+					return discret.ΔZ_W[iZ+1] * (KUNSAT_θΨSe(optionHypix, Ψ[iT,iZ+1], iZ, hydro) ^ (Pkₐᵥₑᵣ[iZ+1] - 1.0)) * K_Aver₀_Vect[iZ+1] * ∂K∂Ψ[iZ+1] * ((Ψ[iT,iZ+1] - Ψ[iT,iZ]) / discret.ΔZ_Aver[iZ+1] + paramHypix.Cosα) + K_Aver_Vect[iZ+1] / discret.ΔZ_Aver[iZ+1]
 					
 				else # elseif iZ == Nz <>=<>=<>=<>=<>
 					return 0.0::Float64

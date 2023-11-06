@@ -16,7 +16,7 @@ module hydroStruct
          Ψm             :: Vector{Float64}
          σ              :: Vector{Float64}
          θsMacMat_ƞ     ::	Vector{Float64}
-         σMac           :: Vector{Float64}
+         σmac           :: Vector{Float64}
          ΨmMac          ::	Vector{Float64}
          ΨmacMat        :: Vector{Float64}
          So             :: Vector{Float64}
@@ -29,7 +29,7 @@ module hydroStruct
          Ψm_Min         :: Vector{Float64}
          σ_Min          :: Vector{Float64}
          θsMacMat_ƞ_Min ::	Vector{Float64}
-         σMac_Min       :: Vector{Float64}
+         σmac_Min       :: Vector{Float64}
          ΨmMac_Min      ::	Vector{Float64}
          ΨmacMat_Min    :: Vector{Float64}
          So_Min         :: Vector{Float64}
@@ -42,7 +42,7 @@ module hydroStruct
          Ψm_Max         :: Vector{Float64}
          σ_Max          :: Vector{Float64}
          θsMacMat_ƞ_Max ::	Vector{Float64}
-         σMac_Max       :: Vector{Float64}
+         σmac_Max       :: Vector{Float64}
          ΨmMac_Max      ::	Vector{Float64}
          ΨmacMat_Max    :: Vector{Float64}
          So_Max         :: Vector{Float64}
@@ -180,24 +180,24 @@ module hydroStruct
 			if optionₘ.HydroModel⍰ == "Kosugi" # <>=<>=<>=<>=<>
 				σ              = fill(0.0::Float64, NiZ)
             Ψm             = fill(0.0::Float64, NiZ)
-            σMac           = fill(0.0::Float64, NiZ)
+            σmac           = fill(0.0::Float64, NiZ)
             ΨmMac          = fill(0.0::Float64, NiZ)
 				
             Ψm_Min         = fill(0.0::Float64, NiZ)
             σ_Min          = fill(0.0::Float64, NiZ)
             θsMacMat_ƞ_Min = fill(0.0::Float64, NiZ)
-            σMac_Min       = fill(0.0::Float64, NiZ)
+            σmac_Min       = fill(0.0::Float64, NiZ)
             ΨmMac_Min      = fill(0.0::Float64, NiZ)
             θsMacMat_Min   = fill(0.0::Float64, NiZ)
 
             Ψm_Max         = fill(0.0::Float64, NiZ)
             σ_Max          = fill(0.0::Float64, NiZ)
             θsMacMat_ƞ_Max = fill(0.0::Float64, NiZ)
-            σMac_Max       = fill(0.0::Float64, NiZ)
+            σmac_Max       = fill(0.0::Float64, NiZ)
             ΨmMac_Max      = fill(0.0::Float64, NiZ)
             θsMacMat_Max   = fill(0.0::Float64, NiZ)
           
-				hydro = KOSUGI(θs, θr, Ks, σ, Ψm, θsMacMat_ƞ, σMac, ΨmMac, ΨmacMat, So, θsMacMat, Φ, θs_Min, θr_Min, Ks_Min, σ_Min,Ψm_Min, θsMacMat_ƞ_Min, σMac_Min, ΨmMac_Min, ΨmacMat_Min, So_Min, θsMacMat_Min, Φ_Min, θs_Max, θr_Max, Ks_Max, σ_Max, Ψm_Max, θsMacMat_ƞ_Max, σMac_Max, ΨmMac_Max, ΨmacMat_Max, So_Max, θsMacMat_Max, Φ_Max)
+				hydro = KOSUGI(θs, θr, Ks, σ, Ψm, θsMacMat_ƞ, σmac, ΨmMac, ΨmacMat, So, θsMacMat, Φ, θs_Min, θr_Min, Ks_Min, σ_Min,Ψm_Min, θsMacMat_ƞ_Min, σmac_Min, ΨmMac_Min, ΨmacMat_Min, So_Min, θsMacMat_Min, Φ_Min, θs_Max, θr_Max, Ks_Max, σ_Max, Ψm_Max, θsMacMat_ƞ_Max, σmac_Max, ΨmMac_Max, ΨmacMat_Max, So_Max, θsMacMat_Max, Φ_Max)
 				return hydro
 
 			elseif optionₘ.HydroModel⍰=="Vangenuchten" || optionₘ.HydroModel⍰=="VangenuchtenJules" # <>=<>=<>=<>=<>

@@ -37,7 +37,7 @@ module sorptivity
 				# Sorptivity based on Ψ₁
 					function SORPTIVITY_Ψ²(hydroInfilt, iZ, θini, Ψ₁)
 						θ = wrc.Ψ_2_θ(optionₘ, Ψ₁, iZ, hydroInfilt)
-					return kunsat.Ψ_2_KUNSAT(optionₘ, Ψ₁, iZ, hydroInfilt) * (hydroInfilt.θs[iZ] + θ - 2.0 * θini)
+					return kunsat.KUNSAT_θΨSe(optionₘ, Ψ₁, iZ, hydroInfilt) * (hydroInfilt.θs[iZ] + θ - 2.0 * θini)
 					end # SORPTIVITY_Ψ² ~~~~~~~~~~~~~~~~~
 
 					Sorptivity_Ψ² = QuadGK.quadgk(Ψ₁ -> SORPTIVITY_Ψ²(hydroInfilt, iZ, θini, Ψ₁), Ψ_Sat, Ψ⬙, rtol=Rtol)[1]

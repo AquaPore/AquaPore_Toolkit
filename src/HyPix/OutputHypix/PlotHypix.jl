@@ -529,7 +529,7 @@ end  # module plotHypix
 	# 	Ψ_Min_Horizon = fill(0.0::Float64, N_Layer)
 	# 	Ψ_Max_Horizon = fill(0.0::Float64, N_Layer)
 	# 	for iZ=1:N_Layer
-	# 		Ψ_Max_Horizon[iZ], Ψ_Min_Horizon[iZ] = ΨminΨmax.ΨMINΨMAX(hydroHorizon.θs[iZ], hydroHorizon.θsMacMat[iZ], hydroHorizon.σ[iZ], hydroHorizon.σMac[iZ], hydroHorizon.Ψm[iZ], hydroHorizon.ΨmMac[iZ])
+	# 		Ψ_Max_Horizon[iZ], Ψ_Min_Horizon[iZ] = ΨminΨmax.ΨMINΨMAX(hydroHorizon.θs[iZ], hydroHorizon.θsMacMat[iZ], hydroHorizon.σ[iZ], hydroHorizon.σmac[iZ], hydroHorizon.Ψm[iZ], hydroHorizon.ΨmMac[iZ])
 	# 	end  # for iZ=1:N_Layer
 		
 	# 	# PREPARING THE DATA
@@ -550,7 +550,7 @@ end  # module plotHypix
 	# 			if Ψ_Max_Horizon[iZ] ≥ Ψplot[iΨ] ≥ Ψ_Min_Horizon[iZ]
 	# 				θplot[iΨ]    = wrc.Ψ_2_θ(optionₘ,Ψplot[iΨ], iZ, hydroHorizon)
 					
-	# 				Kplot[iΨ]    = kunsat.Ψ_2_KUNSAT(optionₘ, Ψplot[iΨ], iZ, hydroHorizon)
+	# 				Kplot[iΨ]    = kunsat.KUNSAT_θΨSe(optionₘ, Ψplot[iΨ], iZ, hydroHorizon)
 					
 	# 				∂θ∂Ψplot[iΨ] = wrc.∂θ∂Ψ(optionₘ, Ψplot[iΨ], iZ, hydroHorizon)
 
