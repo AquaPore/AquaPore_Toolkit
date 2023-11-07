@@ -52,6 +52,11 @@ module lab
 
 						Fig_θΨsim = lines!(Fig[1,1], log1p.(cst.Mm_2_kPa .* Ψ_Sim[1:N_Se]), θ_Sim[1:N_Se], color=:blue, linewidth=3)
 
+						lines!(Fig[1,1], [Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), 0), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
+
+						lines!(Fig[1,1], [Point(log1p(0.0), hydro.θsMacMat[iZ]), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
+
+				
 					# Plot_θ_Ψ: Total porosity point
 						Fig_TotalPorosity = scatter!(Fig[1,1], [log1p.(cst.Mm_2_kPa .* 0.0)], [hydro.Φ[iZ]], color=:green, markersize=25, marker ='●')
 

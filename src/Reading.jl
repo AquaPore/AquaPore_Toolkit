@@ -433,8 +433,11 @@ module reading
 		# Compute σmac & ΨmMac from ΨmacMat
 		if optionₘ.ΨmacMat_2_σmac_ΨmMac
 			for iZ=1:NiZ 
+				ΨmacMat₀ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=1.0) 
+
+
             hydro.σmac[iZ]    = hydroRelation.FUNC_ΨmacMat_2_σmac(ΨmacMat=hydro.ΨmacMat[iZ])
-            hydro.ΨmacMat[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σmac=hydro.σmac[iZ])
+            hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σmac=hydro.σmac[iZ])
 			end
 		end
 

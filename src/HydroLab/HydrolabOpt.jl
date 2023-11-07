@@ -132,6 +132,9 @@ module hydrolabOpt
 
 				hydro = hydrolabOpt.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
 
+				# FINAL CORRECTION
+					hydro.ΨmacMat[iZ] = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ])
+
 				# STATISTICS
 					if option.data.Kθ && "Ks" ∈ optim.ParamOpt
 						Of, Of_θΨ, Of_Kunsat = ofHydrolab.OF_WRC_KUNSAT(hydro, iZ, N_θΨobs, optim, optionₘ, θ_θΨobs, Ψ_θΨobs; K_KΨobs=K_KΨobs, N_KΨobs=N_KΨobs, Ψ_KΨobs=Ψ_KΨobs)
@@ -224,8 +227,11 @@ module hydrolabOpt
 
 			# RELATIONSHIP BETWEEN ΨmacMat ➡ σmac & ΨmMac
 				if optionₘ.ΨmacMat_2_σmac_ΨmMac
-				   hydro.σmac[iZ]    = hydroRelation.FUNC_ΨmacMat_2_σmac(ΨmacMat=hydro.ΨmacMat[iZ])
-            	hydro.ΨmacMat[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σmac=hydro.σmac[iZ])
+					ΨmacMat₁ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat( θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=0.95) 
+
+               hydro.σmac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σmac(ΨmacMat=ΨmacMat₁)
+            
+				   hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=ΨmacMat₁, σmac=hydro.σmac[iZ])
 				end
 
 			# RELATIONSHIP BETWEEN σ AND Ψm

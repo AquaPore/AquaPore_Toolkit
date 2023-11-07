@@ -25,7 +25,7 @@
 			# Input hydro parameters
 				θs = 0.4
 				θr = 0.
-				σ = 3
+				σ = 1
 				θsMacMat_η = 0.75
 				Ks = 0.008
 
@@ -96,9 +96,9 @@
 					
 					Ψ_2_θDual_2[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σmac=σmac)
 
-					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σmac=σmac, Ks=Ks,Option_KosugiModel_KΨ⍰="Traditional")
+					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σmac=σmac, Ks=Ks,Option_KosugiModel_KΨ⍰="ΨmacMat")
 
-					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σmac=σmac, Ks=Ks, Option_KosugiModel_KΨ⍰="Traditional")
+					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σmac=σmac, Ks=Ks, Option_KosugiModel_KΨ⍰="ΨmacMat")
 				end
 
 			# ---------------
@@ -172,7 +172,7 @@
 			# titlesize=30, xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, yminorticksvisible=true, xticklabelrotation = pi/2
 
 				# xlims!(Axis_θΨ, Ψ_Min, Ψ_Max)
-				ylims!(Axis_θΨ, 0., 0.5)
+				ylims!(Axis_θΨ, 0., 0.5) +
 				# Axis_θΨ.xticks = (TableComplete_θΨ, string.( round.(TableComplete_θΨ, digits = 2)))
 				lines!(Axis_θΨ, Ψ, Ψ_2_θDual_1, color=:green, linewidth=Linewidth)
 				lines!(Axis_θΨ,Ψ, Ψ_2_θDual_2, color=:blue, linewidth=Linewidth)
