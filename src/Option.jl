@@ -44,7 +44,7 @@ module options
    	KosugiModel_KΨ⍰::String
 		θrOpt⍰::String
 		σ_2_Ψm⍰::String
-		ΨmacMat_2_σmac_ΨmMac::Bool
+		ΨmacMat_2_σMac_ΨmMac::Bool
 		Plot_θΨ::Bool
 	end
 

@@ -200,16 +200,26 @@ module hypixStart
 						println("			iNonConverge 			= ", iNonConverge, "  [count] \n")	
 
 					# Computing average simulated θ to comapre it with average observed θ
-					if optionHypix.θavr_RootZone && optionHypix.θobs	
+					if optionHypix.θavr_RootZone && optionHypix.θobs
+
+						# Option to determine if we want to make corrections if the θobs was not corrected
+						Option_CorrectAverage = false
+
 						θsim_Aver = θaver.θAVER(discret; Z=Z, θ_Reduced=θ_Reduced, Nz=Nz, Nit_Reduced=Nit_Reduced, ZaverArray=[400.0])
 
 						NoNaN =  .!( isnan.( θobs_Reduced[1:Nit_Reduced, 1]))
 
-						θsim_Aver_Mean    = mean(θsim_Aver[NoNaN])
-						θobs_Reduced_Mean = mean(filter(.!isnan, θobs_Reduced[NoNaN, 1]))
+						if Option_CorrectAverage
+							θsim_Aver_Mean    = mean(θsim_Aver[NoNaN])
+							θobs_Reduced_Mean = mean(filter(.!isnan, θobs_Reduced[NoNaN, 1]))
 
-						θobs_Reduced_MeanAdj = θobs_Reduced[NoNaN, 1] .- θobs_Reduced_Mean
-						θsim_Reduced_MeanAdj = θsim_Aver[NoNaN] .- θsim_Aver_Mean
+							θobs_Reduced_MeanAdj = θobs_Reduced[NoNaN, 1] .- θobs_Reduced_Mean
+							θsim_Reduced_MeanAdj = θsim_Aver[NoNaN] .- θsim_Aver_Mean
+						else
+							θobs_Reduced_MeanAdj = θobs_Reduced[NoNaN, 1]
+							θsim_Reduced_MeanAdj = θsim_Aver[NoNaN]
+						end  # if: Option_CorrectAverage
+
 
 						CccBest[iOpt_Count]      = stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(θobs_Reduced_MeanAdj, θsim_Reduced_MeanAdj)
 						NseBest[iOpt_Count]      = stats.NSE(θobs_Reduced_MeanAdj, θsim_Reduced_MeanAdj)

@@ -208,7 +208,7 @@ module plotHypix
 			# , resolution = (3000, 2500)
 				CairoMakie.activate!(type = "svg")
 				# fontsize=40,
-				Fig = Figure(font="Sans", titlesize=50,  xlabelsize=30, ylabelsize=30, labelsize=30, fontsize=30)
+				Fig = Figure(font="Sans", titlesize=50,  xlabelsize=40, ylabelsize=40, labelsize=40, fontsize=40)
 			
 			# Plot Climate -------------------------------------------------	
 			iSubplot = 0
@@ -321,6 +321,7 @@ module plotHypix
 
 							if optionHypix.θobs
 								if optionHypix.θavr_RootZone
+
 									Plot_θsim = lines!(Axis4, ∑T_Reduced[1:Nit_Reduced], θsim_Aver[1:Nit_Reduced,1], linewidth=1.5, color=:blue, label=L"$\theta _{Hypix}$", linestyle=:dash)
 
 									# Correcting θbs
@@ -384,7 +385,13 @@ module plotHypix
 			if optionHypix.θavr_RootZone && optionHypix.θobs
 				iSubplot += 1
 
-				Axis5 = Axis(Fig[iSubplot,1], ylabel=L"$\theta _{MeanAdj}$ $[mm^3 mm^{-3}]$", xgridvisible=true, ygridvisible=false, height=Height, width=Width, xlabelsize=30)
+				Option_CorrectAverage = false
+
+				if Option_CorrectAverage
+					Axis5 = Axis(Fig[iSubplot,1], ylabel=L"$\theta _{MeanAdj}$ $[mm^3 mm^{-3}]$", xgridvisible=true, ygridvisible=false, height=Height, width=Width, xlabelsize=30)
+				else
+					Axis5 = Axis(Fig[iSubplot,1], ylabel=L"$\theta$ $[mm^3 mm^{-3}]$", xgridvisible=true, ygridvisible=false, height=Height, width=Width, xlabelsize=30)
+				end
 
 				xlims!(Axis5, ∑T_Reduced[1],∑T_Reduced[Nit_Reduced])
 
@@ -398,14 +405,21 @@ module plotHypix
 				
 				iZobs = 1
 
-				θsim_Aver_Mean    = mean(θsim_Aver[1:Nit_Reduced,1])
-				θobs_Reduced_Mean = mean(filter(.!isnan, θobs_Reduced[1:Nit_Reduced, 1]))
+				if Option_CorrectAverage
+					θsim_Aver_Mean    = mean(θsim_Aver[1:Nit_Reduced,1])
+					θobs_Reduced_Mean = mean(filter(.!isnan, θobs_Reduced[1:Nit_Reduced, 1]))
 
-				Plot_θobs = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θobs_Reduced[1:Nit_Reduced, iZobs] .- θobs_Reduced_Mean, linewidth=3.0, color=:red, label= L"$\theta MeanAdjObs$")
-				
-				Plot_θsim = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θ_Reduced[1:Nit_Reduced, obsθ.ithetaObs[iZobs]] .- θsim_Aver_Mean , linewidth=3.0, color=:blue, label=L"$\theta MeanAdjHypix$", linestyle = :dash)
+					Plot_θobs = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θobs_Reduced[1:Nit_Reduced, iZobs] .- θobs_Reduced_Mean, linewidth=3.0, color=:red, label= L"$\theta MeanAdjObs$")
+					
+					Plot_θsim = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θ_Reduced[1:Nit_Reduced, obsθ.ithetaObs[iZobs]] .- θsim_Aver_Mean , linewidth=3.0, color=:blue, label=L"$\theta MeanAdjHypix$", linestyle = :dash)
 
-				Plot_Line = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], 0.0 .* ∑T_Reduced[1:Nit_Reduced] , linewidth=2, color=:silver,  linestyle = :dashdot)
+					Plot_Line = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], 0.0 .* ∑T_Reduced[1:Nit_Reduced] , linewidth=2, color=:silver,  linestyle = :dashdot)
+
+				else
+					Plot_θobs = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θobs_Reduced[1:Nit_Reduced, iZobs], linewidth=3.0, color=:red, label= L"$\theta Obs$")
+					
+					Plot_θsim = lines!(Axis5, ∑T_Reduced[1:Nit_Reduced], θ_Reduced[1:Nit_Reduced, obsθ.ithetaObs[iZobs]] , linewidth=3.0, color=:blue, label=L"$\theta Hypix$", linestyle = :dash)
+				end
 
 				Fig[iSubplot, 2] = Legend(Fig, Axis5, framevisible=true, tellwidth=true, tellheight=true, margin = (10, 10, 10, 10))
 			end
@@ -529,7 +543,7 @@ end  # module plotHypix
 	# 	Ψ_Min_Horizon = fill(0.0::Float64, N_Layer)
 	# 	Ψ_Max_Horizon = fill(0.0::Float64, N_Layer)
 	# 	for iZ=1:N_Layer
-	# 		Ψ_Max_Horizon[iZ], Ψ_Min_Horizon[iZ] = ΨminΨmax.ΨMINΨMAX(hydroHorizon.θs[iZ], hydroHorizon.θsMacMat[iZ], hydroHorizon.σ[iZ], hydroHorizon.σmac[iZ], hydroHorizon.Ψm[iZ], hydroHorizon.ΨmMac[iZ])
+	# 		Ψ_Max_Horizon[iZ], Ψ_Min_Horizon[iZ] = ΨminΨmax.ΨMINΨMAX(hydroHorizon.θs[iZ], hydroHorizon.θsMacMat[iZ], hydroHorizon.σ[iZ], hydroHorizon.σMac[iZ], hydroHorizon.Ψm[iZ], hydroHorizon.ΨmMac[iZ])
 	# 	end  # for iZ=1:N_Layer
 		
 	# 	# PREPARING THE DATA

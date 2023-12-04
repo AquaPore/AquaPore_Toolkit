@@ -17,14 +17,18 @@ module lab
 				println("  ==  START: Plotting HydroParam  ==")
 
 				# ===================== DATA =====================
-				θ_Sim             = fill(0.0,N_Se)
-				Kunsat_Sim        = fill(0.0,N_Se)
+            θ_Sim      = fill(0.0,N_Se)
+            Kunsat_Sim = fill(0.0,N_Se)
+            KsMat      = fill(0.0, param.globalparam.N_iZ_Plot_End)
 
 				Ψ_θΨobs_Min = 0.0
 				for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
+
 					Ψ_θΨobs_Max = maximum(Ψ_θΨobs[iZ,N_θΨobs[iZ]]) + 100000.0
 
 					Ψ_Sim = expm1.(range(log1p(Ψ_θΨobs_Min), stop=log1p(Ψ_θΨobs_Max), length=N_Se)) 
+
+					KsMat[iZ] =hydro.Ks[iZ] * min(max((hydro.θsMacMat[iZ] - hydro.θr[iZ]) / (hydro.θs[iZ] - hydro.θr[iZ]), 0.0), 1.0)
 
 					θ_θΨobs_Max = hydro.Φ[iZ]
 
@@ -55,9 +59,7 @@ module lab
 						lines!(Fig[1,1], [Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), 0), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
 
 						lines!(Fig[1,1], [Point(log1p(0.0), hydro.θsMacMat[iZ]), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
-
 				
-					# Plot_θ_Ψ: Total porosity point
 						Fig_TotalPorosity = scatter!(Fig[1,1], [log1p.(cst.Mm_2_kPa .* 0.0)], [hydro.Φ[iZ]], color=:green, markersize=25, marker ='●')
 
 					# == Plot_K_Ψ  ==
@@ -79,9 +81,14 @@ module lab
 
 						Fig_Kθsim = lines!(Fig[1,2], log1p.(Ψ_Sim[1:N_Se].*cst.Mm_2_kPa), log1p.(Kunsat_Sim[1:N_Se] .* cst.MmS_2_MmH), color=:blue, linewidth=3)
 
-						Fig_Ks = scatter!(Fig[1,2], [log1p.(cst.Mm_2_kPa .* 0.0)], [log1p(hydro.Ks[iZ] * cst.cst.MmS_2_MmH)], color=:green, markersize=25, marker ='●')
+						Fig_Ks = scatter!(Fig[1,2], [log1p.(cst.Mm_2_kPa .* 0.0)], [log1p(hydro.Ks[iZ] * cst.MmS_2_MmH)], color=:green, markersize=25, marker ='●')
 
+						lines!(Fig[1,2], [ Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), 0) , Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), log1p(KsMat[iZ]* cst.MmS_2_MmH))], color=:brown, linewidth=3)
 
+						lines!(Fig[1,2], [Point(log1p(0.0), log1p(KsMat[iZ] * cst.MmS_2_MmH)), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), log1p.(KsMat[iZ]* cst.MmS_2_MmH))], color=:brown, linewidth=3)
+						
+
+					# TAGGING
 						if option.data.Kθ
 							Leg = Fig[1, end+1] = Legend(Fig, [Fig_θΨobs, Fig_θΨsim, Fig_TotalPorosity, Fig_Kθobs, Fig_Kθsim, Fig_Ks], ["θobs(Ψ)", "θsim(Ψ)", "Φ", "Kobs(Ψ)", "Ksim(Ψ)", "Ksₛᵢₘ"])
 						else
@@ -517,7 +524,7 @@ module lab
 
 					ΨmacMat = 100.0
 					Ψ₁ = 0.0
-					σmac = hydro.σmac[1]
+					σMac = hydro.σMac[1]
 					ΨmMac = hydro.ΨmMac[1]
 					ΨmMean = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
 
@@ -538,7 +545,7 @@ module lab
 
 							θr₀, θs₀, θsMacMat₀ =  ROCKCORRECTION!(hydro, 1, Rf[iRf], θr[iSoil], θs[iSoil], θsMacMat[iSoil])
 
-							KsModel[iSoil, iRf] =  60.0 * 60.0 * θψ_2_KsψModel.KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr₀, θs₀, θsMacMat₀, σ[iSoil], σmac, Ψ₁, Ψm, ΨmMac)	
+							KsModel[iSoil, iRf] =  60.0 * 60.0 * θψ_2_KsψModel.KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr₀, θs₀, θsMacMat₀, σ[iSoil], σMac, Ψ₁, Ψm, ΨmMac)	
 						end 
 					end
 					

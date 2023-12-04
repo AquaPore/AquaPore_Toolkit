@@ -34,6 +34,9 @@ module optionsHypix
 		Discretisation_File_Auto⍰::String
 		HydrostaticEquilibrium::Bool
 		HydroModel⍰::String
+		KosugiModel_θΨ⍰::String
+		KosugiModel_KΨ⍰::String
+
 		TopBoundary⍰::String
 		BottomBoundary⍰::String
 		∂R∂Ψ_NumericalAuto::Bool

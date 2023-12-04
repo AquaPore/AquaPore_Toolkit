@@ -12,19 +12,21 @@ module hydrolabOpt
 	function HYDROLABOPT_START(;NiZ, ∑Psd, θ_θΨobs, Ψ_θΨobs, N_θΨobs, K_KΨobs=[0], Ψ_KΨobs=[0], N_KΨobs=1, hydro, hydroOther, option, optionₘ, optim, param, θϵ=0.005)
 		
 		for iZ = 1:NiZ
-			# CORRECTION OF THE FEASIBLE RANGE ~~~
+
+			# TEST IF EXIST Ψ ≈ 0  ~~~
+				if minimum(Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]) < θϵ 
+					🎏ΘΨ_0 = true
+				else
+					🎏ΘΨ_0 = false
+				end
+
+			# FEASIBLE RANGE OF θ_θΨobs ~~~
 				θobs_Min = minimum(θ_θΨobs[iZ, 1:N_θΨobs[iZ]])  # Smallest measurement of θ
 
 				θobs_Max = maximum(θ_θΨobs[iZ, 1:N_θΨobs[iZ]])  # Greatest measurement of θ
 
-			# TEST IF EXIST Ψ ≈ 0  ~~~
-				if minimum(Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]) < θϵ
-					🎏_0sOpt = false
-				else
-					🎏_0sOpt = true
-				end
 
-			# Correcting θr_Max
+			# CORRECTING θr  ~~~~~
 				hydro.θr_Max[iZ] = min(max(θobs_Min - θϵ, 0.0), hydro.θr_Max[iZ]) # Maximum value of θr
 
 				if ("θr" ∈ optim.ParamOpt)
@@ -39,44 +41,43 @@ module hydrolabOpt
 				end # if ("θr" ∈ optim.ParamOpt)
 
 
-			# CORRECTING θS  ~~~
-				if ("θs" ∈ optim.ParamOpt) && 🎏_0sOpt
-					hydro.θs_Min[iZ] = max(θobs_Max * 0.75, hydro.θs_Min[iZ])
-					hydro.θs_Max[iZ] = min( θobs_Max * 1.25, hydro.θs_Max[iZ])
-					hydro.Φ[iZ] = θobs_Max / param.hydro.Coeff_Φ_2_θs
+			# CORRECTING θs  ~~~~~
+				if ("θs" ∈ optim.ParamOpt) # *****
+					if 🎏ΘΨ_0
+						hydro.θs_Min[iZ] = θ_θΨobs[iZ, 2]
+						hydro.θs_Max[iZ] = θobs_Max * 1.1
 
-					# Changing the feasible range of θs
-						iθs = findfirst(isequal("θs"), optim.ParamOpt)[1]
-						optim.ParamOpt_Min[iθs] = hydro.θs_Min[iZ]
-						optim.ParamOpt_Max[iθs] = hydro.θs_Max[iZ]
+						hydro.Φ[iZ] = θobs_Max / param.hydro.Coeff_Φ_2_θs
 
-				elseif ("θs" ∉ optim.ParamOpt) &&  (🎏_0sOpt == false) # <>=<>=<>=<>=<>
-					hydro.θs[iZ] = θobs_Max
-					hydro.Φ[iZ] = hydro.θs[iZ] / param.hydro.Coeff_Φ_2_θs
+						# Changing the feasible range of θs
+							iθs = findfirst(isequal("θs"), optim.ParamOpt)[1]
+							optim.ParamOpt_Min[iθs] = hydro.θs_Min[iZ]
+							optim.ParamOpt_Max[iθs] = hydro.θs_Max[iZ]
 
-				elseif ("θs" ∉ optim.ParamOpt) &&  (🎏_0sOpt == true) # <>=<>=<>=<>=<>
-					if option.data.Φ⍰ ≠ "No"
+					elseif !(🎏ΘΨ_0) 
+						hydro.θs_Min[iZ] = θobs_Max
+						hydro.θs_Max[iZ] = max(hydro.Φ[iZ], θobs_Max * 1.1)
+
+						# Changing the feasible range of θs
+							iθs = findfirst(isequal("θs"), optim.ParamOpt)[1]
+							optim.ParamOpt_Min[iθs] = hydro.θs_Min[iZ]
+							optim.ParamOpt_Max[iθs] = hydro.θs_Max[iZ]	
+					end  # if: 🎏ΘΨ_0
+
+				elseif ("θs" ∉ optim.ParamOpt) # *****
+					if 🎏ΘΨ_0
 						hydro.θs[iZ] = θobs_Max
-						hydro.Φ[iZ] = hydro.θs[iZ] / param.hydro.Coeff_Φ_2_θs
+						hydro.Φ[iZ]  = hydro.θs[iZ] / param.hydro.Coeff_Φ_2_θs
 
-					else
-						if hydro.Φ[iZ] * param.hydro.Coeff_Φ_2_θs > θobs_Max + θϵ
-							hydro.θs[iZ] = hydro.Φ[iZ] * param.hydro.Coeff_Φ_2_θs
-
-						elseif hydro.Φ[iZ] * (param.hydro.Coeff_Φ_2_θs + 0.015) > θobs_Max + θϵ
-							hydro.θs[iZ] = hydro.Φ[iZ] * (param.hydro.Coeff_Φ_2_θs + 0.015)
-
-						else
-							hydro.θs[iZ] = max(hydro.Φ[iZ] - θϵ, θobs_Max + θϵ)
-
-						end # hydro.Φ[iZ] * 0.95 > θobs_Max + θϵ
+					elseif !(🎏ΘΨ_0)
+						hydro.θs[iZ] = max(hydro.Φ[iZ] * param.hydro.Coeff_Φ_2_θs, θobs_Max + 0.015)
 					end
-				end
+				end # if "θs"
 
-				
+
 			# CORRECTING Ks  ~~~
 				if option.data.Kθ
-					if minimum(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]) < eps(100.0)
+					if minimum(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]) < eps(1000.0)
 						🎏_KsOpt = false
 					else
 						🎏_KsOpt = true
@@ -225,13 +226,13 @@ module hydrolabOpt
 
 			# ==================== SPECIAL CASES ====================
 
-			# RELATIONSHIP BETWEEN ΨmacMat ➡ σmac & ΨmMac
-				if optionₘ.ΨmacMat_2_σmac_ΨmMac
+			# RELATIONSHIP BETWEEN ΨmacMat ➡ σMac & ΨmMac
+				if optionₘ.ΨmacMat_2_σMac_ΨmMac
 					ΨmacMat₁ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat( θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=0.95) 
 
-               hydro.σmac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σmac(ΨmacMat=ΨmacMat₁)
+               hydro.σMac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σMac(ΨmacMat=ΨmacMat₁)
             
-				   hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=ΨmacMat₁, σmac=hydro.σmac[iZ])
+				   hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=ΨmacMat₁, σMac=hydro.σMac[iZ])
 				end
 
 			# RELATIONSHIP BETWEEN σ AND Ψm

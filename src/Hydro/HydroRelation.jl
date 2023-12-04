@@ -4,7 +4,7 @@
 module hydroRelation
 import BlackBoxOptim
 import ..tool
-export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMacMatη_2_ΨmacMat, FUNC_ΨmacMat_2_σmac, FUNC_σ_2_Ψm, FUNC_ΨmMode, FUNC_θsMacMatη
+export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMacMatη_2_ΨmacMat, FUNC_ΨmacMat_2_σMac, FUNC_σ_2_Ψm, FUNC_ΨmMode, FUNC_θsMacMatη
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,7 +19,7 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNC_θsMacMatη_2_ΨmacMat
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr, ΨmacMat_Max=70.0, ΨmacMat_Min=0.0, θsMacMat_η_Tresh=0.9) 
+		function FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr, ΨmacMat_Max=70.0, ΨmacMat_Min=0.0, θsMacMat_η_Tresh=1.0) 
 
 			θsMacMat_η = FUNC_θsMacMatη(;θr, θs, θsMacMat)
 
@@ -34,25 +34,25 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMac
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : FUNC_ΨmacMat_2_σmac
+	#		FUNCTION : FUNC_ΨmacMat_2_σMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNC_ΨmacMat_2_σmac(;ΨmacMat, Pσ_Mac=3)
-			# σmac = log(√ΨmacMat) / Pσ
-			return σmac = log1p(ΨmacMat) / (2.0 * Pσ_Mac)
-		end  # function: FUNC_ΨmacMat_2_σmac
+		function FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac=2)
+			# σMac = log(√ΨmacMat) / Pσ
+			return σMac = log1p(ΨmacMat) / (2.0 * Pσ_Mac)
+		end  # function: FUNC_ΨmacMat_2_σMac
 	# ------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNC_ΨmacMat_2_ΨmMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat, σmac, Option_Mode=false)
+		function FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat, σMac, Option_Mode=false)
 
 			# Option 1: based on Mode of pore size distribution
-				# LONG: ΨmMac = exp(log(ΨmacMat) * 0.5 + σmac ^ 2.0)
-				# LONG2 ΨmMac = exp(log(sqrt(ΨmacMat)) + σmac ^ 2.0)
+				# LONG: ΨmMac = exp(log(ΨmacMat) * 0.5 + σMac ^ 2.0)
+				# LONG2 ΨmMac = exp(log(sqrt(ΨmacMat)) + σMac ^ 2.0)
 				if Option_Mode
-					return ΨmMac = √ΨmacMat * exp(σmac ^ 2.0)
+					return ΨmMac = √ΨmacMat * exp(σMac ^ 2.0)
 				else 
 					return ΨmMac = √ΨmacMat	
 				end			
@@ -63,7 +63,7 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNC_σ_2_Ψm
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNC_σ_2_Ψm(;ΨmacMat, σ, Pσ, Ψm_Min=ΨmacMat, Ψm_Max=10.0^8, Option_Mode=true)
+		function FUNC_σ_2_Ψm(;ΨmacMat, σ, Pσ, Ψm_Min=ΨmacMat, Ψm_Max=10.0^8, Option_Mode=false)
 			if Option_Mode
 				Ψm = (1.0 + ΨmacMat) * exp(σ * Pσ + σ^2)
 			else
@@ -81,16 +81,19 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMac
 	#		FUNCTION : FUNCTION_σ_2_Ψm_SOFTWARE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0)
+
+			if option₂.ΨmacMat_2_σMac_ΨmMac
+				ΨmacMat₁ = FUNC_θsMacMatη_2_ΨmacMat(θs=hydro₂.θs[iZ], θsMacMat=hydro₂.θsMacMat[iZ], θr=hydro₂.θr[iZ], ΨmacMat_Max=hydro₂.ΨmacMat[iZ])
 		
-			ΨmacMat₁ = FUNC_θsMacMatη_2_ΨmacMat(θs=hydro₂.θs[iZ], θsMacMat=hydro₂.θsMacMat[iZ], θr=hydro₂.θr[iZ], ΨmacMat_Max=hydro₂.ΨmacMat[iZ])
-	
-			# Deriving σmac
-				hydro₂.σmac[iZ] = hydroRelation.FUNC_ΨmacMat_2_σmac(;ΨmacMat=ΨmacMat₁)
+				# Deriving σMac
+					hydro₂.σMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat=ΨmacMat₁)
 
-			# Deriving ΨmMac
-				hydro₂.ΨmMac[iZ] =  hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=ΨmacMat₁, σmac=hydro₂.σmac[iZ])
+				# Deriving ΨmMac
+					hydro₂.ΨmMac[iZ] =  hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=ΨmacMat₁, σMac=hydro₂.σMac[iZ])
+			end
 
-				 ΨmacMat₂ = hydro₂.ΨmacMat[iZ]
+			 ΨmacMat₂ = hydro₂.ΨmacMat[iZ]
+
 
 			if (option₂.σ_2_Ψm⍰ == "Constrained")
 				# Deriving  Ψm 

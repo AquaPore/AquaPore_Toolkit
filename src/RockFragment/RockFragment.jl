@@ -7,13 +7,13 @@ module rockFragment
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION :  ρᵦ_2_Φ
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function ρᵦ_2_Φ(NiZ::Int64, option, RockFragment::Vector{Float64}, ρₚ_Fine::Vector{Float64}, ρₚ_Rock::Vector{Float64}, ρᵦ_Soil::Vector{Float64})
+		function ρᵦ_2_Φ(hydro, NiZ::Int64, option, RockFragment::Vector{Float64}, ρₚ_Fine::Vector{Float64}, ρₚ_Rock::Vector{Float64}, ρᵦ_Soil::Vector{Float64})
 
 			if option.rockFragment.RockInjectedIncluded⍰  == "InjectRock"
-				return Φ = rockFragment.injectRock.ρᵦ_2_Φ(NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
+				return hydro = rockFragment.injectRock.ρᵦ_2_Φ(hydro, NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
 
 			elseif option.rockFragment.RockInjectedIncluded⍰  == "Included"
-				return Φ = rockFragment.included.ρᵦ_2_Φ(NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
+				return hydro = rockFragment.included.ρᵦ_2_Φ(hydro, NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
 			end
 		end  # function: function ρᵦ_2_Φ
 
@@ -53,7 +53,7 @@ module rockFragment
 						θ_θΨobs[iZ,iθ] = θ_θΨobs[iZ,iθ] * (1.0 - RockFragment[iZ])
 					end # for iθ=1:N_θΨobs[iZ]
 				end #  for iZ = 1:NiZ	
-			return  θ_θΨobs
+			return θ_θΨobs
 			end  # function: STONECORRECTION_NONEWETABLE
 		#..................................................................
 
@@ -96,13 +96,13 @@ module rockFragment
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION :  CORECTION_Φ!
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function CORECTION_Φ!(NiZ, option, RockFragment, Φ)		
+			function CORECTION_Φ!(hydro, NiZ, option, RockFragment)		
 				if option.run.RockCorection
 					for iZ = 1:NiZ 
-						Φ[iZ] = Φ[iZ] * (1.0 - RockFragment[iZ])
+						hydro.Φ[iZ] = hydro.Φ[iZ] * (1.0 - RockFragment[iZ])
 					end
 				end
-			return  Φ
+			return  hydro
 			end  # function: STONECORRECTION_NONEWETABLE
 		#..................................................................
 
@@ -110,19 +110,18 @@ module rockFragment
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION :  ρᵦ_2_Φ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ρᵦ_2_Φ(NiZ::Int64, option, RockFragment::Vector{Float64}, ρₚ_Fine::Vector{Float64}, ρₚ_Rock::Vector{Float64}, ρᵦ_Soil::Vector{Float64})
-
-			
-				Φ = fill(0.0::Float64, NiZ)
+			function ρᵦ_2_Φ(hydro, NiZ::Int64, option, RockFragment::Vector{Float64}, ρₚ_Fine::Vector{Float64}, ρₚ_Rock::Vector{Float64}, ρᵦ_Soil::Vector{Float64})
 
 				for iZ=1:NiZ
 					if option.run.RockCorection
-						Φ[iZ] = (1.0 - ρᵦ_Soil[iZ] / ρₚ_Fine[iZ]) * (1.0 - RockFragment[iZ])
+						hydro.Φ[iZ] = (1.0 - ρᵦ_Soil[iZ] / ρₚ_Fine[iZ]) * (1.0 - RockFragment[iZ])
+
 					else
-						Φ[iZ] = 1.0 - ρᵦ_Soil[iZ] / ρₚ_Fine[iZ]
+						hydro.Φ[iZ] = 1.0 - ρᵦ_Soil[iZ] / ρₚ_Fine[iZ]
+					
 					end
 				end # for
-			return Φ
+			return hydro
 			end  # function: Φ			
 		end  # module: injectRock
 		# ............................................................
@@ -137,16 +136,17 @@ module rockFragment
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION :  ρᵦ_2_Φ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ρᵦ_2_Φ(NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
-				Φ = fill(0.0::Float64, NiZ)
+			function ρᵦ_2_Φ(hydro, NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
+
 				for iZ=1:NiZ
 					if option.run.RockCorection					
-						Φ[iZ] = 1.0 - (RockFragment[iZ] * ρᵦ_Soil[iZ] / ρₚ_Rock[iZ]) - ((1.0 - RockFragment[iZ]) * ρᵦ_Soil[iZ] / ρₚ_Fine[iZ])
+						hydro.Φ[iZ] = 1.0 - (RockFragment[iZ] * ρᵦ_Soil[iZ] / ρₚ_Rock[iZ]) - ((1.0 - RockFragment[iZ]) * ρᵦ_Soil[iZ] / ρₚ_Fine[iZ])
+				
 					else
-						Φ[iZ] = 1.0 - ρᵦ_Soil[iZ] / ρₚ_Fine[iZ]
+						hydro.Φ[iZ] = 1.0 - ρᵦ_Soil[iZ] / ρₚ_Fine[iZ]
 					end
 				end # for
-			return Φ
+			return hydro
 			end  # function: Φ
 		
 	end  # module: included

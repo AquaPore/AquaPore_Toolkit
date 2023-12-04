@@ -2,7 +2,7 @@
 #		MODULE: reading
 # =============================================================
 module reading
-	import ..tool, ..table, ..ksModel, ..hydroRelation
+	import ..tool, ..table, ..ksModel, ..hydroRelation, ..cst
 	import  DelimitedFiles
 	using CSV, Tables, DataFrames
 	export ID, θΨ, KUNSATΨ, INFILTRATION, PSD, BULKDENSITY, Φ
@@ -83,7 +83,7 @@ module reading
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : total porosity
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function Φ(IdSelect, NiZ, Path)
+		function Φ(hydro, IdSelect, NiZ, Path)
 			println("    ~  $(Path) ~")
 
 			# Read data
@@ -98,7 +98,11 @@ module reading
 			Φ, ~  = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "TotalPorosity[0-1]", NiZ, N_Point_Max=1)
 			
 			RockFragment, ~   = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header,"RockFragment[0-1]", NiZ, N_Point_Max=1)
-		return RockFragment, Φ
+
+			for iZ =1:NiZ
+				hydro.Φ[iZ]= Φ[iZ]	
+			end
+		return hydro, RockFragment
 		end # function: Φ
 	#----------------------------------------------------------------------
 
@@ -174,7 +178,12 @@ module reading
 				# Determeining if data has only 3 columns: Id, H and Theta
 				if length(Header) ≤ 6
 					# Get the data of interest
-                  Ψ_θΨobs, N_θΨobs = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "H[mm]", NiZ)
+						try
+                  	Ψ_θΨobs, N_θΨobs = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "H[mm]", NiZ)
+						catch
+							Ψ_θΨobs, N_θΨobs = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "H[kPa]", NiZ)
+							Ψ_θΨobs = Ψ_θΨobs .* cst.kPa_2_Mm
+						end
 				
                   θ_θΨobs, ~       = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "Theta[0-1]", NiZ)
 				
@@ -430,14 +439,14 @@ module reading
 		end # for loop
 
 
-		# Compute σmac & ΨmMac from ΨmacMat
-		if optionₘ.ΨmacMat_2_σmac_ΨmMac
+		# Compute σMac & ΨmMac from ΨmacMat
+		if optionₘ.ΨmacMat_2_σMac_ΨmMac
 			for iZ=1:NiZ 
 				ΨmacMat₀ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=1.0) 
 
 
-            hydro.σmac[iZ]    = hydroRelation.FUNC_ΨmacMat_2_σmac(ΨmacMat=hydro.ΨmacMat[iZ])
-            hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σmac=hydro.σmac[iZ])
+            hydro.σMac[iZ]    = hydroRelation.FUNC_ΨmacMat_2_σMac(ΨmacMat=hydro.ΨmacMat[iZ])
+            hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σMac=hydro.σMac[iZ])
 			end
 		end
 

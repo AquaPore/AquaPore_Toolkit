@@ -2,7 +2,7 @@ using Symbolics, SpecialFunctions
 
 function KUNSAT_DERIV()
 
-	@variables θs, θsMacMat, θr,  Ψm, σ, KsMat, Ψ₁, ΨmMac, σmac, Ks, SeMat, SeMac, KsMat, KsMac
+	@variables θs, θsMacMat, θr,  Ψm, σ, KsMat, Ψ₁, ΨmMac, σMac, Ks, SeMat, SeMac, KsMat, KsMac
 
 
 	# KsMat = Ks * (θsMacMat - θr) / (θs - θr)
@@ -14,7 +14,7 @@ function KUNSAT_DERIV()
 
 	Se_Mat(Ψ₁) =  SeMat * 0.5 * erfc((log( Ψ₁ / Ψm)) / (σ * √2))
 
-	Se_Mac(Ψ₁)  = SeMac * 0.5 * erfc((log(Ψ₁ / ΨmMac)) / (σmac * √2))
+	Se_Mac(Ψ₁)  = SeMac * 0.5 * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2))
 
 	Se(Ψ₁) = Se_Mat(Ψ₁) + Se_Mac(Ψ₁)
 
@@ -22,7 +22,7 @@ function KUNSAT_DERIV()
 	Kunsat_Mat(Ψ₁) =  KsMat * √Se(Ψ₁) * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2)) ^ 2
 
 	# KsMac = Ks * SeMac
-	Kunsat_Mac(Ψ₁) =  KsMac * √Se(Ψ₁) * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σmac + σmac) / √2)) ^ 2
+	Kunsat_Mac(Ψ₁) =  KsMac * √Se(Ψ₁) * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2)) ^ 2
 
 	Kunsat(Ψ₁) = Kunsat_Mat(Ψ₁) + Kunsat_Mac(Ψ₁)
 

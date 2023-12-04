@@ -120,7 +120,7 @@ module hydroSmooth
 
                hydro_Smooth.θs[iSmooth]       = θₛ_AVER(hydroHorizon.θs[iZ], hydroHorizon.θs[iZ-1], 0.5)
 
-               hydro_Smooth.σmac[iSmooth]     = σ_AVER(hydroHorizon.σmac[iZ], hydroHorizon.σmac[iZ-1], 0.5)
+               hydro_Smooth.σMac[iSmooth]     = σ_AVER(hydroHorizon.σMac[iZ], hydroHorizon.σMac[iZ-1], 0.5)
 
                hydro_Smooth.σ[iSmooth]        = σ_AVER(hydroHorizon.σ[iZ], hydroHorizon.σ[iZ-1], 0.5)
 
@@ -141,7 +141,7 @@ module hydroSmooth
 
                hydro_Smooth.θs[iSmooth]       = hydroHorizon.θs[iZ]
 
-               hydro_Smooth.σmac[iSmooth]     = hydroHorizon.σmac[iZ]
+               hydro_Smooth.σMac[iSmooth]     = hydroHorizon.σMac[iZ]
 
                hydro_Smooth.σ[iSmooth]        = hydroHorizon.σ[iZ]
 

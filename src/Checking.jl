@@ -27,8 +27,8 @@ module checking
 			elseif option.run.HydroLabθΨ⍰≠"No" && !option.data.θΨ
 				error("*** If option.run.HydroLabθΨ⍰ ⇒ option.data.θΨ ***")
 			
-			elseif option.hydro.ΨmacMat_2_σmac_ΨmMac && ("ΨmMac" ∈ optim.ParamOpt || "σmac" ∈ optim.ParamOpt)
-				error("*** If option..hydro.ΨmacMat_2_σmac_ΨmMac ⇒ ΨmMac || σmac param should not be optimised pls change in GUI_HydroParam.csv ***")
+			elseif option.hydro.ΨmacMat_2_σMac_ΨmMac && ("ΨmMac" ∈ optim.ParamOpt || "σMac" ∈ optim.ParamOpt)
+				error("*** If option..hydro.ΨmacMat_2_σMac_ΨmMac ⇒ ΨmMac || σMac param should not be optimised pls change in GUI_HydroParam.csv ***")
 
 
 
@@ -53,7 +53,7 @@ module checking
         	elseif option.data.SimulationKosugiθΨK && "Ks" ∉ optim.ParamOpt
             	error("***  Ks  ∉ optim.ParamOpt && option.smap.SimulationKosugiθΨK THAN Ks ∈ optim.ParamOpt ***")
 
-			  elseif option.run.HydroLabθΨ⍰ == "HydroParamPrecomputed" 
+			elseif option.run.HydroLabθΨ⍰ == "HydroParamPrecomputed" 
 				@warn("***  Running from HydroParamPrecomputed.csv ***") 
 
 			# ------------ CHECKING Infiltration model--------------------
@@ -88,6 +88,10 @@ module checking
 
 			elseif option.run.Smap2Hypix && !(option.run.Smap) 
 				error("*** option.run.Smap2Hypix ⇒ option.run.Smap  ➡ true***")
+
+			elseif option.rockFragment.CorectStoneRockWetability && !(option.data.RockWetability)
+				error("*** option.data.RockWetability ⇒ option.rockFragment.CorectStoneRockWetability  ➡ true***")
+
 			end # Check error
 
     	return nothing

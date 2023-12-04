@@ -185,7 +185,7 @@ module tableSmap
             Path_θΨ =  path.tableSoilwater.Path_Soilwater_Table *  "_" * string(HydroModel_θΨ) *  "_" * "Table_Smap_θΨK.csv"
 
             if isfile(Path_θΨ)
-               Select_θΨ =["θs";"θr";"Ks";"Ψm";"σ";"θsMacMat_ƞ";"σmac";"ΨmMac"; "θsMacMat";"Φ"]
+               Select_θΨ =["θs";"θr";"Ks";"Ψm";"σ";"θsMacMat_ƞ";"σMac";"ΨmMac"; "θsMacMat";"Φ"]
                    
                Data_θΨ = Tables.matrix(CSV.File(Path_θΨ, select=Select_θΨ))
                   

@@ -94,7 +94,7 @@ module hypixOpt
 				println("			ΔTmax 				= ",  round(maximum(ΔT[2:Nit-1]), digits=0) , "  [seconds]")
 				println("			ΔT_HyPix 			= ", ceil(Int, value(Time_End - Time_Start) / 1000) , "  [seconds] \n")
 
-				HydroAll = [hydroHorizon.θs, hydroHorizon.θr, hydroHorizon.Ks, hydroHorizon.Ψm, hydroHorizon.σ, hydroHorizon.θsMacMat ./ hydroHorizon.θs, hydroHorizon.σmac, hydroHorizon.ΨmMac, hydroHorizon.So]
+				HydroAll = [hydroHorizon.θs, hydroHorizon.θr, hydroHorizon.Ks, hydroHorizon.Ψm, hydroHorizon.σ, hydroHorizon.θsMacMat ./ hydroHorizon.θs, hydroHorizon.σMac, hydroHorizon.ΨmMac, hydroHorizon.So]
 
 				println(collect(Iterators.flatten(HydroAll)))
 
@@ -102,7 +102,7 @@ module hypixOpt
 
 				Efficiency = ceil(Int, cst.Day_2_Second * IterCount / ∑T[Nit] )
 	
-				HydroAll = [hydroHorizon.θs, hydroHorizon.θr, hydroHorizon.Ks, hydroHorizon.Ψm, hydroHorizon.σ, hydroHorizon.θsMacMat ./ hydroHorizon.θs, hydroHorizon.σmac, hydroHorizon.ΨmMac, hydroHorizon.So]
+				HydroAll = [hydroHorizon.θs, hydroHorizon.θr, hydroHorizon.Ks, hydroHorizon.Ψm, hydroHorizon.σ, hydroHorizon.θsMacMat ./ hydroHorizon.θs, hydroHorizon.σMac, hydroHorizon.ΨmMac, hydroHorizon.So]
 	
 				HydroAll = collect(Iterators.flatten(HydroAll))
 	
@@ -265,7 +265,7 @@ module hypixOpt
 				# 	println("			~ Ψm = ",   round.(hydroHorizon.Ψm, digits=0))
 				# 	println("			~ σ = ",   round.(hydroHorizon.σ, digits=2))
 				# 	println("			~ θsMacMat = ",   round.(hydroHorizon.θsMacMat, digits=2))
-				# 	# println("			~ σmac = ",  round.(hydroHorizon.σmac, digits=2))
+				# 	# println("			~ σMac = ",  round.(hydroHorizon.σMac, digits=2))
 				# 	# println("			~ ΨmMac = ",  round.(hydroHorizon.ΨmMac, digits=2))
 				# 	# println("			~ ΨmMac = ",  round.(hydroHorizon.So, digits=2))
 				# end

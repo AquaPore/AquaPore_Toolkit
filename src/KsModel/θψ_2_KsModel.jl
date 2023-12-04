@@ -22,11 +22,11 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSMODEL_TRADITIONAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL_TRADITIONAL(Se, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σmac, Ψm, ΨmMac)
+		function KSMODEL_TRADITIONAL(Se, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψm, ΨmMac)
 
 			Kunsat_Mat = T1 * ((θsMacMat - θr) ^ T3) * ((cst.Y / Ψm) / (exp( erfcinv(2.0 * Se) * σ * √2.0 )) ) ^ T2
 
-			Kunsat_Mac = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σmac * √2.0))) ^ T2Mac 
+			Kunsat_Mac = T1Mac * ((θs - θsMacMat) ^ T3Mac) * ((cst.Y / ΨmMac) / ( exp( erfcinv(2.0 * Se) * σMac * √2.0))) ^ T2Mac 
 
 		return Kunsat_Mat + Kunsat_Mac
 		end  # function: KS_MODEL
@@ -35,7 +35,7 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KsΨMODEL_NOINTEGRAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σmac, Ψ₁::Float64, Ψm, ΨmMac)
+		function KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
 			# Matrix ====	
 				θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
@@ -47,13 +47,13 @@ module θψ_2_KsψModel
 				Kunsat_Mat = Ks_Mat * √Se_Mat * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 			
 			# Macropore ===
-				θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σmac * √2.0))
+				θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
 				
 				Se_Mac = θ_Mac / (θs - θr)
 
-				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σmac) ^ 2.0) / 2.0)) ^ T3Mac
+				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
-				Kunsat_Mac = Ks_Mac * √Se_Mac * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σmac + σmac) / √2.0)) ^ 2.0
+				Kunsat_Mac = Ks_Mac * √Se_Mac * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 		return Kunsat_Mat + Kunsat_Mac
 		end  # function: KsΨMODEL_NOINTEGRAL
 	# ------------------------------------------------------------------
@@ -62,7 +62,7 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KsΨMODEL_CLAY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KsΨMODEL_CLAY(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σmac, Ψ₁::Float64, Ψm, ΨmMac)
+		function KsΨMODEL_CLAY(hydro, iZ::Int64, optionₘ, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁::Float64, Ψm, ΨmMac)
 
 			# Se ===
 				Se = wrc.Ψ_2_Se(optionₘ, Ψ₁, iZ, hydro)
@@ -73,9 +73,9 @@ module θψ_2_KsψModel
 				Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
 			# Macropore ===
-				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σmac) ^ 2.0) / 2.0)) ^ T3Mac
+				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
-				Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σmac + σmac) / √2.0)) ^ 2.0
+				Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
 	return  Kunsat_Mat + Kunsat_Mac
 	end  # function: KsΨMODEL_CLAY
@@ -86,7 +86,7 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : TORTUOSITYMODELS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL_OPTIONS(∑Psd, 🎏_Clay::Bool, 🎏_RockFragment::Bool, hydro, ipClass, iZ::Int64, ksmodelτ, option, param, Ψ₁; RockFragment=[], θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σmac=hydro.σmac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τclay₀=ksmodelτ.τclay₀[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τclay₀Mac=ksmodelτ.τclay₀Mac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τclayₘₐₓMac=ksmodelτ.τclayₘₐₓMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τclayΔθsrMac=ksmodelτ.τclayΔθsrMac)
+		function KSMODEL_OPTIONS(∑Psd, 🎏_Clay::Bool, 🎏_RockFragment::Bool, hydro, ipClass, iZ::Int64, ksmodelτ, option, param, Ψ₁; RockFragment=[], θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τclay₀=ksmodelτ.τclay₀[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τclay₀Mac=ksmodelτ.τclay₀Mac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τclayₘₐₓMac=ksmodelτ.τclayₘₐₓMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τclayΔθsrMac=ksmodelτ.τclayΔθsrMac)
 
 			# Only correct if RF > Rf_StartIncrease
 			if 🎏_RockFragment
@@ -110,7 +110,7 @@ module θψ_2_KsψModel
 					T3Mac = 1.0 / (1.0 - τ₃ₐMac)	
 		
 				# Ks model
-					KₛModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σmac, Ψm, ΨmMac), 0.0, 0.9999; rtol=1.0E-3)[1]
+					KₛModel = cst.KunsatModel * QuadGK.quadgk(Se -> KSMODEL_TRADITIONAL(Se, T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψm, ΨmMac), 0.0, 0.9999; rtol=1.0E-3)[1]
 
 					return Kunsat = KₛModel * kunsat.KUNSAT_θΨSe(option.hydro, Ψ₁, iZ, hydro) / hydro.Ks[iZ]
 				
@@ -137,7 +137,7 @@ module θψ_2_KsψModel
 					
 					# Tortuosity T3Mac
 						T3Mac = T3_Max * (1.0 - τ₃ₐMac)			 											
-			return KsΨMODEL_NOINTEGRAL( T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σmac, Ψ₁, Ψm, ΨmMac)
+			return KsΨMODEL_NOINTEGRAL( T1, T1Mac, T2, T2Mac, T3, T3Mac, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)
 				
 	
 			# MODEL 2 ====	
@@ -169,7 +169,7 @@ module θψ_2_KsψModel
 					# Tortuosity T3Mac
 						T3Mac = T3_Max * (1.0 - τ₃ₐMac)
 							
-				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σmac, Ψ₁, Ψm, ΨmMac)	
+				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)	
 		
 			
 			# MODEL 3 ====	
@@ -199,7 +199,7 @@ module θψ_2_KsψModel
 					# Tortuosity T3Mac
 						T3Mac = T3_Max * (1.0 - τ₃ₐMac)
 						
-				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σmac, Ψ₁, Ψm, ΨmMac)	
+				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)	
 			
 			# Model 3Unimodal	
 			elseif option.ksModel.KₛModel⍰=="KsΨmodel_3Unimodal"
@@ -233,7 +233,7 @@ module θψ_2_KsψModel
 						τ₃ₐMac = 0.0
 						T3Mac = T3_Max * (1.0 - τ₃ₐMac)
 							
-				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σmac, Ψ₁, Ψm, ΨmMac)	
+				return KsΨMODEL_CLAY(hydro, iZ, option.hydro, T1, T1Mac, T2, T2Mac, T3, T3Mac, Tclay, θr, θs, θsMacMat, σ, σMac, Ψ₁, Ψm, ΨmMac)	
 				
 			else
 				error("option.ksModel.KₛModel⍰ = $(option.ksModel.KₛModel⍰) is not yet implemented try <KsModel_Traditional>; <KsModel_Tσ>; <KsModel_New>; <KsModel_NewSimplified> ")

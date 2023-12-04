@@ -167,7 +167,7 @@ module table
 				println("    ~  $Path ~")
 
 				# Matrix, FieldName_String = tool.readWrite.STRUCT_2_FIELDNAME(2,  ksmodelτ)
-				Header = ["IdSelect", "θs", "θsMacMat","θr","Ψm[mm]","LnΨm[mm]","σ","σmac","ΨmMac","ΔθsMacMat-θr","Δθs-ΔθsMacMat","Ks[mm h⁻¹]", "KsModel[mm h⁻¹]","LnKs[mm h⁻¹]","LnKsModel[mm h⁻¹]","ΔKs-KsModel[mm h⁻¹]","ΔLnKs-LnKsModel[mm h⁻¹]"]
+				Header = ["IdSelect", "θs", "θsMacMat","θr","Ψm[mm]","LnΨm[mm]","σ","σMac","ΨmMac","ΔθsMacMat-θr","Δθs-ΔθsMacMat","Ks[mm h⁻¹]", "KsModel[mm h⁻¹]","LnKs[mm h⁻¹]","LnKsModel[mm h⁻¹]","ΔKs-KsModel[mm h⁻¹]","ΔLnKs-LnKsModel[mm h⁻¹]"]
 
 				KsObs = hydro.Ks .* cst.MmS_2_MmH
 				kₛ_Model₂ = KₛModel .* cst.MmS_2_MmH
@@ -178,7 +178,7 @@ module table
 				ΔKsKsModel = KsObs .- kₛ_Model₂
 				ΔLnKsKsModel = LnKsObs .- Lnkₛ_Model
 
-				CSV.write(Path, Tables.table([string.(Int64.(IdSelect)) hydro.θs hydro.θsMacMat hydro.θr hydro.Ψm log.(hydro.Ψm) hydro.σ hydro.σmac hydro.ΨmMac hydro.θsMacMat.-hydro.θr hydro.θs.-hydro.θsMacMat KsObs kₛ_Model₂ LnKsObs Lnkₛ_Model ΔKsKsModel ΔLnKsKsModel ]), writeheader=true, header=Header, bom=true)	
+				CSV.write(Path, Tables.table([string.(Int64.(IdSelect)) hydro.θs hydro.θsMacMat hydro.θr hydro.Ψm log.(hydro.Ψm) hydro.σ hydro.σMac hydro.ΨmMac hydro.θsMacMat.-hydro.θr hydro.θs.-hydro.θsMacMat KsObs kₛ_Model₂ LnKsObs Lnkₛ_Model ΔKsKsModel ΔLnKsKsModel ]), writeheader=true, header=Header, bom=true)	
 			return nothing
 			end  # function: KSMODEL
 		# ------------------------------------------------------------------

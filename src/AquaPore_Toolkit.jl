@@ -61,10 +61,13 @@ module AquaPore_Toolkit
 	
 			# DETERMINE WHICH SOILS/ PROFILE TO RUN: <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 				IdSelect, IdSelect_True, Soilname, NiZ = reading.ID(PathIdSelect=path.inputSoilwater.IdSelect, PathOptionSelect=path.option.Select, PathModelName=path.option.ModelName)
-
-				# Deriving opt parameters
-					hydroₒ = hydroStruct.HYDROSTRUCT(option.hydro, 1)
-					hydroₒ, optim = reading.HYDRO_PARAM(option.hydro, hydroₒ, 1, path.inputGuiSoilwater.GUI_HydroParam)
+ 
+			# Defining the hydro structure
+				hydro = hydroStruct.HYDROSTRUCT(option.hydro, NiZ)
+	
+			# Deriving opt parameters
+				hydroₒ = hydroStruct.HYDROSTRUCT(option.hydro, 1)
+				hydroₒ, optim = reading.HYDRO_PARAM(option.hydro, hydroₒ, 1, path.inputGuiSoilwater.GUI_HydroParam)
 
 			# IF WE HAVE Θ(Ψ) DATA: <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 				if option.data.θΨ && !(option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠"Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained")
@@ -118,12 +121,12 @@ module AquaPore_Toolkit
 					RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil = reading.BULKDENSITY(IdSelect, NiZ, path.inputSoilwater.BulkDensity)
 
 					# Φ  corrected for RockFragments
-					Φ = rockFragment.ρᵦ_2_Φ(NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
+					hydro = rockFragment.ρᵦ_2_Φ(hydro, NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
 
 				elseif option.data.Φ⍰ == "Φ" # Total Porosity
-					RockFragment, Φ = reading.Φ(IdSelect, NiZ, path.inputSoilwater.Φ)
+					hydro, RockFragment = reading.Φ(hydro, IdSelect, NiZ, path.inputSoilwater.Φ)
 					
-					Φ = rockFragment.injectRock.CORECTION_Φ!(NiZ, option, RockFragment, Φ)	
+					hydro = rockFragment.injectRock.CORECTION_Φ!(hydro, NiZ, option, RockFragment)	
 				end # option.data.Φ⍰ == :ρᵦ
 
 
@@ -181,20 +184,12 @@ module AquaPore_Toolkit
 
 		if option.run.HydroLabθΨ⍰ ≠ "No" && option.run.HydroLabθΨ⍰ ≠ "HydroParamPrecomputed"
 		printstyled("\n ----- START RUNNING HYDROLABΘΨ ----------------------------------------------- \n"; color=:red)
-			# STRUCTURES
-				hydro = hydroStruct.HYDROSTRUCT(option.hydro, NiZ)
 				hydroOther = hydroStruct.HYDRO_OTHERS(NiZ)
 				hydro, optim = reading.HYDRO_PARAM(option.hydro, hydro, NiZ, path.inputGuiSoilwater.GUI_HydroParam; PrintScreen=true)
 
 			# CHECKING THE DATA
 				checking.CHECKING(option, option.hydro, optim)
 
-			# TRANSFERING Φ -> hydro
-				if option.data.Φ⍰ ≠ "No"
-					for iZ =1:NiZ 
-						hydro.Φ[iZ] = Φ[iZ]
-					end
-				end # option.data.Φ⍰ ≠ :No
 
 			# CORRECT θ(Ψ) FOR ROCK FRAGMENT
 			if option.run.RockCorection && !(option.data.SimulationKosugiθΨK)
@@ -265,7 +260,7 @@ module AquaPore_Toolkit
 
 			# TRANSFERING Φ -> hydro
 				for iZ =1:NiZ 
-					hydroPsd.Φ[iZ] = Φ[iZ]
+					hydroPsd.Φ[iZ] = hydro.Φ[iZ]
 				end
 
 			# PSD model
@@ -300,7 +295,7 @@ module AquaPore_Toolkit
 
 			# TRANSFERING Φ -> hydro
 				for iZ =1:NiZ 
-					hydroInfilt.Φ[iZ] = Φ[iZ]
+					hydroInfilt.Φ[iZ] = hydro.Φ[iZ]
 				end
 
 			# RUNNING INFILTRATION MODEL
@@ -463,9 +458,11 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 	#  @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Convert")
 
 	
-	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
+	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
 
-		@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Pumice")
+		# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Pumice")
+
+		# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
 
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)

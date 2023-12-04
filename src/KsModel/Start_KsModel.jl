@@ -68,9 +68,9 @@ module startKsModel
 				end
 
 				# Checking the Ks model is withing boundaries
-					for iZ=1:NiZ
-						KₛModel[iZ] = max(min(KₛModel[iZ], hydro.Ks_Max[iZ]), hydro.Ks_Min[iZ])
-					end
+					# for iZ=1:NiZ
+					# 	KₛModel[iZ] = max(min(KₛModel[iZ], hydro.Ks_Max[iZ]), hydro.Ks_Min[iZ])
+					# end
 
 				# PLOTTING ALL SOILS
 				if option.ksModel.Plot_KsModel && sum(optimKsmodel.NparamOpt) ≥ 1
