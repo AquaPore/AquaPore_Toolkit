@@ -92,6 +92,7 @@
 		#		FUNCTION : BOUNDARY_BOTTOM
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function BOUNDARY_BOTTOM(path)
+
 				# Read data
 					Data           = CSV.read(path.inputSmap.SoilProfile, DataFrame, header=true)
 					BoundarySmap   = convert(Vector{String}, Data."Boundary")
@@ -115,6 +116,7 @@
 				# Converting Smap boundary -> Hypix 
 					Hypix_BottomBoundary = fill("", N_BoundarySmap)
 					for i = 1:N_BoundarySmap
+					# println(BoundarySmap[i])
 						Hypix_BottomBoundary[i] = Dict_Boundary_Smap2Hypix[BoundarySmap[i]]
 
 						Dict_SoilNames_2_HypixBottomBoundary[Soilname[i]] = Hypix_BottomBoundary[i] 
