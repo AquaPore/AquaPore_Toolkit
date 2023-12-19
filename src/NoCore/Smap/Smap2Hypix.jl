@@ -70,7 +70,7 @@ module smap2hypix
                RootingDepth = min(smap.Smap_MaxRootingDepth[iHorizon_Start], maximum(Zhorizon))
 
             # Maximum Rock Fragment of the soil profile
-               # MAximum Rf for the top 400mm
+               # MAximum RockFragment for the top 400mm
               Nz_400 = iHorizon_End
                for iZ = iHorizon_Start:iHorizon_End
                   if smap.Smap_Depth[iZ] > 400.0

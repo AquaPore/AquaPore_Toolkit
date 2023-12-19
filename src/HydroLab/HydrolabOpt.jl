@@ -134,7 +134,9 @@ module hydrolabOpt
 				hydro = hydrolabOpt.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
 
 				# FINAL CORRECTION
-					hydro.ΨmacMat[iZ] = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ])
+					if optionₘ.σ_2_Ψm⍰ ≠ "No"
+						hydro.ΨmacMat[iZ] = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ])
+					end
 
 				# STATISTICS
 					if option.data.Kθ && "Ks" ∈ optim.ParamOpt
@@ -259,12 +261,14 @@ module hydrolabOpt
 					hydro.θsMacMat[iZ] = min(hydro.θsMacMat_ƞ[iZ] * (hydro.θs[iZ] - hydro.θr[iZ]) + hydro.θr[iZ], hydro.θs[iZ])
 				end
 
-				if hydro.θsMacMat[iZ] > hydro.θs[iZ] 
-					error("θsMacMat: $iZ $(hydro.θsMacMat[iZ])> $(hydro.θs[iZ])")
+				if  optionₘ.HydroModel⍰ == "Kosugi"
+					if hydro.θsMacMat[iZ] > hydro.θs[iZ]
+						error("θsMacMat: $iZ $(hydro.θsMacMat[iZ])> $(hydro.θs[iZ])")
+					end
 				end
 
 				if hydro.θr[iZ] > hydro.θs[iZ]
-					error("Θr_θs: $iZ $(hydro.θr[iZ]) > $(hydro.θs[iZ])")
+					error("Θr_θs: iZ = $iZ  , $(hydro.θr[iZ]) > $(hydro.θs[iZ])")
 				end
 
 				if hydro.θr[iZ] < 0.0

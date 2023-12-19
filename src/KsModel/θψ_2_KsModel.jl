@@ -32,6 +32,7 @@ module θψ_2_KsψModel
 		end  # function: KS_MODEL
 	# ------------------------------------------------------------------
 	
+
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KsΨMODEL_NOINTEGRAL
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -283,33 +284,32 @@ module θψ_2_KsψModel
 	#		FUNCTION : ROCKCORRECTION
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
-		function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.4, Rf_EndIncrease=0.9, θs_Amplify=1.1)
+		function ROCKCORRECTION!(hydro, iZ, RockFragment, θr, θs, θsMacMat; Rf_StartIncrease=0.4, Rf_EndIncrease=0.9, θs_Amplify=1.1)
 
-			Rf = min(Rf, Rf_EndIncrease)
+			Rf₁ = min(RockFragment, Rf_EndIncrease)
 
-			if Rf > Rf_StartIncrease
-			
+			if Rf₁ > Rf_StartIncrease
 				# X values
 					X = [Rf_StartIncrease, Rf_EndIncrease]
 				
 				# θs ----
-					θs_NoRf = θs / (1.0 - Rf)
+					θs_NoRf = θs / (1.0 - Rf₁)
 					Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, θs_Amplify * θs_NoRf]
 					Fit_θs = Polynomials.fit(X, Y_θs, 1)
-					# θs = max(min(Fit_θs(Rf), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
-					θs = Fit_θs(Rf)
+					# θs = max(min(Fit_θs(Rf₁), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
+					θs = Fit_θs(Rf₁)
 
 				# θr ----
-					θr_NoRf = θr / (1.0 - Rf)
+					θr_NoRf = θr / (1.0 - Rf₁)
 					Y_θr = [(1.0 - Rf_StartIncrease) * θr_NoRf, θr_NoRf]
 					Fit_θr = Polynomials.fit(X, Y_θr, 1)
-					θr = max(min(Fit_θr(Rf), hydro.θr_Max[iZ]), hydro.θr_Min[iZ])
+					θr = max(min(Fit_θr(Rf₁), hydro.θr_Max[iZ]), hydro.θr_Min[iZ])
 
 				# θsMacMat ----
-					θsMacMat_NoRf =  θsMacMat / (1.0 - Rf)
+					θsMacMat_NoRf =  θsMacMat / (1.0 - Rf₁)
 					Y_θsMacMat = [min((1.0 - Rf_StartIncrease) * θsMacMat_NoRf, θs), 0.7 * (θs - θr) + θr]
 					Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)	
-					θsMacMat = min(Fit_θsMacMat(Rf), θs)					
+					θsMacMat = min(Fit_θsMacMat(Rf₁), θs)					
 			end
 		return θr, θs, θsMacMat
 		end  # function: ROCKCORRECTION

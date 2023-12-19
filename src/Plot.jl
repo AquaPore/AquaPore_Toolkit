@@ -476,11 +476,11 @@ module lab
 
 			
 			""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
-					function ROCKCORRECTION!(hydro, iZ, Rf, θr, θs, θsMacMat; Rf_StartIncrease=0.4, Rf_EndIncrease=0.9, θs_Amplify=1.)
+					function ROCKCORRECTION!(hydro, iZ, RockFragment, θr, θs, θsMacMat; Rf_StartIncrease=0.4, Rf_EndIncrease=0.9, θs_Amplify=1.)
 
-						Rf = min(Rf, Rf_EndIncrease)
+						RockFragment₁ = min(RockFragment, Rf_EndIncrease)
 
-						if Rf > Rf_StartIncrease
+						if RockFragment₁ > Rf_StartIncrease
 							# X values
 								X = [Rf_StartIncrease, Rf_EndIncrease]
 		
@@ -488,25 +488,25 @@ module lab
 								θs_NoRf = θs * 1.0
 								Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, θs_Amplify * θs_NoRf]
 								Fit_θs = Polynomials.fit(X, Y_θs, 1)
-								# θs = max(min(Fit_θs(Rf), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
-								θs = Fit_θs(Rf)
+								# θs = max(min(Fit_θs(RockFragment₁), hydro.θs_Max[iZ]), hydro.θs_Min[iZ])
+								θs = Fit_θs(RockFragment₁)
 
 							# θr ----
 								θr_NoRf = θr * 1.0
 								Y_θr = [(1.0 - Rf_StartIncrease) * θr_NoRf, θr_NoRf]
 								Fit_θr = Polynomials.fit(X, Y_θr, 1)
-								θr = max(min(Fit_θr(Rf), hydro.θr_Max[iZ]), hydro.θr_Min[iZ])
+								θr = max(min(Fit_θr(RockFragment₁), hydro.θr_Max[iZ]), hydro.θr_Min[iZ])
 
 							# θsMacMat ----
 								θsMacMat_NoRf =  θsMacMat * 1.0
 								Y_θsMacMat = [min((1.0 - Rf_StartIncrease) * θsMacMat_NoRf, θs), 0.7 * (θs - θr) + θr]
 								Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)	
-								θsMacMat = min(Fit_θsMacMat(Rf), θs)
+								θsMacMat = min(Fit_θsMacMat(RockFragment₁), θs)
 
 						else
-							θs = θs * (1.0 - Rf)
-							θr = θr * (1.0 - Rf)
-							θsMacMat =  θsMacMat * (1.0 - Rf)
+							θs = θs * (1.0 - RockFragment₁)
+							θr = θr * (1.0 - RockFragment₁)
+							θsMacMat =  θsMacMat * (1.0 - RockFragment₁)
 						end
 					return θr, θs, θsMacMat
 					end  # function: ROCKCORRECTION
@@ -534,8 +534,8 @@ module lab
 					θsMacMat = θs .* 0.8
 					Nsoil = length(θs)
 
-					Rf = collect(0.0:0.001:0.9)
-					Nrf = length(Rf)
+					RockFragment = collect(0.0:0.001:0.9)
+					Nrf = length(RockFragment)
 							
 
 					KsModel = fill(0.0::Float64, Nsoil, Nrf)
@@ -543,7 +543,7 @@ module lab
 						for iRf=1:Nrf 							
 							Ψm = ΨmMean * exp(σ[iSoil] * 3.0)
 
-							θr₀, θs₀, θsMacMat₀ =  ROCKCORRECTION!(hydro, 1, Rf[iRf], θr[iSoil], θs[iSoil], θsMacMat[iSoil])
+							θr₀, θs₀, θsMacMat₀ =  ROCKCORRECTION!(hydro, 1, RockFragment[iRf], θr[iSoil], θs[iSoil], θsMacMat[iSoil])
 
 							KsModel[iSoil, iRf] =  60.0 * 60.0 * θψ_2_KsψModel.KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr₀, θs₀, θsMacMat₀, σ[iSoil], σMac, Ψ₁, Ψm, ΨmMac)	
 						end 
@@ -582,7 +582,7 @@ module lab
 
 					Colormap = cgrad(colorschemes[ColourMap], Nsoil, categorical = true)
 					for iSoil=1:Nsoil
-						Fig_Model1 = lines!(Axis_KsModel1, Rf, KsModel[iSoil, :], linewidth=5, colormap =Colormap[iSoil], label =string(σ[iSoil]))
+						Fig_Model1 = lines!(Axis_KsModel1, RockFragment, KsModel[iSoil, :], linewidth=5, colormap =Colormap[iSoil], label =string(σ[iSoil]))
 					end
 		
 				Leg = Legend(Fig[1:2,2], Axis_KsModel1, "σ", framevisible=true, tellheight=true, tellwidth=true, labelsize=LabelSize, margin=(30, 30, 30, 30))

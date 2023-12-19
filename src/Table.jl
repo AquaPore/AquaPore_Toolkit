@@ -43,16 +43,16 @@ module table
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : θΨK
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function θΨK(hydro, hydroOther, IdSelect, KₛModel, NiZ::Int64, Path)
+			function θΨK(hydro, hydroOther, IdSelect, KₛModel, NiZ::Int64, Path, RockFragment)
 				println("    ~  $(Path) ~")
 
 				Matrix₁, FieldName_String = tool.readWrite.STRUCT_2_FIELDNAME(NiZ, hydro)
 
 				Matrix₂, FieldName_String2 = tool.readWrite.STRUCT_2_FIELDNAME(NiZ, hydroOther)
 
-				Header = vcat("Id", FieldName_String, FieldName_String2, "KsModel")
+				Header = vcat("Id", FieldName_String, "RockFragment", "KsModel", FieldName_String2 )
 
-				CSV.write(Path, Tables.table([string.(IdSelect) Matrix₁ Matrix₂ KₛModel]), writeheader=true, header=Header, bom=true)
+				CSV.write(Path, Tables.table([string.(IdSelect) Matrix₁ RockFragment KₛModel Matrix₂ ]), writeheader=true, header=Header, bom=true)
 			return nothing
 			end  # function:  θΨK
 		#---------------------------------------------------------------------

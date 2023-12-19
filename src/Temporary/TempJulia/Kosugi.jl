@@ -13,10 +13,10 @@ function RUN_KOSUGI()
 	N = length(Ψ₀)
 	θ =fill(0.0,N)
 
-	Rf=0.0
+	RockFragment=0.0
 
 	for iZ=1:N
-		θ[iZ] = KG(Ψ₀[iZ], θs=0.1/(1-Rf), θr=0.0/(1-Rf), σ=3.8)
+		θ[iZ] = KG(Ψ₀[iZ], θs=0.1/(1-RockFragment), θr=0.0/(1-RockFragment), σ=3.8)
 	end 
 
 	println(Ψ₀)

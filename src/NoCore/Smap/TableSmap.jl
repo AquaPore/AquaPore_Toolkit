@@ -54,7 +54,7 @@ module tableSmap
             Option_Kosugi_Table_θψ   = true
             Option_Kosugi_Table_Kψ   = true
 
-         Header = ["Id"; "SoilName"; "Depth_mm"; "IsTopsoil"; "RockFragment_%";"MaxRootingDepth_mm"; "PermeabilityClass"; "SmapFH"]
+         Header = ["Id"; "SoilName"; "Depth_mm"; "IsTopsoil"; "RockFragment_%";"MaxRootingDepth_mm"; "PermeabilityClass"; "SmapFH"; "ImpermClass"]
          Data = []
       
       # Select data
@@ -260,7 +260,7 @@ module tableSmap
       end # Option_Kosugi
          
       # COMBINING OUTPUTS  
-         CSV.write(path.tableSmap.Table_Smap, Tables.table( [IdSelect[1:NiZ] smap.Soilname[1:NiZ] smap.Smap_Depth[1:NiZ] smap.IsTopsoil[1:NiZ] smap.RockFragment[1:NiZ] smap.Smap_MaxRootingDepth[1:NiZ] smap.Smap_PermeabilityClass[1:NiZ] smap.Smap_SmapFH[1:NiZ] Data[1:NiZ,:]]), writeheader=true, header=Header, bom=!(HeaderSmap))
+         CSV.write(path.tableSmap.Table_Smap, Tables.table( [IdSelect[1:NiZ] smap.Soilname[1:NiZ] smap.Smap_Depth[1:NiZ] smap.IsTopsoil[1:NiZ] smap.RockFragment[1:NiZ] smap.Smap_MaxRootingDepth[1:NiZ] smap.Smap_PermeabilityClass[1:NiZ] smap.Smap_SmapFH[1:NiZ] smap.Smap_ImpermClass[1:NiZ] Data[1:NiZ,:]]), writeheader=true, header=Header, bom=!(HeaderSmap))
 
       return nothing
       end  # function:  smap

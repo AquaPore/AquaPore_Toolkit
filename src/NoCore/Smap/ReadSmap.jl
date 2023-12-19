@@ -95,10 +95,11 @@
 
 				# Read data
 					Data           = CSV.read(path.inputSmap.SoilProfile, DataFrame, header=true)
-					BoundarySmap   = convert(Vector{String}, Data."Boundary")
-					Soilname 		= convert(Vector{String}, Data."Soilname")
+               BoundarySmap   = convert(Vector{String}, Data."Boundary")
 					
-					N_BoundarySmap = length(BoundarySmap)
+               Soilname       = convert(Vector{String}, Data."Soilname")
+					
+               N_BoundarySmap = length(BoundarySmap)
 
 				# Dictionary of boundary
 					Dict_Boundary_Smap2Hypix = Dict{String, String}()

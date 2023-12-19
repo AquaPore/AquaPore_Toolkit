@@ -87,8 +87,8 @@ module rockFragment
 		#		FUNCTION : FUNC_RF_CORECTION_KΨ_NASEI
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			""" Naseri (2022) Rock fragments influence the water retention and hydraulic conductivity of soils """
-			function ϜUNC_RF_CORECTION_KΨ_NASEI(Rf::Float64; Pshape=1.26, Pcritical=1.26)
-				return (1.0 - Rf / Pcritical) ^ Pshape	
+			function ϜUNC_RF_CORECTION_KΨ_NASEI(RockFragment::Float64; Pshape=1.26, Pcritical=1.26)
+				return (1.0 - RockFragment / Pcritical) ^ Pshape	
 			end  #  FUNC_RF_CORECTION_KΨ_NASEI()
 		# ------------------------------------------------------------------
 

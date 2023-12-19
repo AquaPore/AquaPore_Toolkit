@@ -156,13 +156,13 @@ module AquaPore_Toolkit
 				# 	IsTopsoil, RockClass = reading.PEDOLOGICAL(IdSelect, NiZ, path.inputSoilwater.Pedological⍰)
 				
 				if option.data.Pedological⍰ == "Smap"
-					smap = readSmap.SMAP(IdSelect_True, NiZ, path)
-					 Dict_SoilNames_2_HypixBottomBoundary = readSmap.BOUNDARY_BOTTOM(path)
+               smap                                 = readSmap.SMAP(IdSelect_True, NiZ, path)
+               Dict_SoilNames_2_HypixBottomBoundary = readSmap.BOUNDARY_BOTTOM(path)
 
-               RockFragment   = copy(smap.RockFragment)
-               RockClass      = copy(smap.RockClass)
-               IsTopsoil      = copy(smap.IsTopsoil)
-               Ks_Impermeable = copy(smap.Ks_Impermeable)
+               RockFragment                         = copy(smap.RockFragment)
+               RockClass                            = copy(smap.RockClass)
+               IsTopsoil                            = copy(smap.IsTopsoil)
+               Ks_Impermeable                       = copy(smap.Ks_Impermeable)
 				else
 					IsTopsoil=[]; Ks_Impermeable=[]
 				end  # if: option.data.Pedological⍰
@@ -335,7 +335,7 @@ module AquaPore_Toolkit
 
 		if option.run.HydroLabθΨ⍰ ≠ "No" && option.run.HydroLabθΨ⍰ ≠ "HydroParamPrecomputed" # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 			# CORE OUTPUT
-				table.hydroLab.θΨK(hydro, hydroOther, IdSelect[1:NiZ], KₛModel[1:NiZ], NiZ, path.tableSoilwater.Table_θΨK)
+				table.hydroLab.θΨK(hydro, hydroOther, IdSelect[1:NiZ], KₛModel[1:NiZ], NiZ, path.tableSoilwater.Table_θΨK, RockFragment)
 
 				# When optimising other model than Kosugi we do not have a model for σ_2_Ψm⍰. Therefore we assume that θ(Ψ) and K(θ) derived by Kosugi from very dry to very wet are physical points
 				# if option.hydro.HydroModel⍰ == "Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained"
