@@ -15,7 +15,7 @@ module checking
 				error("*** Cannot run simulataneously HyPix and SoilWater ***")
 
         # ------------ CHECKING HydroLabθΨ---------------------
-			 elseif "Ks" ∉ optim.ParamOpt && option.data.Kθ && option.run.HydroLabθΨ⍰ == "Opt" 
+			elseif "Ks" ∉ optim.ParamOpt && option.data.Kθ && option.run.HydroLabθΨ⍰ == "Opt" 
 				@warn("*** If  optim.ParamOpt && option.data.Kθ && option.run.HydroLabθΨ⍰==Opt ⇒ Ks ∈ optim.ParamOpt  ***")
 
 		 	elseif "Ks" ∈ optim.ParamOpt && !(option.data.Kθ) 
@@ -29,8 +29,6 @@ module checking
 			
 			elseif option.hydro.ΨmacMat_2_σMac_ΨmMac && ("ΨmMac" ∈ optim.ParamOpt || "σMac" ∈ optim.ParamOpt)
 				error("*** If option..hydro.ΨmacMat_2_σMac_ΨmMac ⇒ ΨmMac || σMac param should not be optimised pls change in GUI_HydroParam.csv ***")
-
-
 
 			elseif optionₘ.HydroModel⍰=="Kosugi" && "θsMacMat" ∈ optim.ParamOpt
 				error("*** optionₘ.HydroModel⍰==Kosugi && optionₘ.HydroModel⍰==Bimodal THAN optionₘ.HydroModel⍰ == Φ ***")
@@ -51,16 +49,21 @@ module checking
 				error("*** optionₘ.θrOpt⍰==ParamPsd THAN option.run.IntergranularMixingPsd=true ***")
 
         	elseif option.data.SimulationKosugiθΨK && "Ks" ∉ optim.ParamOpt
-            	error("***  Ks  ∉ optim.ParamOpt && option.smap.SimulationKosugiθΨK THAN Ks ∈ optim.ParamOpt ***")
+            error("***  Ks  ∉ optim.ParamOpt && option.smap.SimulationKosugiθΨK THAN Ks ∈ optim.ParamOpt ***")
 
 			elseif option.run.HydroLabθΨ⍰ == "HydroParamPrecomputed" 
-				@warn("***  Running from HydroParamPrecomputed.csv ***") 
+				@warn("***  Running from HydroParamPrecomputed.csv ***")
 
-			# ------------ CHECKING Infiltration model--------------------
+		# ------------ CHECKING SimulationKosugiθΨK which simulates other θ(ψ) & K(ψ) functions from Kosugi  θ(ψ) & K(ψ) models --------------------
+			elseif option.data.SimulationKosugiθΨK && option.run.RockCorection
+				error("***  option.data.SimulationKosugiθΨK && option.run.RockCorection THAN rock fragments are double corrected ***")
+
+
+		# ------------ CHECKING Infiltration model--------------------
 			elseif option.run.Infiltration && !(option.data.Infiltration)
 				error("***  option.run.Infiltration ⇒option.data.Infiltration ***")
 
-			# ------------ CHECKING Particle Size Distribution model--------------------
+		# ------------ CHECKING Particle Size Distribution model--------------------
 			elseif option.run.IntergranularMixingPsd && !(option.data.Psd)
 				error("***  option.run.IntergranularMixingPsd ⇒option.data.Psd ***")
 
@@ -77,12 +80,11 @@ module checking
 			elseif option.rockFragment.CorectStoneRockWetability && !(option.run.Smap)
 				@warn("*** If option.data.RockWetability ⇒ option.run.Smap ***")
 			
-			# ------------ CHECKING KsModel---------------------
+		# ------------ CHECKING KsModel---------------------
 			elseif option.run.KsModel && !(option.data.θΨ)
 				error("*** If option.run.KsModel ⇒ option.data.θΨ == true ***")
 
-			# ------------ CHECKING Smap_2_Hypix---------------------
-
+		# ------------ CHECKING Smap_2_Hypix---------------------
 			elseif option.run.Smap2Hypix && (option.data.Pedological⍰≠"Smap")
 				error("*** option.run.Smap2Hypix ⇒option.data.Pedological⍰ == Smap ***")
 
@@ -92,8 +94,7 @@ module checking
 			elseif option.rockFragment.CorectStoneRockWetability && !(option.data.RockWetability)
 				error("*** option.data.RockWetability ⇒ option.rockFragment.CorectStoneRockWetability  ➡ true***")
 
-			end # Check error
-
+		end # Check error
     	return nothing
     	end  # function: CHECKING
    
