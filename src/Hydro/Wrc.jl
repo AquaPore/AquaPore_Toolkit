@@ -213,6 +213,17 @@ module wrc
 					return θ_Mac + θ_Mat
 
 				elseif KosugiModel_θΨ⍰ == "ΨmacMat"
+
+					ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
+
+					if Ψ₁ ≤ ΨmacMat
+						return θ_Mac = 0.5 * (θs - θsMacMat) * (erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0)) 
+																		 - (min(Ψ₁ / ΨmacMat, 1.0)) * erfc((log(ΨmacMat / ΨmMac)) / (σMac * √2.0))) + θsMacMat
+					else
+						return θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0)) + θr
+					end		
+
+				elseif KosugiModel_θΨ⍰ == "ΨmacMat2"
 					ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
 
 					θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0)) + θr
@@ -220,6 +231,8 @@ module wrc
 					θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
 
 					return θ_Mac + θ_Mat
+
+
 				end
 
 			end # function Ψ_2_θ

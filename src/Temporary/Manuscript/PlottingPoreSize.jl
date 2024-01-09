@@ -25,14 +25,16 @@
 			# Input hydro parameters
 				θs = 0.4
 				θr = 0.
-				σ = 1
+				σ = 0.5
 				θsMacMat_η = 0.75
 				Ks = 0.008
 
 			θsMacMat = (θs - θr) * θsMacMat_η + θr
 
 			# Deriving macropore hydraulic parameters from ΨmacMat
-            ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr, ΨmacMat_Max=100.0, ΨmacMat_Min=0, θsMacMat_η_Tresh=0.95)
+
+			ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
+            # ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr, ΨmacMat_Max=100.0, ΨmacMat_Min=0, θsMacMat_η_Tresh=0.95)
 
             σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac=2)
 
@@ -73,7 +75,7 @@
 				Ψ_Min_Log = log10(exp(log(ΨmMac) - 3.0 * σMac))
 				
 
-				Ψ = 10.0.^(collect(Ψ_Min_Log:0.001:Ψ_Max_Log))
+				Ψ = 10.0.^(collect(Ψ_Min_Log:0.0001:Ψ_Max_Log))
 				N = length(Ψ)
 
 				∂θ∂Ψ_1 = fill(0.0::Float64 , N)
@@ -85,20 +87,19 @@
 				Ψ_2_KUNSAT_1 = fill(0.0::Float64 , N)
 				Ψ_2_KUNSAT_2 = fill(0.0::Float64 , N)
 
-		
 				for iΨ=1:N
 			
 					∂θ∂Ψ_1[iΨ] = wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
 
 					∂θ∂Ψ_2[iΨ] =  wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
 
-					Ψ_2_θDual_1[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac,KosugiModel_θΨ⍰="ΨmacMat")
+					Ψ_2_θDual_1[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰="ΨmacMat")
 					
-					Ψ_2_θDual_2[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
+					Ψ_2_θDual_2[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰="ΨmacMat")
 
-					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, Ks=Ks,Option_KosugiModel_KΨ⍰=="ΨmacMat")
+					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, Ks=Ks,Option_KosugiModel_KΨ⍰="Traditional")
 
-					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σMac=σMac, Ks=Ks, Option_KosugiModel_KΨ⍰="ΨmacMat")
+					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σMac=σMac, Ks=Ks, Option_KosugiModel_KΨ⍰="Traditional")
 				end
 
 			# ---------------
@@ -179,6 +180,7 @@
 				lines!(Axis_θΨ, Ψ, (Ψ ./ Ψ ) .* θ_Inlection , color=:yellow, linewidth=Linewidth/2.0)
 				lines!(Axis_θΨ,[Point(ΨmacMat,0), Point(ΨmacMat,θsMacMat)], color=:brown, linewidth=Linewidth/2.0)
 				lines!(Axis_θΨ, Ψ, (Ψ ./ Ψ ) .* θsMacMat , color=:grey, linewidth=Linewidth/2.0)
+				lines!(Axis_θΨ, Ψ, (Ψ ./ Ψ ) .* θs , color=:grey, linewidth=Linewidth/2.0)
 
 			Axis_KΨ = Axis(Fig[4,1], xlabel="Ψ [mm]", ylabel="K(Ψ) [cm h⁻¹]", xscale=log, xminorticksvisible=true, xminorgridvisible=true, xminorticks=IntervalsBetween(5))
 
