@@ -25,7 +25,7 @@
 			# Input hydro parameters
 				θs = 0.4
 				θr = 0.
-				σ = 0.5
+				σ = 4
 				θsMacMat_η = 0.75
 				Ks = 0.008
 
@@ -93,13 +93,13 @@
 
 					∂θ∂Ψ_2[iΨ] =  wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
 
-					Ψ_2_θDual_1[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰="ΨmacMat")
+					Ψ_2_θDual_1[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰="Traditional")
 					
 					Ψ_2_θDual_2[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰="ΨmacMat")
 
-					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, Ks=Ks,Option_KosugiModel_KΨ⍰="Traditional")
+					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, Ks=Ks,Option_KosugiModel_KΨ⍰="ΨmacMat")
 
-					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σMac=σMac, Ks=Ks, Option_KosugiModel_KΨ⍰="Traditional")
+					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σMac=σMac, Ks=Ks, Option_KosugiModel_KΨ⍰="ΨmacMat")
 				end
 
 			# ---------------
@@ -189,6 +189,7 @@
 				lines!(Axis_KΨ, Ψ , cst.MmS_2_CmH .* Ψ_2_KUNSAT_1, color=:green, linewidth=Linewidth)
 				lines!(Axis_KΨ, Ψ , cst.MmS_2_CmH .* Ψ_2_KUNSAT_2, color=:blue, linewidth=Linewidth)
 				lines!(Axis_KΨ, Ψ, (Ψ ./ Ψ ) .* cst.MmS_2_CmH .* KsMat, color=:grey, linewidth=Linewidth/2.0)
+				lines!(Axis_KΨ, Ψ, (Ψ ./ Ψ ) .* cst.MmS_2_CmH .* Ks, color=:grey, linewidth=Linewidth/2.0)
 				lines!(Axis_KΨ,[Point(ΨmacMat,0), Point(ΨmacMat,cst.MmS_2_CmH * KsMat)], color=:brown, linewidth=Linewidth/2.0)
 				# xlims!(Axis_KΨ, Ψ_Min, Ψ_Max)
 

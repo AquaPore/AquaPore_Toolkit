@@ -360,7 +360,7 @@ module lab
 					end
 
 			# Final adjustments
-				resize_to_layout!(Fig)
+				# resize_to_layout!(Fig)
 				trim!(Fig.layout)
 				colgap!(Fig.layout, 20)
 				rowgap!(Fig.layout, 20)

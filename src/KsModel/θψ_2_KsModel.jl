@@ -181,6 +181,7 @@ module θψ_2_KsψModel
 						
 				# MATRIX ----------------------------
 						T2_Max = 3.0; T3_Max = 4.0
+						
 					# Tortuosity T1
 						T1 =  10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
 						
