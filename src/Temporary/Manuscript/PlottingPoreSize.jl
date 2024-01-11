@@ -7,7 +7,7 @@
 			using CairoMakie, ColorSchemes
 			import SpecialFunctions: erfc, erfcinv
 
-			import ...cst, ..wrc, ..kunsat, ..hydroRelation
+			import ...cst, ...wrc, ...kunsat, ..hydroRelation
 
 			export PLOTTING_PORESIZE
 
@@ -25,7 +25,7 @@
 			# Input hydro parameters
 				θs = 0.4
 				θr = 0.
-				σ = 4
+				σ = 2.0
 				θsMacMat_η = 0.75
 				Ks = 0.008
 
@@ -71,7 +71,7 @@
 
 			# filling the data -----------------------
 
-				Ψ_Max_Log = log10(exp(log(Ψm_Max) + 3.0 * σ))
+				Ψ_Max_Log = log10(exp(log(Ψm_Max) + 2.0 * σ))
 				Ψ_Min_Log = log10(exp(log(ΨmMac) - 3.0 * σMac))
 				
 
@@ -89,17 +89,17 @@
 
 				for iΨ=1:N
 			
-					∂θ∂Ψ_1[iΨ] = wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
+					∂θ∂Ψ_1[iΨ] = wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac)
 
-					∂θ∂Ψ_2[iΨ] =  wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac)
+					∂θ∂Ψ_2[iΨ] =  wrc.kg.∂θ∂Ψ_NORM(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac)
 
-					Ψ_2_θDual_1[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰="Traditional")
+					Ψ_2_θDual_1[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, KosugiModel_θΨ⍰="ΨmacMat")
 					
-					Ψ_2_θDual_2[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰="ΨmacMat")
+					Ψ_2_θDual_2[iΨ] = wrc.kg.Ψ_2_θ(Ψ₁=Ψ[iΨ], θs=θs, θr=θr,  Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, KosugiModel_θΨ⍰="ΨmacMat")
 
-					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, σMac=σMac, Ks=Ks,Option_KosugiModel_KΨ⍰="ΨmacMat")
+					Ψ_2_KUNSAT_1[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, Ks=Ks, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
 
-					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, σMac=σMac, Ks=Ks, Option_KosugiModel_KΨ⍰="ΨmacMat")
+					Ψ_2_KUNSAT_2[iΨ] = kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, Ks=Ks, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
 				end
 
 			# ---------------

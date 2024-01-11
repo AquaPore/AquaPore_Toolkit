@@ -304,7 +304,7 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂θ∂Ψ_NORM
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂θ∂Ψ_NORM(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional")
+			function ∂θ∂Ψ_NORM(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac)
 
 				# ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
 
