@@ -121,9 +121,9 @@ module plotSmap
                   # Plot_θ_Ψ: General attributes
 
                   Fig = Figure(backgroundcolor = RGBf0(0.98, 0.98, 0.98),
-                     resolution = (1000, 700))
+                     size = (1000, 700))
 
-                  Axis1 = Axis(Fig[1,1], resolution = (1000, 700))
+                  Axis1 = Axis(Fig[1,1], size = (1000, 700))
 
                   xlims!(Axis1, log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Min), log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Max * 1.1))
                   ylims!(Axis1, 0.0, 0.75)

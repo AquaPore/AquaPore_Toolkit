@@ -91,7 +91,7 @@ module plotHypix
 
 				Color_Hypix = [:red, :darkviolet, :orange,  :blue, :teal]
 
-				Fig = Figure(resolution=(600,500))
+				Fig = Figure(size=(600,500))
 				Title = SiteName[iScenario]
 
 				Label_HyPix =fill("", Nt)
@@ -205,7 +205,7 @@ module plotHypix
 					end # for
 			
 			# PLOTTING
-			# , resolution = (3000, 2500)
+			# , size = (3000, 2500)
 				CairoMakie.activate!(type = "svg")
 				# fontsize=40,
 				Fig = Figure(font="Sans", titlesize=50,  xlabelsize=40, ylabelsize=40, labelsize=40, fontsize=40)

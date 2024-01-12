@@ -126,8 +126,9 @@
 						Ψ_Min = 0.001
 						Ψ_Max = 2000_00.0
 
-			CairoMakie.activate!(type = "svg")
-			Fig = Figure(resolution = (5000, 4000), font="Sans", fontsize=NumberSize)
+			# CairoMakie.activate!(type = "svg")
+			# Fig = Figure(size = (5000, 4000), font="Sans", fontsize=NumberSize)
+			Fig = Figure( size=(5000, 4000), font="Sans", fontsize=NumberSize)
 			
 			# TableComplete_θΨ = [0.001, 1.0, 10.0, 50, 100.0, 250, 500.0, 1000.0, 2500, 5000.0,100_00.0, 150_00.0,250_00.0, 500_00.0, 1000_00.0,  1500_00.0, 2000_00.0]
 			
@@ -206,10 +207,10 @@
 				colgap!(Fig.layout, 50)
 				rowgap!(Fig.layout, 50)
 
-				Path = raw"D:\TEMP\Plots\DthetaH.svg"
-				save(Path, Fig)
-
+				# Path = raw"D:\TEMP\Plots\DthetaH.svg"
 				display(Fig)
+				# save(Path, Fig)
+
 			
 		return
 		end  # function: PLOTTING_PORESIZE

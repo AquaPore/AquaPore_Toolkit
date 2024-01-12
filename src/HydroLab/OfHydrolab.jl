@@ -5,18 +5,30 @@ module ofHydrolab
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_WRC_KUNSAT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-		function OF_WRC_KUNSAT(hydro, iZ::Int64, N_θΨobs::Vector{Int64}, optim, optionₘ, θ_θΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64}; K_KΨobs=[0.0 0.0; 0.0 0.0]::Matrix{Float64}, N_KΨobs=[0]::Vector{Int64}, Ψ_KΨobs=[0.0 0.0; 0.0 0.0]::Matrix{Float64}, Wof=0.5::Float64) 
+		function OF_WRC_KUNSAT(hydro, iZ::Int64, N_θΨobs::Vector{Int64}, optim, optionₘ, θ_θΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64}; K_KΨobs=[0.0 0.0; 0.0 0.0]::Matrix{Float64}, N_KΨobs=[0]::Vector{Int64}, Ψ_KΨobs=[0.0 0.0; 0.0 0.0]::Matrix{Float64}, Wof_Min=0.1::Float64, Wof_Max=0.9::Float64) 
 
+			# Weighting algorithm
+				Wof =  WEIGHTING(; iZ, N_KΨobs, N_θΨobs, Wof_Max=Wof_Max, Wof_Min=Wof_Min, Ψ_KΨobs, Ψ_θΨobs)
+
+	
+			
 			# === OF θΨ ====
 				θ_Obs = fill(0.0::Float64, N_θΨobs[iZ])
 				θ_Sim = fill(0.0::Float64, N_θΨobs[iZ])
+
+				# IF we do not optimise θs than we do not use the first obeserved point which is at Ψ=0
+					if "θs" ∉ optim.ParamOpt
+						iStart = 2
+					else
+						iStart = 1
+					end
 
 				for iΨ = 1:N_θΨobs[iZ]
 					θ_Obs[iΨ] = θ_θΨobs[iZ,iΨ]
 					θ_Sim[iΨ] = wrc.Ψ_2_θ(optionₘ, Ψ_θΨobs[iZ,iΨ], iZ, hydro)
 				end # for iΨ = 1:N_θΨobs[iZ]
 
-				Of_θΨ = stats.NSE_MINIMIZE(θ_Obs[1:N_θΨobs[iZ]], θ_Sim[1:N_θΨobs[iZ]])
+				Of_θΨ = stats.NSE_MINIMIZE(θ_Obs[iStart:N_θΨobs[iZ]], θ_Sim[iStart:N_θΨobs[iZ]])
 
 			# === OF Kunsat ====
 			if "Ks" ∈ optim.ParamOpt
@@ -39,6 +51,24 @@ module ofHydrolab
 			end #  "Ks" ∈ optim.ParamOpt
 		return Of, Of_θΨ, Of_Kunsat
 		end # function OF_WRC_KUNSAT
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : WEIGHT
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function WEIGHTING(; iZ, N_KΨobs, N_θΨobs, Wof_Max=0.8, Wof_Min=0.2, Ψ_KΨobs, Ψ_θΨobs)
+
+			Ψ_θΨobs_Min = log10(minimum(abs.(Ψ_θΨobs[iZ, 1:N_θΨobs[iZ]])) + 1.0)
+			Ψ_θΨobs_Max = log10(maximum(abs.(Ψ_θΨobs[iZ, 1:N_θΨobs[iZ]])) + 1.0)	
+
+			Ψ_KΨobs_Min = log10(minimum(abs.(Ψ_KΨobs[iZ, 1:N_KΨobs[iZ]])) + 1.0)
+			Ψ_KΨobs_Max = log10(maximum(abs.(Ψ_KΨobs[iZ, 1:N_KΨobs[iZ]])) + 1.0)
+			
+			Wof = 0.4 * (Ψ_θΨobs_Max - Ψ_θΨobs_Min + 1.0) / (Ψ_KΨobs_Max - Ψ_KΨobs_Min + 1.0)
+			Wof = max(min(Wof, Wof_Max), Wof_Min)
+
+		return Wof
+		end  # function: WEIGHTING
+	# ------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -56,7 +56,7 @@ module temporary
 		# PLOTTING	
 			colors = ColorScheme(range(colorant"black", colorant"red", length=N_Categories))
 		
-			Fig = CairoMakie.Figure(resolution = (700, 800))
+			Fig = CairoMakie.Figure(size = (700, 800))
 			Axis1 = CairoMakie.Axis(Fig, xlabel = "variable", yscale=log10, ylabel = "Ks [mm / h]", xticks = (1:N_Categories, Categorie_Unique))
 			Axis2 = CairoMakie.Axis(Fig, xlabel = "variable", yscale=log10, ylabel = "Ks [mm / h]", xticks = (1:N_Categories, Categorie_Unique))
 

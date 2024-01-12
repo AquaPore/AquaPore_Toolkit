@@ -205,7 +205,7 @@ module plotOther
 
 				# AX1
 	
-				Fig = Figure(resolution = (2000, 800))
+				Fig = Figure(size = (2000, 800))
 				
 				Title = L"Time-stepping: $\Delta \theta$"
 					Ax1 = Axis(Fig[1,1], title=Title, xlabel= L"ln $\psi$ $[mm]$", ylabel=  L"$\theta$ $[m^{3}  m^{-3}]$",  font="Computer Modern", titlesize=30, fontsize=30, xlabelsize=30, ylabelsize=30 , xgridvisible=false, ygridvisible=false, ytickalign=0.1)
@@ -348,7 +348,7 @@ module plotOther
 				Makie.inline!(true)
 
 
-				Fig = Figure(resolution = (1000, 600))
+				Fig = Figure(size = (1000, 600))
 
 				Ax1 = Axis(Fig[1,1], xlabel= L"$\sigma$ $[-]$", ylabel=  L"$\Psi$ $[mm]$",  font="Computer Modern", titlesize=35, fontsize=35, xlabelsize=35, ylabelsize=35 , xgridvisible=false, ygridvisible=false, yscale = log10, yminorticksvisible = true, yminorgridvisible = true,
 				yminorticks = IntervalsBetween(10))

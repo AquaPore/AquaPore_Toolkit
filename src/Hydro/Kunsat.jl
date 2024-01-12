@@ -203,27 +203,22 @@ module kunsat
 					# Parameters
 						T2_Max = 3.0; T3_Max = 4.0
 
-                  τ₂ₐ    = 0.9
-                  τ₂ₐMac = 0.9
-                  τ₃ₐ    = 0.
-                  τ₃ₐMac = 0.
-
-						
+                  τ₂ₐ    = 0.5893705657616117 #0.10567
+                  τ₂ₐMac = 0.99754
+                  τ₃ₐ    = 0.6406765923888422 #0.39835
+                  τ₃ₐMac = 0.003521867181435153 #0.00105
+	
                   T2     = T2_Max * (1.0 - τ₂ₐ)
-
                   T2Mac  = T2_Max * (1.0 - τ₂ₐMac)
-
                   T3     = T3_Max * (1.0 - τ₃ₐ)
-
                   T3Mac  = T3_Max * (1.0 - τ₃ₐMac)
 
-                  T2    = 1.0
-                  T2Mac = 1.0
-                  T3    = 2.0
-                  T3Mac = 1.0
+                  # T2    = 1.0
+                  # T2Mac = 1.0
+                  # T3    = 2.0
+                  # T3Mac = 1.0
 					
 					W_Mat = (((θsMacMat - θr) / (Ψm ^ T2)) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
-
 					W_Mac = ((max(θs - θsMacMat, 0.0) / (ΨmMac ^ T2Mac)) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
 					Ks_Mat = Ks * W_Mat / (W_Mat + W_Mac)
@@ -233,15 +228,13 @@ module kunsat
 
 					
 					if Ψ₁ ≤ ΨmacMat		
-
 						return Kunsat_Mac =  Ks_Mac * √Se₁ * (KR_Mac(Ψ₁) - (Ψ₁ / ΨmacMat) * KR_Mac(ΨmacMat)) ^ 2.0 + Ks_Mat
 			
 					else
 						# Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0))
 						Se_Mat = Se₁ * (θs - θr) / (θsMacMat - θr)
 
-						return Kunsat_Mat =  Ks_Mat * √Se_Mat * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + T2 * σ) / √2.0)) ^ 2.0
-
+					return Kunsat_Mat =  Ks_Mat * √Se_Mat * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + T2 * σ) / √2.0)) ^ 2.0
 					end				
 		
 				else

@@ -40,7 +40,7 @@ module lab
 
 					# _______________________ START: Plotting _______________________
 								
-					Fig = Figure(resolution = (2500, 1000),  font="Sans", fontsize=16)
+					Fig = Figure(size = (2500, 1000),  font="Sans", fontsize=16)
 
 					Title = "iZ= $(IdSelect[iZ]) " * "θ(Ψ) Nse_θΨ=" * string(round(hydroOther.Nse_θΨ[iZ], digits=2)) * "; Nse_KΨ=" * string(round(hydroOther.Nse_KΨ[iZ], digits=2)) * "; Wilmot_θΨ=" *  string(round(hydroOther.NseWilmot_θΨ[iZ],digits=2)) * "; Wilmot_KΨ=" * string(round(hydroOther.NseWilmot_KΨ[iZ], digits=2))
 					
