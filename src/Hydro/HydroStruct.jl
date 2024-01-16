@@ -22,6 +22,12 @@ module hydroStruct
          So             :: Vector{Float64}
          θsMacMat       ::	Vector{Float64}
          Φ              ::	Vector{Float64}
+         τa             ::	Vector{Float64}
+         τb             ::	Vector{Float64}
+         τc             ::	Vector{Float64}
+         τaMac          ::	Vector{Float64}       
+         τbMac          ::	Vector{Float64}
+         τcMac          ::	Vector{Float64}
 			
          θs_Min         :: Vector{Float64}
          θr_Min         :: Vector{Float64}
@@ -35,6 +41,12 @@ module hydroStruct
          So_Min         :: Vector{Float64}
          θsMacMat_Min   ::	Vector{Float64}
          Φ_Min          ::	Vector{Float64}
+         τa_Min         ::	Vector{Float64}
+         τb_Min         ::	Vector{Float64}
+         τc_Min         ::	Vector{Float64}
+         τaMac_Min      ::	Vector{Float64}
+         τbMac_Min      ::	Vector{Float64}
+         τcMac_Min      ::	Vector{Float64}
 
          θs_Max         :: Vector{Float64}
          θr_Max         :: Vector{Float64}
@@ -48,92 +60,98 @@ module hydroStruct
          So_Max         :: Vector{Float64}
          θsMacMat_Max   ::	Vector{Float64}
          Φ_Max          ::	Vector{Float64}
+         τa_Max         ::	Vector{Float64}
+         τb_Max         ::	Vector{Float64}
+         τc_Max         ::	Vector{Float64}
+         τaMac_Max      ::	Vector{Float64}
+         τbMac_Max      ::	Vector{Float64}
+         τcMac_Max      ::	Vector{Float64}
 		end # struct KOSUGI
 
 		
 		Base.@kwdef mutable struct VANGENUCHTEN # <>=<>=<>=<>=<>=<>=<>=<>=<>
-         θs      ::	Vector{Float64}
-         θr      ::	Vector{Float64}
-         N       ::	Vector{Float64}
-         Ψvg     ::	Vector{Float64}
-         ΨmacMat :: Vector{Float64}
-         Ks      ::	Vector{Float64}
-         Km      ::	Vector{Float64}
-         Φ       ::	Vector{Float64}
+         θs          ::	Vector{Float64}
+         θr          ::	Vector{Float64}
+         N           ::	Vector{Float64}
+         Ψvg         ::	Vector{Float64}
+         ΨmacMat     :: Vector{Float64}
+         Ks          ::	Vector{Float64}
+         Km          ::	Vector{Float64}
+         Φ           ::	Vector{Float64}
 			
-         θs_Min  ::	Vector{Float64}
-         θr_Min  ::	Vector{Float64}
-         N_Min   ::	Vector{Float64}
-         Ψvg_Min ::	Vector{Float64}
-         ΨmacMat_Min  :: Vector{Float64}
-         Ks_Min  ::	Vector{Float64}
-         Km_Min  ::	Vector{Float64}
-         Φ_Min   ::	Vector{Float64}
+         θs_Min      ::	Vector{Float64}
+         θr_Min      ::	Vector{Float64}
+         N_Min       ::	Vector{Float64}
+         Ψvg_Min     ::	Vector{Float64}
+         ΨmacMat_Min :: Vector{Float64}
+         Ks_Min      ::	Vector{Float64}
+         Km_Min      ::	Vector{Float64}
+         Φ_Min       ::	Vector{Float64}
 			
-         θs_Max  ::	Vector{Float64}
-         θr_Max  ::	Vector{Float64}
-         N_Max   ::	Vector{Float64}
-         Ψvg_Max ::	Vector{Float64}
-         ΨmacMat_Max  :: Vector{Float64}
-         Ks_Max  ::	Vector{Float64}
-         Km_Max  ::	Vector{Float64}
-         Φ_Max   ::	Vector{Float64}
+         θs_Max      ::	Vector{Float64}
+         θr_Max      ::	Vector{Float64}
+         N_Max       ::	Vector{Float64}
+         Ψvg_Max     ::	Vector{Float64}
+         ΨmacMat_Max :: Vector{Float64}
+         Ks_Max      ::	Vector{Float64}
+         Km_Max      ::	Vector{Float64}
+         Φ_Max       ::	Vector{Float64}
 		end # struct VANGENUCHTEN
 
 
 		Base.@kwdef mutable struct BROOKS_COREY # <>=<>=<>=<>=<>=<>=<>=<>=<>
-         θs      ::	Vector{Float64}
-         θr      ::	Vector{Float64}
-         λbc     ::	Vector{Float64}
-         Ψbc     ::	Vector{Float64}
-         ΨmacMat :: Vector{Float64}
-         Ks      ::	Vector{Float64}
-         Φ       ::	Vector{Float64}
-         Ψga     ::	Vector{Float64}
+         θs          ::	Vector{Float64}
+         θr          ::	Vector{Float64}
+         λbc         ::	Vector{Float64}
+         Ψbc         ::	Vector{Float64}
+         ΨmacMat     :: Vector{Float64}
+         Ks          ::	Vector{Float64}
+         Φ           ::	Vector{Float64}
+         Ψga         ::	Vector{Float64}
 			
-         θs_Min  ::	Vector{Float64}
-         θr_Min  ::	Vector{Float64}
-         λbc_Min ::	Vector{Float64}
-         Ψbc_Min ::	Vector{Float64}
-         ΨmacMat_Min  :: Vector{Float64}         
-         Ks_Min  ::	Vector{Float64}
-         Φ_Min   ::	Vector{Float64}
+         θs_Min      ::	Vector{Float64}
+         θr_Min      ::	Vector{Float64}
+         λbc_Min     ::	Vector{Float64}
+         Ψbc_Min     ::	Vector{Float64}
+         ΨmacMat_Min :: Vector{Float64}
+         Ks_Min      ::	Vector{Float64}
+         Φ_Min       ::	Vector{Float64}
 			
-         θs_Max  ::	Vector{Float64}
-         θr_Max  ::	Vector{Float64}
-         λbc_Max ::	Vector{Float64}
-         Ψbc_Max ::	Vector{Float64}
-         ΨmacMat_Max  :: Vector{Float64}         
-         Ks_Max  ::	Vector{Float64}
-         Φ_Max   ::	Vector{Float64}
+         θs_Max      ::	Vector{Float64}
+         θr_Max      ::	Vector{Float64}
+         λbc_Max     ::	Vector{Float64}
+         Ψbc_Max     ::	Vector{Float64}
+         ΨmacMat_Max :: Vector{Float64}
+         Ks_Max      ::	Vector{Float64}
+         Φ_Max       ::	Vector{Float64}
 		end # struct BROOKS COREY
 
 
 		Base.@kwdef mutable struct CLAPP_HORNBERGER # <>=<>=<>=<>=<>=<>=<>=<>=<>
-			θs        ::	Vector{Float64}
-         θr        ::	Vector{Float64}
-         λch       ::	Vector{Float64}
-         Ψch       ::	Vector{Float64}
-         ΨmacMat   :: Vector{Float64}               
-         Ks        ::	Vector{Float64}
-			Φ         ::	Vector{Float64}
-         Ψga       ::	Vector{Float64}
+         θs          ::	Vector{Float64}
+         θr          ::	Vector{Float64}
+         λch         ::	Vector{Float64}
+         Ψch         ::	Vector{Float64}
+         ΨmacMat     :: Vector{Float64}
+         Ks          ::	Vector{Float64}
+         Φ           ::	Vector{Float64}
+         Ψga         ::	Vector{Float64}
 			
-			θs_Min        ::	Vector{Float64}
-         θr_Min        ::	Vector{Float64}
-         λch_Min       ::	Vector{Float64}
-         Ψch_Min       ::	Vector{Float64}
-         ΨmacMat_Min  :: Vector{Float64}               
-         Ks_Min        ::	Vector{Float64}
-			Φ_Min         ::	Vector{Float64}
+         θs_Min      ::	Vector{Float64}
+         θr_Min      ::	Vector{Float64}
+         λch_Min     ::	Vector{Float64}
+         Ψch_Min     ::	Vector{Float64}
+         ΨmacMat_Min :: Vector{Float64}
+         Ks_Min      ::	Vector{Float64}
+         Φ_Min       ::	Vector{Float64}
 			
-			θs_Max        ::	Vector{Float64}
-         θr_Max        ::	Vector{Float64}
-         λch_Max       ::	Vector{Float64}
-         Ψch_Max       ::	Vector{Float64}
-         ΨmacMat_Max  :: Vector{Float64}         
-         Ks_Max        ::	Vector{Float64}
-         Φ_Max         ::	Vector{Float64}
+         θs_Max      ::	Vector{Float64}
+         θr_Max      ::	Vector{Float64}
+         λch_Max     ::	Vector{Float64}
+         Ψch_Max     ::	Vector{Float64}
+         ΨmacMat_Max :: Vector{Float64}
+         Ks_Max      ::	Vector{Float64}
+         Φ_Max       ::	Vector{Float64}
 		end # struct CLAPP_HORNBERGER
 
 
@@ -178,10 +196,16 @@ module hydroStruct
          So_Max      = fill(0.0::Float64, NiZ)
 			
 			if optionₘ.HydroModel⍰ == "Kosugi" # <>=<>=<>=<>=<>
-				σ              = fill(0.0::Float64, NiZ)
+            σ              = fill(0.0::Float64, NiZ)
             Ψm             = fill(0.0::Float64, NiZ)
             σMac           = fill(0.0::Float64, NiZ)
             ΨmMac          = fill(0.0::Float64, NiZ)
+            τa             = fill(0.0::Float64, NiZ)
+            τb             = fill(0.0::Float64, NiZ)
+            τc             = fill(0.0::Float64, NiZ)
+            τaMac          = fill(0.0::Float64, NiZ)
+            τbMac          = fill(0.0::Float64, NiZ)
+            τcMac          = fill(0.0::Float64, NiZ)
 				
             Ψm_Min         = fill(0.0::Float64, NiZ)
             σ_Min          = fill(0.0::Float64, NiZ)
@@ -189,6 +213,12 @@ module hydroStruct
             σMac_Min       = fill(0.0::Float64, NiZ)
             ΨmMac_Min      = fill(0.0::Float64, NiZ)
             θsMacMat_Min   = fill(0.0::Float64, NiZ)
+            τa_Min         = fill(0.0::Float64, NiZ)
+            τb_Min         = fill(0.0::Float64, NiZ)
+            τc_Min         = fill(0.0::Float64, NiZ)
+            τaMac_Min      = fill(0.0::Float64, NiZ)
+            τbMac_Min      = fill(0.0::Float64, NiZ)
+            τcMac_Min      = fill(0.0::Float64, NiZ)
 
             Ψm_Max         = fill(0.0::Float64, NiZ)
             σ_Max          = fill(0.0::Float64, NiZ)
@@ -196,8 +226,15 @@ module hydroStruct
             σMac_Max       = fill(0.0::Float64, NiZ)
             ΨmMac_Max      = fill(0.0::Float64, NiZ)
             θsMacMat_Max   = fill(0.0::Float64, NiZ)
+            τa_Max         = fill(0.0::Float64, NiZ)
+            τb_Max         = fill(0.0::Float64, NiZ)
+            τc_Max         = fill(0.0::Float64, NiZ)
+            τaMac_Max      = fill(0.0::Float64, NiZ)
+            τbMac_Max      = fill(0.0::Float64, NiZ)
+            τcMac_Max      = fill(0.0::Float64, NiZ)
           
-				hydro = KOSUGI(θs, θr, Ks, σ, Ψm, θsMacMat_ƞ, σMac, ΨmMac, ΨmacMat, So, θsMacMat, Φ, θs_Min, θr_Min, Ks_Min, σ_Min,Ψm_Min, θsMacMat_ƞ_Min, σMac_Min, ΨmMac_Min, ΨmacMat_Min, So_Min, θsMacMat_Min, Φ_Min, θs_Max, θr_Max, Ks_Max, σ_Max, Ψm_Max, θsMacMat_ƞ_Max, σMac_Max, ΨmMac_Max, ΨmacMat_Max, So_Max, θsMacMat_Max, Φ_Max)
+				hydro = KOSUGI(θs, θr, Ks, σ, Ψm, θsMacMat_ƞ, σMac, ΨmMac, ΨmacMat, So, θsMacMat, Φ,  τa, τb, τc, τaMac, τbMac, τcMac,θs_Min, θr_Min, Ks_Min, σ_Min,Ψm_Min, θsMacMat_ƞ_Min, σMac_Min, ΨmMac_Min, ΨmacMat_Min, So_Min, θsMacMat_Min, Φ_Min,  τa_Min, τb_Min, τc_Min, τaMac_Min, τbMac_Min, τcMac_Min, θs_Max, θr_Max, Ks_Max, σ_Max, Ψm_Max, θsMacMat_ƞ_Max, σMac_Max, ΨmMac_Max, ΨmacMat_Max, So_Max, θsMacMat_Max, Φ_Max, τa_Max, τb_Max, τc_Max, τaMac_Max, τbMac_Max, τcMac_Max)   
+           
 				return hydro
 
 			elseif optionₘ.HydroModel⍰=="Vangenuchten" || optionₘ.HydroModel⍰=="VangenuchtenJules" # <>=<>=<>=<>=<>

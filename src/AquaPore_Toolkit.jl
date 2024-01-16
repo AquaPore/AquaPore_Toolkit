@@ -97,7 +97,7 @@ module AquaPore_Toolkit
 						K_KΨobs, Ψ_KΨobs, N_KΨobs = reading.KUNSATΨ(IdSelect, NiZ, path, path.tableSoilwater.TableComplete_KΨ)
 					catch
 						@warn "\n *** option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰≠:Kosugi => Kosugi simulation not performed yet! *** \n"
-						if "Ks" ∈ optim.ParamOpt
+						if option.data.Kθ
 							K_KΨobs, Ψ_KΨobs, N_KΨobs = reading.KUNSATΨ(IdSelect, NiZ, path, path.inputSoilwater.Kunsat)
 						end
 					end # catch
@@ -212,13 +212,13 @@ module AquaPore_Toolkit
 
 
 			# OPTIMISING HYDRAULIC PARAMETERS
-			if "Ks" ∈ optim.ParamOpt
+			if option.data.Kθ
 				hydro, hydroOther = hydrolabOpt.HYDROLABOPT_START(NiZ=NiZ, ∑Psd=∑Psd, θ_θΨobs=θ_θΨobs, Ψ_θΨobs=Ψ_θΨobs, N_θΨobs=N_θΨobs, K_KΨobs=K_KΨobs, Ψ_KΨobs=Ψ_KΨobs, N_KΨobs=N_KΨobs, hydro=hydro, hydroOther=hydroOther, option=option, optionₘ=option.hydro, optim=optim, param=param)
 
 			else
 				hydro, hydroOther = hydrolabOpt.HYDROLABOPT_START(NiZ=NiZ, ∑Psd=∑Psd, θ_θΨobs=θ_θΨobs, Ψ_θΨobs=Ψ_θΨobs, N_θΨobs=N_θΨobs, hydro=hydro, hydroOther=hydroOther, option=option, optionₘ=option.hydro, optim=optim, param=param)
 
-			end # "Ks" ∈ optim.ParamOpt
+			end # option.data.Kθ
 
 			# SPECIAL CASE
 				if option.hydro.HydroModel⍰=="BrooksCorey" || option.hydro.HydroModel⍰=="ClappHornberger"

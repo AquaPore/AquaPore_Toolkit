@@ -44,15 +44,12 @@ module hydrolabOpt
 			# CORRECTING θs  ~~~~~
 				if ("θs" ∈ optim.ParamOpt) # *****
 					if 🎏ΘΨ_0
-						hydro.θs_Min[iZ] = θ_θΨobs[iZ, 2]
-						hydro.θs_Max[iZ] = θobs_Max * 1.1
-
 						hydro.Φ[iZ] = θobs_Max / param.hydro.Coeff_Φ_2_θs
 
 						# Changing the feasible range of θs
 							iθs = findfirst(isequal("θs"), optim.ParamOpt)[1]
-							optim.ParamOpt_Min[iθs] = hydro.θs_Min[iZ]
-							optim.ParamOpt_Max[iθs] = hydro.θs_Max[iZ]
+							optim.ParamOpt_Min[iθs] = θ_θΨobs[iZ, 2]
+							optim.ParamOpt_Max[iθs] = θobs_Max * 1.1
 
 					elseif !(🎏ΘΨ_0) 
 						hydro.θs_Min[iZ] = θobs_Max
@@ -75,50 +72,36 @@ module hydrolabOpt
 				end # if "θs"
 
 
-			# CORRECTING Ks  ~~~
+			# test if exist K(Ψ=0) and therefore we can obtain Ks from data  ~~~
 				if option.data.Kθ
-					if minimum(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]) < eps(1000.0)
-						🎏_KsOpt = false
+					if minimum(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]) < eps(1000.0)  
+						🎏_Ks = true
 					else
-						🎏_KsOpt = true
+						🎏_Ks = false
 					end
+					
+					K_KΨobs_Max = maximum(K_KΨobs[iZ, 1:N_KΨobs[iZ]])
 				end # if option.data.Kθ
 
+
 				if option.data.Kθ && "Ks" ∈ optim.ParamOpt
-					# test if exist Ψ=0
-					if "Ks" ∈ optim.ParamOpt
-						if minimum(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]) < eps(100.0)
-							🎏_KsOpt = false
-						else
-							🎏_KsOpt = true
-						end
-					end # if "Ks" ∈ optim.ParamOpt
-
-					K_KΨobs_Max = maximum(K_KΨobs[iZ, 1:N_KΨobs[iZ]])
-
-					if 🎏_KsOpt && ("Ks" ∈ optim.ParamOpt)
-						hydro.Ks_Min[iZ] = K_KΨobs_Max # Greatest measure of Kunsat)
-
+					if !(🎏_Ks) 
 						# Modifying the searchrange
 						iKs = findfirst(isequal("Ks"), optim.ParamOpt)[1]
-						optim.ParamOpt_Min[iKs] = hydro.Ks_Min[iZ]
-						optim.ParamOpt_Max[iKs] = max(optim.ParamOpt_Max[iKs], hydro.Ks_Min[iZ] + 0.01)
+						optim.ParamOpt_Min[iKs] = max(hydro.Ks_Min[iZ], K_KΨobs_Max)
+						optim.ParamOpt_Max[iKs] = max(optim.ParamOpt_Max[iKs], optim.ParamOpt_Min[iKs] + 0.01)
 
-					elseif !(🎏_KsOpt) && ("Ks" ∈ optim.ParamOpt)
-						hydro.Ks_Max[iZ] = K_KΨobs_Max # Greatest measure of Kunsat
-
+					elseif 🎏_Ks 
 						# Modifying the searchrange
                      iKs                     = findfirst(isequal("Ks"), optim.ParamOpt)[1]
-                     optim.ParamOpt_Max[iKs] = hydro.Ks_Max[iZ]
-                     optim.ParamOpt_Min[iKs] = max(hydro.Ks_Max[iZ] - eps(1000.0), eps(10.0))
-
-					elseif ("Ks" ∉ optim.ParamOpt)
-                  hydro.Ks_Max[iZ] = K_KΨobs_Max
-						hydro.Ks_Min[iZ] = K_KΨobs_Max
-                  hydro.Ks[iZ]     = hydro.Ks_Max[iZ]
-
+                     optim.ParamOpt_Min[iKs] = K_KΨobs_Max * 0.9
+                     optim.ParamOpt_Max[iKs] = K_KΨobs_Max  * 1.1
 					end # "Ks" ∈ optim.ParamOpt
-				end # if "Ks" ∈ optim.ParamOpt
+
+				elseif option.data.Kθ && "Ks" ∉ optim.ParamOpt && 🎏_Ks
+					hydro.Ks[iZ] = K_KΨobs_Max
+
+				end # if option.data.Kθ && "Ks" ∈ optim.ParamOpt
 			
 			# Updated searchrange
 				SearchRange = optimize.SEARCHRANGE(optionₘ, optim)
@@ -202,7 +185,6 @@ module hydrolabOpt
 			end 
 		return Of
 		end  # function: OF_HYPIX
-
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : PARAM

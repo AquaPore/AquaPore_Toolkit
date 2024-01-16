@@ -6,10 +6,6 @@ module ofHydrolab
 	#		FUNCTION : OF_WRC_KUNSAT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 		function OF_WRC_KUNSAT(hydro, iZ::Int64, N_θΨobs::Vector{Int64}, optim, optionₘ, θ_θΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64}; K_KΨobs=[0.0 0.0; 0.0 0.0]::Matrix{Float64}, N_KΨobs=[0]::Vector{Int64}, Ψ_KΨobs=[0.0 0.0; 0.0 0.0]::Matrix{Float64}, Wof_Min=0.1::Float64, Wof_Max=0.9::Float64) 
-
-			# Weighting algorithm
-				Wof =  WEIGHTING(; iZ, N_KΨobs, N_θΨobs, Wof_Max=Wof_Max, Wof_Min=Wof_Min, Ψ_KΨobs, Ψ_θΨobs)
-
 	
 			
 			# === OF θΨ ====
@@ -32,6 +28,10 @@ module ofHydrolab
 
 			# === OF Kunsat ====
 			if "Ks" ∈ optim.ParamOpt
+
+				# Weighting algorithm
+					Wof =  WEIGHTING(; iZ, N_KΨobs, N_θΨobs, Wof_Max=Wof_Max, Wof_Min=Wof_Min, Ψ_KΨobs, Ψ_θΨobs)
+					
 				# Of_Kunsat = 0.0
 				Kunsat_Obs_Ln = fill(0.0::Float64, N_KΨobs[iZ])
 				Kunsat_Sim_Ln = fill(0.0::Float64, N_KΨobs[iZ])
@@ -68,6 +68,25 @@ module ofHydrolab
 
 		return Wof
 		end  # function: WEIGHTING
+	# ------------------------------------------------------------------
+
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : OF_ALL
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	function OF_ALLSOILS(NiZ)
+
+		Of = sum(Of) / NiZ
+
+
+		if option.ksModel.Of_KₛModel⍰ == "Wilmot"
+			Of_Kθ = Of_Kθ + (1.0 - abs(stats.NSE_WILMOT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])))
+		else
+			Of_Kθ = Of_Kθ + stats.RMSE_CONCORDANCE_CORELATION_COEFICIENT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])
+		end
+		
+	return
+	end  # function: OF_ALL
 	# ------------------------------------------------------------------
 
 

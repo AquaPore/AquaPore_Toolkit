@@ -9,7 +9,7 @@ module kunsat
 			Ψ₁ = max(Ψ₁, 0.0)
 
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				return kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], Option_KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰, KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
+				return kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], τa=hydroParam.τa[iZ], τb=hydroParam.τb[iZ], τc=hydroParam.τc[iZ], τaMac=hydroParam.τaMac[iZ], τbMac=hydroParam.τbMac[iZ], τcMac=hydroParam.τcMac[iZ], Option_KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰, KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
 
 			elseif  optionₘ.HydroModel⍰ == "Vangenuchten" ||  optionₘ.HydroModel⍰ == "VangenuchtenJules"
 				return kunsat.vg.KUNSAT_θΨSe(optionₘ, Ψ₁, iZ::Int64, hydroParam)
@@ -23,17 +23,18 @@ module kunsat
 		end # function KUNSAT_θΨSe
 	#-------------------------------------------------------------------
 
+
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : θ_2_KUNSAT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	  function θ_2_KUNSAT(optionₘ, θ₁, iZ::Int64, hydroParam)
+	#   function θ_2_KUNSAT(optionₘ, θ₁, iZ::Int64, hydroParam)
 			
-			if  optionₘ.HydroModel⍰ == "Kosugi"
-				return kunsat.kg.KUNSAT_θΨSe(θ₁=θ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ],  Option_KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰)
-			else
-				error("$( optionₘ.HydroModel⍰) model for θ_2_KUNSAT is not yet available")
-			end
-		end # function θ_2_KUNSAT
+	# 		if  optionₘ.HydroModel⍰ == "Kosugi"
+	# 			return kunsat.kg.KUNSAT_θΨSe(θ₁=θ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], τa=hydroParam.τa[iZ], τb=hydroParam.τb[iZ], τc=hydroParam.τc[iZ], τaMac=hydroParam.τaMac[iZ], τbMac=hydroParam.τbMac[iZ], τcMac=hydroParam.τcMac[iZ], Option_KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰,  Option_KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰)
+	# 		else
+	# 			error("$( optionₘ.HydroModel⍰) model for θ_2_KUNSAT is not yet available")
+	# 		end
+	# 	end # function θ_2_KUNSAT
 	#-------------------------------------------------------------------
 
 
@@ -45,7 +46,9 @@ module kunsat
 
 			if  optionₘ.HydroModel⍰ == "Kosugi"
 
-				return kunsat.kg.KUNSAT_θΨSe(Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], Option_KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰)
+				# return kunsat.kg.KUNSAT_θΨSe(Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], τa=hydroParam.τa[iZ], τb=hydroParam.τb[iZ], τc=hydroParam.τc[iZ], τaMac=hydroParam.τaMac[iZ], τbMac=hydroParam.τbMac[iZ], τcMac=hydroParam.τcMac[iZ], Option_KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰)
+
+				error("Se_2_KUNSAT in Kosugi is replaced by intelligent function KUNSAT_θΨSe()")
 				
 			elseif  optionₘ.HydroModel⍰ == "Vangenuchten"
 				return kunsat.vg.Se_2_KUNSAT(optionₘ, Se₁, iZ::Int64, hydroParam)
@@ -113,7 +116,7 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KUNSAT_θΨSe
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function KUNSAT_θΨSe(;Ψ₁=-1.0, θ₁=-1.0, Se₁ =-1.0, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, Option_KosugiModel_KΨ⍰="Traditional", KosugiModel_θΨ⍰="Traditional")
+			function KUNSAT_θΨSe(;Ψ₁=-1.0, θ₁=-1.0, Se₁ =-1.0, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τaMac, τbMac, τcMac, Option_KosugiModel_KΨ⍰="Traditional", KosugiModel_θΨ⍰="Traditional")
 
 				if Ψ₁==-1.0 && θ₁==-1.0 && Se₁==-1.0
 					error("KUNSAT_θΨSe function: Cannot 3 of them: Ψ₁==-1.0 && θ₁=-1.0 && Se₁=-1.0 ")
@@ -161,10 +164,8 @@ module kunsat
 
 				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat_Contimous" # =====
 
-						
-					ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
+					# ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
 
-					
 					KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
 
 					Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0))
@@ -201,40 +202,31 @@ module kunsat
 				
 			
 					# Parameters
-						T2_Max = 3.0; T3_Max = 4.0
+						Tb_Max = 3.0; Tc_Max = 4.0
 
-                  τ₂ₐ    = 0.5893705657616117 #0.10567
-                  τ₂ₐMac = 0.99754
-                  τ₃ₐ    = 0.6406765923888422 #0.39835
-                  τ₃ₐMac = 0.003521867181435153 #0.00105
-	
-                  T2     = T2_Max * (1.0 - τ₂ₐ)
-                  T2Mac  = T2_Max * (1.0 - τ₂ₐMac)
-                  T3     = T3_Max * (1.0 - τ₃ₐ)
-                  T3Mac  = T3_Max * (1.0 - τ₃ₐMac)
+                  Ta    = τa
+                  Tb    = Tb_Max * (1.0 - τb)
+                  TbMac = Tb_Max * (1.0 - τbMac)
+                  Tc    = Tc_Max * (1.0 - τc)
+                  TcMac = Tc_Max * (1.0 - τcMac)
 
-                  # T2    = 1.0
-                  # T2Mac = 1.0
-                  # T3    = 2.0
-                  # T3Mac = 1.0
+						Tc= σ ^ -0.59
 					
-					W_Mat = (((θsMacMat - θr) / (Ψm ^ T2)) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
-					W_Mac = ((max(θs - θsMacMat, 0.0) / (ΨmMac ^ T2Mac)) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
+					W_Mat = (((θsMacMat - θr) / (Ψm ^ Tb)) * exp(((Tb * σ) ^ 2.0) / 2.0)) ^ Tc
+					W_Mac = ((max(θs - θsMacMat, 0.0) / (ΨmMac ^ TbMac)) * exp(((TbMac * σMac) ^ 2.0) / 2.0)) ^ TcMac
 
 					Ks_Mat = Ks * W_Mat / (W_Mat + W_Mac)
 					Ks_Mac = Ks * W_Mac / (W_Mat + W_Mac)
 
-					KR_Mac(Ψ₁) = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + T2Mac * σMac) / √2.0)
-
-					
+					KR_Mac(Ψ₁) = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + TbMac * σMac) / √2.0)
 					if Ψ₁ ≤ ΨmacMat		
-						return Kunsat_Mac =  Ks_Mac * √Se₁ * (KR_Mac(Ψ₁) - (Ψ₁ / ΨmacMat) * KR_Mac(ΨmacMat)) ^ 2.0 + Ks_Mat
+						return Kunsat_Mac =  Ks_Mac * (Se₁)^Ta * (KR_Mac(Ψ₁) - (Ψ₁ / ΨmacMat) * KR_Mac(ΨmacMat)) ^ 2.0 + Ks_Mat
 			
 					else
 						# Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0))
 						Se_Mat = Se₁ * (θs - θr) / (θsMacMat - θr)
 
-					return Kunsat_Mat =  Ks_Mat * √Se_Mat * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + T2 * σ) / √2.0)) ^ 2.0
+						return Kunsat_Mat =  Ks_Mat * (Se_Mat)^Ta * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + Tb * σ) / √2.0)) ^ 2.0
 					end				
 		
 				else
