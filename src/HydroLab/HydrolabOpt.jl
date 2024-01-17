@@ -11,8 +11,11 @@ module hydrolabOpt
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	function HYDROLABOPT_START(;NiZ, ∑Psd, θ_θΨobs, Ψ_θΨobs, N_θΨobs, K_KΨobs=[0], Ψ_KΨobs=[0], N_KΨobs=1, hydro, hydroOther, option, optionₘ, optim, param, θϵ=0.005)
 		
-		for iZ = 1:NiZ
 
+		# Initiating arrays 
+			Of_Sample = zeros(Float64, NiZ)
+
+		for iZ = 1:NiZ
 			# TEST IF EXIST Ψ ≈ 0  ~~~
 				if minimum(Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]) < θϵ 
 					🎏ΘΨ_0 = true
@@ -110,9 +113,10 @@ module hydrolabOpt
 			# OPTIMIZATION: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-				Optimization = BlackBoxOptim.bboptimize(X -> hydrolabOpt.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs); SearchRange=SearchRange, NumDimensions=optim.NparamOpt, TraceMode=:silent)
+				Optimization = BlackBoxOptim.bboptimize(X -> hydrolabOpt.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs); SearchRange=SearchRange, NumDimensions=optim.NparamOpt, TraceMode=:silent)
 
 				X = BlackBoxOptim.best_candidate(Optimization)
+		
 
 				hydro = hydrolabOpt.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
 
@@ -123,9 +127,9 @@ module hydrolabOpt
 
 				# STATISTICS
 					if option.data.Kθ && "Ks" ∈ optim.ParamOpt
-						Of, Of_θΨ, Of_Kunsat = ofHydrolab.OF_WRC_KUNSAT(hydro, iZ, N_θΨobs, optim, optionₘ, θ_θΨobs, Ψ_θΨobs; K_KΨobs=K_KΨobs, N_KΨobs=N_KΨobs, Ψ_KΨobs=Ψ_KΨobs)
+						Of_Sample, Of_θΨ, Of_Kunsat = ofHydrolab.OF_WRC_KUNSAT(hydro, iZ, N_θΨobs, Of_Sample, optim, optionₘ, θ_θΨobs, Ψ_θΨobs; K_KΨobs=K_KΨobs, N_KΨobs=N_KΨobs, Ψ_KΨobs=Ψ_KΨobs)
 					else
-						Of, Of_θΨ, Of_Kunsat = ofHydrolab.OF_WRC_KUNSAT(hydro, iZ, N_θΨobs, optim, optionₘ, θ_θΨobs, Ψ_θΨobs)
+						Of_Sample, Of_θΨ, Of_Kunsat = ofHydrolab.OF_WRC_KUNSAT(hydro, iZ, N_θΨobs, Of_Sample, optim, optionₘ, θ_θΨobs, Ψ_θΨobs)
 					end  
 
 					hydroOther.Rmse[iZ], hydroOther.Rmse_KΨ[iZ], hydroOther.Rmse_θΨ[iZ] = ofHydrolab.OF_RMSE(option, optionₘ, iZ, θ_θΨobs, Ψ_θΨobs, N_θΨobs, K_KΨobs, Ψ_KΨobs, N_KΨobs, hydro, optim) 
@@ -173,17 +177,18 @@ module hydrolabOpt
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_HYPIX
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs)
+		function OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs)
+
 			# New optimized which are put into the matching veg or hydro parameters
 				hydro = hydrolabOpt.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
 		
 			# Weighted Objective Function
 			if option.data.Kθ && "Ks" ∈ optim.ParamOpt
-				Of, Of_θΨ, Of_Kunsat = ofHydrolab.OF_WRC_KUNSAT(hydro, iZ, N_θΨobs, optim, optionₘ, θ_θΨobs, Ψ_θΨobs; K_KΨobs=K_KΨobs, N_KΨobs=N_KΨobs, Ψ_KΨobs=Ψ_KΨobs)
+				Of_Sample, Of_θΨ, Of_Kunsat = ofHydrolab.OF_WRC_KUNSAT(hydro, iZ, N_θΨobs, Of_Sample, optim, optionₘ, θ_θΨobs, Ψ_θΨobs; K_KΨobs=K_KΨobs, N_KΨobs=N_KΨobs, Ψ_KΨobs=Ψ_KΨobs)
 			else
-				Of, Of_θΨ, Of_Kunsat = ofHydrolab.OF_WRC_KUNSAT(hydro, iZ, N_θΨobs, optim, optionₘ, θ_θΨobs, Ψ_θΨobs)
+				Of_Sample, Of_θΨ, Of_Kunsat = ofHydrolab.OF_WRC_KUNSAT(hydro, iZ, N_θΨobs, Of_Sample, optim, optionₘ, θ_θΨobs, Ψ_θΨobs)
 			end 
-		return Of
+		return Of_Sample[iZ]
 		end  # function: OF_HYPIX
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -191,6 +196,7 @@ module hydrolabOpt
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X; ΔMinΘₛ_Θᵣ=0.05)
 			for iParam = 1:optim.NparamOpt
+				
 				# Determening if parameters are Log transformed
 					if (optim.ParamOpt_LogTransform[iParam]) && !(optim.ParamOpt[iParam]=="Ψm" && optionₘ.σ_2_Ψm⍰ == "Constrained")
 						Paramₐ = expm1(X[iParam])

@@ -40,10 +40,10 @@ module plotOther
 					
 					Id=1:N_Waitoa
 
-					Of = [Of_Waitoa Of_Waihou Of_Taupo Of_Otorohanga Of_Hamilton]
+					Of_Sample = [Of_Waitoa Of_Waihou Of_Taupo Of_Otorohanga Of_Hamilton]
 
 					for i=1:5
-						Plots.plot!(Plot1, subplot=1, Id, Of[1:N_Waitoa, i], palette=:darkrainbow,  marker=(:circle, 4, 1.0), line=(2.0,:solid))
+						Plots.plot!(Plot1, subplot=1, Id, Of_Sample[1:N_Waitoa, i], palette=:darkrainbow,  marker=(:circle, 4, 1.0), line=(2.0,:solid))
 					end
 					Plots.plot!(Plot1, subplot=1,  xlabel="", ylabel=L"WOF _{\theta} \ [mm^{3} \ mm^{-3}]", xticks=(1:1:9, Ticks), xtickfont=(12, :white), legend=false, title="(a) Weighted Objective Function", titlelocation = :left)
 

@@ -67,7 +67,7 @@ module AquaPore_Toolkit
 	
 			# Deriving opt parameters
 				hydroₒ = hydroStruct.HYDROSTRUCT(option.hydro, 1)
-				hydroₒ, optim = reading.HYDRO_PARAM(option.hydro, hydroₒ, 1, path.inputGuiSoilwater.GUI_HydroParam)
+				hydroₒ, optim, optimAllSoils = reading.HYDRO_PARAM(option.hydro, hydroₒ, 1, path.inputGuiSoilwater.GUI_HydroParam)
 
 			# IF WE HAVE Θ(Ψ) DATA: <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
 				if option.data.θΨ && !(option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠"Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained")
@@ -185,7 +185,7 @@ module AquaPore_Toolkit
 		if option.run.HydroLabθΨ⍰ ≠ "No" && option.run.HydroLabθΨ⍰ ≠ "HydroParamPrecomputed"
 		printstyled("\n ----- START RUNNING HYDROLABΘΨ ----------------------------------------------- \n"; color=:red)
 				hydroOther = hydroStruct.HYDRO_OTHERS(NiZ)
-				hydro, optim = reading.HYDRO_PARAM(option.hydro, hydro, NiZ, path.inputGuiSoilwater.GUI_HydroParam; PrintScreen=true)
+				hydro, optim, optimAllSoils = reading.HYDRO_PARAM(option.hydro, hydro, NiZ, path.inputGuiSoilwater.GUI_HydroParam)
 
 			# CHECKING THE DATA
 				checking.CHECKING(option, option.hydro, optim)
@@ -253,7 +253,7 @@ module AquaPore_Toolkit
 			# STRUCTURES
 				hydroPsd = hydroStruct.HYDROSTRUCT(option.psd, NiZ)
 				hydroOther_Psd = hydroStruct.HYDRO_OTHERS(NiZ)
-				hydroPsd, optim_Psd = reading.HYDRO_PARAM(option.psd, hydroPsd, NiZ, path.inputGuiSoilwater.GUI_HydroParam)
+				hydroPsd, optim_Psd, optimAllSoils = reading.HYDRO_PARAM(option.psd, hydroPsd, NiZ, path.inputGuiSoilwater.GUI_HydroParam)
 
 			# CHECKING THE DATA
 				checking.CHECKING(option, option.psd, optim)
@@ -288,7 +288,7 @@ module AquaPore_Toolkit
 			# STRUCTURES
 				hydroInfilt = hydroStruct.HYDROSTRUCT(option.infilt, NiZ)
 				hydroOther_Infilt = hydroStruct.HYDRO_OTHERS(NiZ)
-				hydroInfilt, optim_Infilt = reading.HYDRO_PARAM(option.psd, hydroInfilt, NiZ, path.inputGuiSoilwater.GUI_HydroParam)
+				hydroInfilt, optim_Infilt, optimAllSoils = reading.HYDRO_PARAM(option.psd, hydroInfilt, NiZ, path.inputGuiSoilwater.GUI_HydroParam)
 
 			# CHECKING THE DATA
 				checking.CHECKING(option, option.infilt, optim)

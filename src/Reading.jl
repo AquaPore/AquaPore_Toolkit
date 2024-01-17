@@ -320,18 +320,16 @@ module reading
 	#		FUNCTION : HYDRO_PARAM
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		Base.@kwdef mutable struct OPTIM
-			Param_Name :: Vector{String}
-			ParamOpt_Min :: Vector{Float64}
-			ParamOpt_Max :: Vector{Float64}
-			Param_Min :: Vector{Float64}
-			Param_Max :: Vector{Float64}
-			ParamOpt :: Vector{String}
-			NparamOpt :: Int64
-			🎏_Opt :: Bool
-			ParamOpt_LogTransform :: Vector{Bool}
+         Param_Name            :: Vector{String}
+         ParamOpt_Min          :: Vector{Float64}
+         ParamOpt_Max          :: Vector{Float64}
+         ParamOpt              :: Vector{String}
+         NparamOpt             :: Int64
+         🎏_Opt                :: Bool
+         ParamOpt_LogTransform :: Vector{Bool}
 		end
 
-		function HYDRO_PARAM(optionₘ, hydro, NiZ, Path; PrintScreen=false)
+	function HYDRO_PARAM(optionₘ, hydro, NiZ, Path)
 		# Read data
 		Data = CSV.File(Path, header=true)
 
@@ -387,10 +385,16 @@ module reading
 			end
 
 		# ====================================================
-		ParamOpt              = []
-		ParamOpt_Max          = []
-		ParamOpt_Min          = []
-		ParamOpt_LogTransform = []
+      ParamOpt              = []
+      ParamOpt_Max          = []
+      ParamOpt_Min          = []
+      ParamOpt_LogTransform = []
+      Sample_or_AllSoils    = []
+
+		# iSample: optimising hydraulic parameters for every sample
+		# iAssSoils: optimising hydraulic parameters for all soils and therefore the hydraulic parameters will be constant for all soils 
+			iSample   = 1 :: Int64
+			iAllSoils = 2 :: Int64
 
 		i = 1
 		# For every hydraulic parameter
@@ -415,13 +419,15 @@ module reading
 				setfield!(hydro, Symbol(inParamValue * "_Max"), ParamValue_Vector)
 	
 			# ParamValue to optimize. The complication is that there are different layers of hydraulic parameters which can be optimized.  
-			if Opt[i] == 1
+			if Opt[i] ≥ 1
 				# appending the values of the parameters
 				append!(ParamOpt, [Param_Name[i]])
 
 				append!(ParamOpt_Min, Param_Min[i])
 				
 				append!(ParamOpt_Max, Param_Max[i])
+
+				append!(Sample_or_AllSoils, Opt[i])
 
 				# Appending name of param to perform logTransform if optimized
 				if Opt_LogTransform[i] == 1
@@ -438,37 +444,64 @@ module reading
 			i += 1
 		end # for loop
 
-
 		# Compute σMac & ΨmMac from ΨmacMat
 		if optionₘ.ΨmacMat_2_σMac_ΨmMac
 			for iZ=1:NiZ 
 				ΨmacMat₀ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=1.0) 
-
-
             hydro.σMac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σMac(ΨmacMat=hydro.ΨmacMat[iZ])
             hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σMac=hydro.σMac[iZ])
 			end
 		end
 
 
-		# Number of parameters to be optimised
-			NparamOpt = length(ParamOpt)
-	
-		# Putting all the in mutable structure
-			optim = OPTIM(Param_Name,ParamOpt_Min,ParamOpt_Max,Param_Min,Param_Max,ParamOpt,NparamOpt,🎏_Opt,ParamOpt_LogTransform)
+		# PUTTING THE HYDRAULIC PARAMETERS OPTIMISED FOR INDIVIDUAL SOILS
+			SampleTrue   = (Sample_or_AllSoils .== iSample)
+		
+         NparamOpt = sum(SampleTrue)
+			if  NparamOpt ≥ 1
+				 🎏_Opt =true
+			else
+				🎏_Opt = false
+			end
 
-		if 🎏_Opt == true && PrintScreen
-			println("	=== === Optimizing the following parameters === ===")
-			println("		Model=" , optionₘ.HydroModel⍰)
-			println("		NparamOpt=" , NparamOpt)
-			println("		ParamOpt= " ,  optim.ParamOpt)
-			println("		Min_Value= " , optim.ParamOpt_Min)
-			println("		Max_Value= " , optim.ParamOpt_Max)
-			println("		LogTransform = " , optim.ParamOpt_LogTransform)
-			println("	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === === \n")
-		end
+			optim = OPTIM(Param_Name, ParamOpt_Min[SampleTrue], ParamOpt_Max[SampleTrue], ParamOpt[SampleTrue], NparamOpt,🎏_Opt, ParamOpt_LogTransform[SampleTrue])
 
-	return hydro, optim
+			if 🎏_Opt == true
+				printstyled("	=== === Optimizing parameters for every soil sample === === \n"; color=:green)
+				println("		Model=" , optionₘ.HydroModel⍰)
+				println("		NparamOpt          = " , NparamOpt)
+				println("		ParamOpt           = " , optim.ParamOpt)
+				println("		Min_Value          = " , optim.ParamOpt_Min)
+				println("		Max_Value          = " , optim.ParamOpt_Max)
+				println("		LogTransform       = " , optim.ParamOpt_LogTransform)
+				println("	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === === \n")
+			end
+
+
+		# PUTTING THE HYDRAULIC PARAMETER OPTIMISED FOR COMBINED ALL SOILS
+			AllSoilsTrue = (Sample_or_AllSoils .== iAllSoils)
+
+			NparamOpt = sum(AllSoilsTrue)
+
+			if  NparamOpt ≥ 1
+				 🎏_Opt =true
+			else
+				🎏_Opt = false
+			end
+
+			optimAllSoils = OPTIM(Param_Name, ParamOpt_Min[AllSoilsTrue], ParamOpt_Max[AllSoilsTrue], ParamOpt[AllSoilsTrue], NparamOpt,🎏_Opt, ParamOpt_LogTransform[AllSoilsTrue])
+		
+			if 🎏_Opt == true
+				printstyled("	=== === Optimizing parameters for all soil sample === === \n"; color=:green)
+				println("		NparamOpt          = " , NparamOpt)
+				println("		ParamOpt           = " , optimAllSoils.ParamOpt)
+				println("		Min_Value          = " , optimAllSoils.ParamOpt_Min)
+				println("		Max_Value          = " , optimAllSoils.ParamOpt_Max)
+				println("		LogTransform       = " , optimAllSoils.ParamOpt_LogTransform)
+				println("	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === === \n")
+			end
+
+	return hydro, optim, optimAllSoils
 	end  # function: GUI_HydroParam
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -480,7 +513,7 @@ module reading
          ParamOpt_Max :: Array{Float64}
          ParamOpt     :: Array{String}
          NparamOpt    :: Vector{Int64}
-         🎏_Opt     :: Bool
+         🎏_Opt       :: Bool
 		end
 
 		function KSΨMODEL_PARAM(NiZ, option, param, Path) 

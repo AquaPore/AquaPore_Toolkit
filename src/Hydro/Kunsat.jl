@@ -1,6 +1,6 @@
 module kunsat
 	import ..wrc
-	export KUNSAT_θΨSe, Se_2_KUNSAT, θ_2_KUNSAT
+	export KUNSAT_θΨSe, Se_2_KUNSAT
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KUNSAT_θΨSe
@@ -108,7 +108,7 @@ module kunsat
 	# =============================================================
 	module kg
 		import..wrc
-		import ...cst, ...hydroRelation
+		import ...cst
 		import ForwardDiff, QuadGK
 		import SpecialFunctions: erfc, erfcinv
 		export KUNSAT_θΨSe, ∂K∂ΨMODEL
@@ -199,34 +199,34 @@ module kunsat
 				
 				
 				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat" # =====
-				
-			
+					
 					# Parameters
 						Tb_Max = 3.0; Tc_Max = 4.0
 
-                  Ta    = τa
+
                   Tb    = Tb_Max * (1.0 - τb)
                   TbMac = Tb_Max * (1.0 - τbMac)
                   Tc    = Tc_Max * (1.0 - τc)
                   TcMac = Tc_Max * (1.0 - τcMac)
 
-						Tc= σ ^ -0.59
+						# Tc= σ ^ -0.59
 					
-					W_Mat = (((θsMacMat - θr) / (Ψm ^ Tb)) * exp(((Tb * σ) ^ 2.0) / 2.0)) ^ Tc
-					W_Mac = ((max(θs - θsMacMat, 0.0) / (ΨmMac ^ TbMac)) * exp(((TbMac * σMac) ^ 2.0) / 2.0)) ^ TcMac
+					W_Mat = ((θsMacMat - θr) * exp( ((Tb * σ) ^ 2.0) / 2.0) / (Ψm ^ Tb)) ^ Tc
+					W_Mac = (max(θs - θsMacMat, 0.0) * exp(((TbMac * σMac) ^ 2.0) / 2.0) / (ΨmMac ^ TbMac)) ^ TcMac
 
 					Ks_Mat = Ks * W_Mat / (W_Mat + W_Mac)
 					Ks_Mac = Ks * W_Mac / (W_Mat + W_Mac)
 
-					KR_Mac(Ψ₁) = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + TbMac * σMac) / √2.0)
+					KR_MAC(Ψ₁) = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + TbMac * σMac) / √2.0)
+
 					if Ψ₁ ≤ ΨmacMat		
-						return Kunsat_Mac =  Ks_Mac * (Se₁)^Ta * (KR_Mac(Ψ₁) - (Ψ₁ / ΨmacMat) * KR_Mac(ΨmacMat)) ^ 2.0 + Ks_Mat
+						return Kunsat_Mac =  Ks_Mac * (Se₁^τa) * (KR_MAC(Ψ₁) - (Ψ₁ / ΨmacMat) * KR_MAC(ΨmacMat)) ^ 2.0 + Ks_Mat
 			
 					else
 						# Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0))
 						Se_Mat = Se₁ * (θs - θr) / (θsMacMat - θr)
 
-						return Kunsat_Mat =  Ks_Mat * (Se_Mat)^Ta * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + Tb * σ) / √2.0)) ^ 2.0
+						return Kunsat_Mat =  Ks_Mat * (Se_Mat^τaMac) * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + Tb * σ) / √2.0)) ^ 2.0
 					end				
 		
 				else
