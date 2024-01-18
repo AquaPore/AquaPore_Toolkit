@@ -44,6 +44,8 @@ using Suppressor
       include("HyPix/Discretisation.jl")
 
       include("HydroLab/OfHydrolab.jl")
+      include("HydroLab/OptIndivSoil.jl")
+      include("HydroLab/OptAllSoil.jl")
       include("HydroLab/HydrolabOpt.jl")
 
       include("NoCore/Smap/ReadSmap.jl")

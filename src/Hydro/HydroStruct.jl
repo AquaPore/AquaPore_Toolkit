@@ -128,43 +128,43 @@ module hydroStruct
 
 
 		Base.@kwdef mutable struct CLAPP_HORNBERGER # <>=<>=<>=<>=<>=<>=<>=<>=<>
-         θs          ::	Vector{Float64}
-         θr          ::	Vector{Float64}
-         λch         ::	Vector{Float64}
-         Ψch         ::	Vector{Float64}
+         θs          :: Vector{Float64}
+         θr          :: Vector{Float64}
+         λch         :: Vector{Float64}
+         Ψch         :: Vector{Float64}
          ΨmacMat     :: Vector{Float64}
-         Ks          ::	Vector{Float64}
-         Φ           ::	Vector{Float64}
-         Ψga         ::	Vector{Float64}
+         Ks          :: Vector{Float64}
+         Φ           :: Vector{Float64}
+         Ψga         :: Vector{Float64}
 			
-         θs_Min      ::	Vector{Float64}
-         θr_Min      ::	Vector{Float64}
-         λch_Min     ::	Vector{Float64}
-         Ψch_Min     ::	Vector{Float64}
+         θs_Min      :: Vector{Float64}
+         θr_Min      :: Vector{Float64}
+         λch_Min     :: Vector{Float64}
+         Ψch_Min     :: Vector{Float64}
          ΨmacMat_Min :: Vector{Float64}
-         Ks_Min      ::	Vector{Float64}
-         Φ_Min       ::	Vector{Float64}
+         Ks_Min      :: Vector{Float64}
+         Φ_Min       :: Vector{Float64}
 			
-         θs_Max      ::	Vector{Float64}
-         θr_Max      ::	Vector{Float64}
-         λch_Max     ::	Vector{Float64}
-         Ψch_Max     ::	Vector{Float64}
+         θs_Max      :: Vector{Float64}
+         θr_Max      :: Vector{Float64}
+         λch_Max     :: Vector{Float64}
+         Ψch_Max     :: Vector{Float64}
          ΨmacMat_Max :: Vector{Float64}
-         Ks_Max      ::	Vector{Float64}
-         Φ_Max       ::	Vector{Float64}
+         Ks_Max      :: Vector{Float64}
+         Φ_Max       :: Vector{Float64}
 		end # struct CLAPP_HORNBERGER
 
 
 		Base.@kwdef mutable struct HYDRO_OTHER # <>=<>=<>=<>=<>=<>=<>=<>=<>
-         Nse            :: 	Vector{Float64}
-         Nse_θΨ         :: 	Vector{Float64}
-         Nse_KΨ         :: 	Vector{Float64}
-         NseWilmot_θΨ   ::    Vector{Float64}
-         NseWilmot_KΨ   ::    Vector{Float64}
-         Rmse           :: 	Vector{Float64}
-         Rmse_θΨ        :: 	Vector{Float64}
-         Rmse_KΨ        :: 	Vector{Float64}
-         NseConcordanceCorelationCoeficient :: 	Vector{Float64}
+         Nse                                :: Vector{Float64}
+         Nse_θΨ                             :: Vector{Float64}
+         Nse_KΨ                             :: Vector{Float64}
+         NseWilmot_θΨ                       :: Vector{Float64}
+         NseWilmot_KΨ                       :: Vector{Float64}
+         Rmse                               :: Vector{Float64}
+         Rmse_θΨ                            :: Vector{Float64}
+         Rmse_KΨ                            :: Vector{Float64}
+         NseConcordanceCorelationCoeficient :: Vector{Float64}
 		end
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

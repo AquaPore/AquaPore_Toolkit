@@ -213,10 +213,10 @@ module AquaPore_Toolkit
 
 			# OPTIMISING HYDRAULIC PARAMETERS
 			if option.data.Kθ
-				hydro, hydroOther = hydrolabOpt.HYDROLABOPT_START(NiZ=NiZ, ∑Psd=∑Psd, θ_θΨobs=θ_θΨobs, Ψ_θΨobs=Ψ_θΨobs, N_θΨobs=N_θΨobs, K_KΨobs=K_KΨobs, Ψ_KΨobs=Ψ_KΨobs, N_KΨobs=N_KΨobs, hydro=hydro, hydroOther=hydroOther, option=option, optionₘ=option.hydro, optim=optim, param=param)
+				hydro, hydroOther = hydrolabOpt.HYDROLABOPT_START(∑Psd=∑Psd, hydro=hydro, hydroOther=hydroOther, K_KΨobs=K_KΨobs, N_KΨobs=N_KΨobs, N_θΨobs=N_θΨobs, NiZ=NiZ, optim=optim, optimAllSoils=optimAllSoils, option=option, optionₘ=option.hydro, param=param, θ_θΨobs=θ_θΨobs, Ψ_KΨobs=Ψ_KΨobs, Ψ_θΨobs=Ψ_θΨobs)
 
 			else
-				hydro, hydroOther = hydrolabOpt.HYDROLABOPT_START(NiZ=NiZ, ∑Psd=∑Psd, θ_θΨobs=θ_θΨobs, Ψ_θΨobs=Ψ_θΨobs, N_θΨobs=N_θΨobs, hydro=hydro, hydroOther=hydroOther, option=option, optionₘ=option.hydro, optim=optim, param=param)
+				hydro, hydroOther = hydrolabOpt.HYDROLABOPT_START(NiZ=NiZ, ∑Psd=∑Psd, θ_θΨobs=θ_θΨobs, Ψ_θΨobs=Ψ_θΨobs, N_θΨobs=N_θΨobs, hydro=hydro, hydroOther=hydroOther, option=option, optionₘ=option.hydro, optim=optim, optimAllSoils=optimAllSoils, param=param)
 
 			end # option.data.Kθ
 
@@ -273,7 +273,7 @@ module AquaPore_Toolkit
 			# Deriving the hydraulic parameters of PSD
 				KunsatModel_Psd = fill(0.0::Float64, NiZ)
 
-				hydroPsd, hydroOther_Psd = hydrolabOpt.HYDROLABOPT_START(NiZ=NiZ, ∑Psd=∑Psd, θ_θΨobs=θ_Rpart, Ψ_θΨobs=Ψ_Rpart, N_θΨobs=N_Psd, hydro=hydroPsd, hydroOther=hydroOther_Psd, option=option, optionₘ=option.psd, optim=optim_Psd, param=param) 
+				hydroPsd, hydroOther_Psd = hydrolabOpt.HYDROLABOPT_START(NiZ=NiZ, ∑Psd=∑Psd, θ_θΨobs=θ_Rpart, Ψ_θΨobs=Ψ_Rpart, N_θΨobs=N_Psd, hydro=hydroPsd, hydroOther=hydroOther_Psd, option=option, optionₘ=option.psd, optim=optim_Psd, optimAllSoils=optimAllSoils, param=param) 
 					
 			
 			printstyled("\n ----- END: RUNNING IntergranularMixingPsd ----------------------------------------------- \n"; color=:yellow)
