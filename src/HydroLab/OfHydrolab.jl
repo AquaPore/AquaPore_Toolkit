@@ -73,16 +73,12 @@ module ofHydrolab
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_ALLSOILS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OF_ALLSOILS(NiZ, Of_Sample)
-
+		function OF_ALLSOILS(NiZ::Int64, Of_Sample::Vector{Float64})
 			Of_AllSoil = 0.0::Float64
 			for iZ=1:NiZ		
 				Of_AllSoil += Of_Sample[iZ]
 			end
-
-			Of_AllSoil = Of_AllSoil / NiZ
-
-		return Of_AllSoil
+		return Of_AllSoil = Of_AllSoil / NiZ
 		end  # function: OF_ALL
 	# ------------------------------------------------------------------
 

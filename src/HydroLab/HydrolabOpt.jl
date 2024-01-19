@@ -3,7 +3,7 @@
 # =============================================================
 module hydrolabOpt
 
-	import   ..stats, ..optIndivSoil
+	import   ..stats, ..optIndivSoil, ..optAllSoil, ..ofHydrolab
 	using  Statistics
 	export HYDROLABOPT_START
 
@@ -12,15 +12,20 @@ module hydrolabOpt
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	function HYDROLABOPT_START(;∑Psd, hydro, hydroOther, K_KΨobs=[0], N_KΨobs=1, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, θ_θΨobs, Ψ_KΨobs=[0], Ψ_θΨobs)
 		
-		# Initiating arrays 
-			Of_Sample = zeros(Float64, NiZ)
 
-			if optimAllSoils.🎏_Opt
-			# OPTIMISATION INDIVDUAL
-				hydro, hydroOther, Of_Sample = optIndivSoil.OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, Of_Sample, optim, option, optionₘ, param, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs)
+		if optimAllSoils.🎏_Opt
+			# OPTIMISATION ALL SOILS
+				hydro = optAllSoil.OPTIMIZE_ALLSOILS(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, θ_θΨobs, θϵ=0.005, Ψ_KΨobs, Ψ_θΨobs)
+
+				hydro, hydroOther, Of_Sample = optIndivSoil.OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, option, optionₘ, param, θ_θΨobs, θϵ=0.005, Ψ_KΨobs, Ψ_θΨobs)
+
+				OfAllSoil = ofHydrolab.OF_ALLSOILS(NiZ::Int64, Of_Sample::Vector{Float64})
+
+				printstyled("				OfAllSoil =  ", trunc(OfAllSoil,digits=3), "\n"; color=:blue)
+
 		else
-		# OPTIMISATION HYDRAULIC PARAMETERS ALL SOILS INDIVIDUALLY AND ALL SOILS
-			hydro, hydroOther, Of_Sample = optIndivSoil.OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, Of_Sample, optim, option, optionₘ, param, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs)
+		# OPTIMISATION INDIVIDUAL SOIL
+			hydro, hydroOther, Of_Sample = optIndivSoil.OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, option, optionₘ, param, θ_θΨobs, θϵ=0.005, Ψ_KΨobs, Ψ_θΨobs)
 		end
 
 		# STATISCS

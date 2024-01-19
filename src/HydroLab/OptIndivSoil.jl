@@ -11,8 +11,10 @@ module optIndivSoil
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OPTIMIZE_INDIVIDUALSOILS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function OPTIMIZE_INDIVIDUALSOILS(;∑Psd::Vector{Any}, hydro::Main.hydroStruct.KOSUGI, hydroOther::Main.hydroStruct.HYDRO_OTHER, K_KΨobs::Matrix{Float64}, N_KΨobs=1, N_θΨobs::Vector{Int64}, NiZ::Int64, Of_Sample::Vector{Float64}, optim::Main.reading.OPTIM, option::Main.options.OPTION, optionₘ::Main.options.HYDRO, param::Main.params.PARAM, θ_θΨobs::Matrix{Float64}, θϵ=0.005::Float64, Ψ_KΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
+	function OPTIMIZE_INDIVIDUALSOILS(;∑Psd::Vector{Any}, hydro::Main.hydroStruct.KOSUGI, hydroOther::Main.hydroStruct.HYDRO_OTHER, K_KΨobs::Matrix{Float64}, N_KΨobs=1, N_θΨobs::Vector{Int64}, NiZ::Int64, optim::Main.reading.OPTIM, option::Main.options.OPTION, optionₘ::Main.options.HYDRO, param::Main.params.PARAM, θ_θΨobs::Matrix{Float64}, θϵ=0.005::Float64, Ψ_KΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
 
+		# Initiating arrays 
+			Of_Sample = zeros(Float64, NiZ)
 
 		for iZ = 1:NiZ # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -110,18 +112,18 @@ module optIndivSoil
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
 				# Updated searchrange
-				SearchRange = optimize.SEARCHRANGE(optionₘ, optim)
+				SearchRange_IndivSoil = optimize.SEARCHRANGE(optionₘ, optim)
 
-				Optimization = BlackBoxOptim.bboptimize(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs); SearchRange=SearchRange, NumDimensions=optim.NparamOpt, TraceMode=:silent)
-
-				X = BlackBoxOptim.best_candidate(Optimization)
-
-				hydro = optIndivSoil.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
+				Optimization = BlackBoxOptim.bboptimize(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs); SearchRange=SearchRange_IndivSoil, NumDimensions=optim.NparamOpt, TraceMode=:silent)
+				
+				# Best parameter set 
+					X = BlackBoxOptim.best_candidate(Optimization)
+					hydro = optIndivSoil.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
 
 				# FINAL CORRECTION
-					if optionₘ.σ_2_Ψm⍰ ≠ "No"
-						hydro.ΨmacMat[iZ] = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ])
-					end
+					# if optionₘ.σ_2_Ψm⍰ ≠ "No"
+					# 	hydro.ΨmacMat[iZ] = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ])
+					# end
 
 				# STATISTICS
 					if option.data.Kθ && "Ks" ∈ optim.ParamOpt
@@ -158,11 +160,11 @@ module optIndivSoil
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : PARAM
+	#		FUNCTION : PARAM_2_hydro
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X; ΔMinΘₛ_Θᵣ=0.05)
-			for iParam = 1:optim.NparamOpt
-				
+		function PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X; ΔMinΘₛ_Θᵣ=0.05, 🎏_CheckError=false)
+
+			for iParam = 1:optim.NparamOpt	
 				# Determening if parameters are Log transformed
 					if (optim.ParamOpt_LogTransform[iParam]) && !(optim.ParamOpt[iParam]=="Ψm" && optionₘ.σ_2_Ψm⍰ == "Constrained")
 						Paramₐ = expm1(X[iParam])
@@ -180,24 +182,22 @@ module optIndivSoil
 					setfield!(hydro, Symbol(optim.ParamOpt[iParam]), vectParam)
 			end # for loop
 
+
 			# ==================== SPECIAL CASES ====================
 
 			# RELATIONSHIP BETWEEN ΨmacMat ➡ σMac & ΨmMac
 				if optionₘ.ΨmacMat_2_σMac_ΨmMac
-					ΨmacMat₁ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat( θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=0.95) 
 
-					hydro.σMac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σMac(ΨmacMat=ΨmacMat₁)
+					# ΨmacMat₁ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat( θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=0.95) 
+
+					hydro.σMac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σMac(ΨmacMat=hydro.ΨmacMat[iZ])
 				
-					hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=ΨmacMat₁, σMac=hydro.σMac[iZ])
+					hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σMac=hydro.σMac[iZ])
 				end
 
 			# RELATIONSHIP BETWEEN σ AND Ψm
 				if (optionₘ.σ_2_Ψm⍰ ≠ "No") && ("Ψm" ∈ optim.ParamOpt)
 					hydro = hydroRelation.FUNCTION_σ_2_Ψm_SOFTWARE(hydro, iZ, optionₘ, param.hydro)
-
-				elseif (optionₘ.σ_2_Ψm⍰ =="UniqueRelationship") 
-					hydro = hydroRelation.FUNCTION_σ_2_Ψm_SOFTWARE(hydro, iZ, optionₘ, param.hydro)
-
 				end # optionₘ.σ_2_Ψm⍰ ≠ No
 
 			#  <>=<>=<>=<>=<>=<> Relationship between σ and θr
@@ -205,16 +205,18 @@ module optIndivSoil
 					hydro.θr[iZ] = hydroRelation.σ_2_θr(hydro, iZ)
 				end
 
-			# Reinforcing θs >> Θr
-				if hydro.θs[iZ] < hydro.θr[iZ] + ΔMinΘₛ_Θᵣ
-					hydro.θr[iZ] = 0.0
-				end
-
 			# Converting θsMacMat_ƞ -> θsMacMat
 				if  optionₘ.HydroModel⍰ == "Kosugi"
 					hydro.θsMacMat[iZ] = min(hydro.θsMacMat_ƞ[iZ] * (hydro.θs[iZ] - hydro.θr[iZ]) + hydro.θr[iZ], hydro.θs[iZ])
 				end
 
+			# Reinforcing θs >> Θr
+				if hydro.θs[iZ] < hydro.θr[iZ] + ΔMinΘₛ_Θᵣ
+					hydro.θr[iZ] = 0.0
+				end
+
+
+			if 🎏_CheckError
 				if  optionₘ.HydroModel⍰ == "Kosugi"
 					if hydro.θsMacMat[iZ] > hydro.θs[iZ]
 						error("θsMacMat: $iZ $(hydro.θsMacMat[iZ])> $(hydro.θs[iZ])")
@@ -228,6 +230,7 @@ module optIndivSoil
 				if hydro.θr[iZ] < 0.0
 					error("Θr: $iZ $(hydro.θr[iZ]) < 0.0)")
 				end
+			end
 
 		return hydro
 		end  # function: PARAM

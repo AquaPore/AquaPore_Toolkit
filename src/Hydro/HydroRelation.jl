@@ -19,20 +19,20 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNC_θsMacMatη_2_ΨmacMat
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr, ΨmacMat_Max=100.0, ΨmacMat_Min=0.0, θsMacMat_η_Tresh=1.0) 
+		# function FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr, ΨmacMat_Max=100.0, ΨmacMat_Min=0.0, θsMacMat_η_Tresh=1.0) 
 
-			# θsMacMat_η = FUNC_θsMacMatη(;θr, θs, θsMacMat)
+		# 	# θsMacMat_η = FUNC_θsMacMatη(;θr, θs, θsMacMat)
 
-			# if θsMacMat_η ≥ θsMacMat_η_Tresh
-			# 	ΨmacMat = ((θsMacMat_η - 1.0) / (θsMacMat_η_Tresh - 1.0)) * (ΨmacMat_Max - ΨmacMat_Min) + ΨmacMat_Min
-			# else
-			# 	ΨmacMat = ΨmacMat_Max
-			# end
+		# 	# if θsMacMat_η ≥ θsMacMat_η_Tresh
+		# 	# 	ΨmacMat = ((θsMacMat_η - 1.0) / (θsMacMat_η_Tresh - 1.0)) * (ΨmacMat_Max - ΨmacMat_Min) + ΨmacMat_Min
+		# 	# else
+		# 	# 	ΨmacMat = ΨmacMat_Max
+		# 	# end
 			
-			ΨmacMat = ΨmacMat_Max
+		# 	ΨmacMat = ΨmacMat_Max
 
-			return ΨmacMat
-		end  # function: FUNC_θsMacMatη_2_ΨmacMat
+		# 	return ΨmacMat
+		# end  # function: FUNC_θsMacMatη_2_ΨmacMat
 	# ------------------------------------------------------------------
 
 
@@ -83,7 +83,7 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNCTION_σ_2_Ψm_SOFTWARE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0, Pσ_Mac=2)
+		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0, Pσ_Mac=3)
 
 			if option₂.ΨmacMat_2_σMac_ΨmMac
 				# ΨmacMat₁ = FUNC_θsMacMatη_2_ΨmacMat(θs=hydro₂.θs[iZ], θsMacMat=hydro₂.θsMacMat[iZ], θr=hydro₂.θr[iZ], ΨmacMat_Max=hydro₂.ΨmacMat[iZ])

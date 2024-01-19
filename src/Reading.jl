@@ -218,6 +218,7 @@ module reading
 				# Determeining if data has only 3 columns: Id, H and Theta
 				if length(Header) == 3
 					Ψ_KΨobs, N_KΨobs = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "H[mm]", NiZ)
+
 						
 					K_KΨobs, ~    = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header,"Kunsat[mm_s]", NiZ)
 				# Data is in square [X=iZ, Y =iΨ]
@@ -226,6 +227,7 @@ module reading
 
 					table.convert.CONVERT_KΨ_2D_2_1D(IdSelect, NiZ, N_KΨobs, path.convertSoilwater.Table_Convert_KΨ_2D_2_1D, K_KΨobs, Ψ_KΨobs)
 				end
+
 			return K_KΨobs, Ψ_KΨobs, N_KΨobs 
 			end  # function: θΨ
 		#----------------------------------------------------------------------
@@ -327,6 +329,7 @@ module reading
          NparamOpt             :: Int64
          🎏_Opt                :: Bool
          ParamOpt_LogTransform :: Vector{Bool}
+         InitialGuess          :: Vector{Float64}
 		end
 
 	function HYDRO_PARAM(optionₘ, hydro, NiZ, Path)
@@ -385,10 +388,11 @@ module reading
 			end
 
 		# ====================================================
+      InitialGuess          = []
       ParamOpt              = []
+      ParamOpt_LogTransform = []
       ParamOpt_Max          = []
       ParamOpt_Min          = []
-      ParamOpt_LogTransform = []
       Sample_or_AllSoils    = []
 
 		# iSample: optimising hydraulic parameters for every sample
@@ -429,6 +433,8 @@ module reading
 
 				append!(Sample_or_AllSoils, Opt[i])
 
+				append!(InitialGuess, ParamValue[i])
+
 				# Appending name of param to perform logTransform if optimized
 				if Opt_LogTransform[i] == 1
 					append!(ParamOpt_LogTransform, [true])
@@ -447,7 +453,7 @@ module reading
 		# Compute σMac & ΨmMac from ΨmacMat
 		if optionₘ.ΨmacMat_2_σMac_ΨmMac
 			for iZ=1:NiZ 
-				ΨmacMat₀ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=1.0) 
+				# ΨmacMat₀ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=1.0) 
             hydro.σMac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σMac(ΨmacMat=hydro.ΨmacMat[iZ])
             hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σMac=hydro.σMac[iZ])
 			end
@@ -464,19 +470,19 @@ module reading
 				🎏_Opt = false
 			end
 
-			optim = OPTIM(Param_Name, ParamOpt_Min[SampleTrue], ParamOpt_Max[SampleTrue], ParamOpt[SampleTrue], NparamOpt,🎏_Opt, ParamOpt_LogTransform[SampleTrue])
+			optim = OPTIM(Param_Name, ParamOpt_Min[SampleTrue], ParamOpt_Max[SampleTrue], ParamOpt[SampleTrue], NparamOpt,🎏_Opt, ParamOpt_LogTransform[SampleTrue], InitialGuess[SampleTrue])
 
 			if 🎏_Opt == true
 				printstyled("	=== === Optimizing parameters for every soil sample === === \n"; color=:green)
 				println("		Model=" , optionₘ.HydroModel⍰)
 				println("		NparamOpt          = " , NparamOpt)
+				println("		InitialGuess       = " , optim.InitialGuess)		
 				println("		ParamOpt           = " , optim.ParamOpt)
 				println("		Min_Value          = " , optim.ParamOpt_Min)
 				println("		Max_Value          = " , optim.ParamOpt_Max)
 				println("		LogTransform       = " , optim.ParamOpt_LogTransform)
 				println("	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === === \n")
 			end
-
 
 		# PUTTING THE HYDRAULIC PARAMETER OPTIMISED FOR COMBINED ALL SOILS
 			AllSoilsTrue = (Sample_or_AllSoils .== iAllSoils)
@@ -489,11 +495,12 @@ module reading
 				🎏_Opt = false
 			end
 
-			optimAllSoils = OPTIM(Param_Name, ParamOpt_Min[AllSoilsTrue], ParamOpt_Max[AllSoilsTrue], ParamOpt[AllSoilsTrue], NparamOpt,🎏_Opt, ParamOpt_LogTransform[AllSoilsTrue])
+			optimAllSoils = OPTIM(Param_Name, ParamOpt_Min[AllSoilsTrue], ParamOpt_Max[AllSoilsTrue], ParamOpt[AllSoilsTrue], NparamOpt,🎏_Opt, ParamOpt_LogTransform[AllSoilsTrue], InitialGuess[AllSoilsTrue])
 		
 			if 🎏_Opt == true
 				printstyled("	=== === Optimizing parameters for all soil sample === === \n"; color=:green)
 				println("		NparamOpt          = " , NparamOpt)
+				println("		InitialGuess       = " , optimAllSoils.InitialGuess)				
 				println("		ParamOpt           = " , optimAllSoils.ParamOpt)
 				println("		Min_Value          = " , optimAllSoils.ParamOpt_Min)
 				println("		Max_Value          = " , optimAllSoils.ParamOpt_Max)
