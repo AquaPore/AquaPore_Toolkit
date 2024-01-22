@@ -11,9 +11,22 @@ export OPTIMIZE_ALLSOILS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	function OPTIMIZE_ALLSOILS(;∑Psd::Vector{Any}, hydro::Main.hydroStruct.KOSUGI, hydroOther::Main.hydroStruct.HYDRO_OTHER, K_KΨobs::Matrix{Float64}, N_KΨobs=1, N_θΨobs::Vector{Int64}, NiZ::Int64, optim::Main.reading.OPTIM, optimAllSoils::Main.reading.OPTIM, option::Main.options.OPTION, optionₘ::Main.options.HYDRO, param::Main.params.PARAM, θ_θΨobs::Matrix{Float64}, θϵ=0.005::Float64, Ψ_KΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
 
+
+# 		const MyFitnessGoal = 30.0
+
+# function myfitnessgoalachieved(oc)
+#     best_fitness(oc) < MyFitnessGoal
+# end
+
+# function cbearlystopping(oc)
+#     if myfitnessgoalachieved(oc)
+#         BlackBoxOptim.shutdown!(oc)
+#     end
+# end
+
 		SearchRange_AllSoils = optimize.SEARCHRANGE(optionₘ, optimAllSoils)
 
-		Optimization = BlackBoxOptim.bboptimize(X -> optAllSoil.OF_HYDROLAB(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, X, θ_θΨobs, θϵ, Ψ_KΨobs, Ψ_θΨobs), optimAllSoils.InitialGuess; SearchRange=SearchRange_AllSoils, NumDimensions=optimAllSoils.NparamOpt, TraceMode=:silent, MaxSteps=70000)
+		Optimization = BlackBoxOptim.bboptimize(X -> optAllSoil.OF_HYDROLAB(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, X, θ_θΨobs, θϵ, Ψ_KΨobs, Ψ_θΨobs), optimAllSoils.InitialGuess; SearchRange=SearchRange_AllSoils, NumDimensions=optimAllSoils.NparamOpt, TraceMode=:silent, MaxSteps=10)
 		# MaxTime=10, 
 
 		# Best parameter set
@@ -35,7 +48,7 @@ export OPTIMIZE_ALLSOILS
 
 			hydro, hydroOther, Of_Sample = optIndivSoil.OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, option, optionₘ, param, θ_θΨobs, θϵ=0.005, Ψ_KΨobs, Ψ_θΨobs)
 
-		OF = ofHydrolab.OF_ALLSOILS(NiZ, Of_Sample)
+			OF = ofHydrolab.OF_ALLSOILS(NiZ, Of_Sample)
 
 		println(" Of =  ", trunc(OF,digits=3), "\n")
 		return OF

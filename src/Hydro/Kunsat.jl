@@ -113,6 +113,28 @@ module kunsat
 		import SpecialFunctions: erfc, erfcinv
 		export KUNSAT_θΨSe, ∂K∂ΨMODEL
 
+
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : KS_MAC
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function KS_MATMAC_ΨmacMat(θs::Float64, θsMacMat::Float64, θr::Float64, Ψm::Float64, σ::Float64, ΨmMac::Float64, σMac::Float64, Ks::Float64, Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  Option_KosugiModel_KΨ⍰)
+
+				if Option_KosugiModel_KΨ⍰ == "ΨmacMat"
+					W_Mat = ((θsMacMat - θr) * exp( ((Tb * σ) ^ 2.0) / 2.0) / (Ψm ^ Tb)) ^ Tc
+					W_Mac = (max(θs - θsMacMat, 0.0) * exp(((TbMac * σMac) ^ 2.0) / 2.0) / (ΨmMac ^ TbMac)) ^ TcMac
+
+					Ks_Mat = Ks * W_Mat / (W_Mat + W_Mac)
+					Ks_Mac = Ks * W_Mac / (W_Mat + W_Mac)
+
+				elseif Option_KosugiModel_KΨ⍰ == "Traditional" # =====
+					Ks_Mat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
+					Ks_Mac = Ks * min(max((θs - θsMacMat) / (θs - θr), 0.0), 1.0)
+				end
+
+			return Ks_Mac, Ks_Mat
+			end  # function: KS_MAC
+		# ------------------------------------------------------------------
+
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KUNSAT_θΨSe
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -199,25 +221,20 @@ module kunsat
 				
 				
 				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat" # =====
-					
 					# Parameters
 						Tb_Max = 3.0; Tc_Max = 4.0
-
-
-                  Tb    = Tb_Max * (1.0 - τb)
+               	Tb    = Tb_Max * (1.0 - τb)
                   TbMac = Tb_Max * (1.0 - τbMac)
-                  Tc    = Tc_Max * (1.0 - τc)
-                  TcMac = Tc_Max * (1.0 - τcMac)
-
+               	Tc    = Tc_Max * (1.0 - τc)
 						# Tc= σ ^ -0.59
-					
-					W_Mat = ((θsMacMat - θr) * exp( ((Tb * σ) ^ 2.0) / 2.0) / (Ψm ^ Tb)) ^ Tc
-					W_Mac = (max(θs - θsMacMat, 0.0) * exp(((TbMac * σMac) ^ 2.0) / 2.0) / (ΨmMac ^ TbMac)) ^ TcMac
+               	TcMac = Tc_Max * (1.0 - τcMac)
+	
 
-					Ks_Mat = Ks * W_Mat / (W_Mat + W_Mac)
-					Ks_Mac = Ks * W_Mac / (W_Mat + W_Mac)
+					# Deriving Ks_Mac and Ks_Mat
+					Ks_Mac, Ks_Mat = KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks, Tb, Tc, TbMac, TcMac,  Option_KosugiModel_KΨ⍰)
 
-					KR_MAC(Ψ₁) = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + TbMac * σMac) / √2.0)
+					# Function
+						KR_MAC(Ψ₁) = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + TbMac * σMac) / √2.0)
 
 					if Ψ₁ ≤ ΨmacMat		
 						return Kunsat_Mac =  Ks_Mac * (Se₁^τa) * (KR_MAC(Ψ₁) - (Ψ₁ / ΨmacMat) * KR_MAC(ΨmacMat)) ^ 2.0 + Ks_Mat

@@ -196,7 +196,7 @@ module wrc
 		import SpecialFunctions: erfc, erfcinv
 		import ForwardDiff, Optim
 		import ...cst
-		import ..wrc, ...hydroRelation
+		import ..wrc
 		export ∂Se∂Ψ, ∂θ∂Ψ, ∂Ψ∂Se, ∂Ψ∂θ, Se_2_Ψ, θ_2_Ψ, Ψ_2_Se, Ψ_2_θ
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
