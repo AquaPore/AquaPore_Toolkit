@@ -215,7 +215,6 @@ module wrc
 					# ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
 
 					if Ψ₁ ≤ ΨmacMat
-
 						return θ_Mac =  (θs - θsMacMat) * 0.5 * (erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0)) - (min(Ψ₁ / ΨmacMat, 1.0)) * erfc((log(ΨmacMat / ΨmMac)) / (σMac * √2.0))) + θsMacMat
 					else
 						return θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0)) + θr
