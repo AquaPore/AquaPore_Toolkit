@@ -123,15 +123,15 @@ module kunsat
 					W_Mat = ((θsMacMat - θr) * exp( ((Tb * σ) ^ 2.0) / 2.0) / (Ψm ^ Tb)) ^ Tc
 					W_Mac = (max(θs - θsMacMat, 0.0) * exp(((TbMac * σMac) ^ 2.0) / 2.0) / (ΨmMac ^ TbMac)) ^ TcMac
 
-					Ks_Mat = Ks * W_Mat / (W_Mat + W_Mac)
-					Ks_Mac = Ks * W_Mac / (W_Mat + W_Mac)
+					KsMat = Ks * W_Mat / (W_Mat + W_Mac)
+					KsMac = Ks * W_Mac / (W_Mat + W_Mac)
 
 				elseif Option_KosugiModel_KΨ⍰ == "Traditional" # =====
-					Ks_Mat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
-					Ks_Mac = Ks * min(max((θs - θsMacMat) / (θs - θr), 0.0), 1.0)
+					KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
+					KsMac = Ks * min(max((θs - θsMacMat) / (θs - θr), 0.0), 1.0)
 				end
 
-			return Ks_Mac, Ks_Mat
+			return KsMac, KsMat
 			end  # function: KS_MAC
 		# ------------------------------------------------------------------
 
@@ -202,21 +202,21 @@ module kunsat
 
 				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat0" # =====
 				
-					Ks_Mat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
-					Ks_Mac = Ks * min(max((θs - θsMacMat) / (θs - θr), 0.0), 1.0)
+					KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
+					KsMac = Ks * min(max((θs - θsMacMat) / (θs - θr), 0.0), 1.0)
 					
 					
 					if Ψ₁ ≤ ΨmacMat		
 
 						Kr_Mac(Ψ₀) = 0.5 * erfc(((log(Ψ₀ / ΨmMac)) / σMac + σMac) / √2.0)
 
-					return Kunsat_Mac =  Ks_Mac * √Se₁ * (Kr_Mac(Ψ₁) - (Ψ₁ / ΨmacMat) * Kr_Mac(ΨmacMat)) ^ 2.0 + Ks_Mat
+					return Kunsat_Mac =  KsMac * √Se₁ * (Kr_Mac(Ψ₁) - (Ψ₁ / ΨmacMat) * Kr_Mac(ΨmacMat)) ^ 2.0 + KsMat
 			
 					else
 						# Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0))
 						Se_Mat = Se₁ * (θs - θr) / (θsMacMat - θr)
 
-					return Kunsat_Mat =  Ks_Mat * √Se_Mat * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + σ) / √2.0)) ^ 2.0
+					return Kunsat_Mat =  KsMat * √Se_Mat * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + σ) / √2.0)) ^ 2.0
 					end				
 				
 				
@@ -230,22 +230,24 @@ module kunsat
                	TcMac = Tc_Max * (1.0 - τcMac)
 	
 
-					# Deriving Ks_Mac and Ks_Mat
-					Ks_Mac, Ks_Mat = KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks, Tb, Tc, TbMac, TcMac,  Option_KosugiModel_KΨ⍰)
+					# Deriving KsMac and KsMat
+					KsMac, KsMat = KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks, Tb, Tc, TbMac, TcMac,  Option_KosugiModel_KΨ⍰)
 
 					# Function
 						KR_MAC(Ψ₁) = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + TbMac * σMac) / √2.0)
 
 					if Ψ₁ ≤ ΨmacMat		
-						return Kunsat_Mac =  Ks_Mac * (Se₁^τa) * (KR_MAC(Ψ₁) - (Ψ₁ / ΨmacMat) * KR_MAC(ΨmacMat)) ^ 2.0 + Ks_Mat
+						return Kunsat_Mac =  KsMac * (Se₁^τa) * (KR_MAC(Ψ₁) - (Ψ₁ / ΨmacMat) * KR_MAC(ΨmacMat)) ^ 2.0 + KsMat
 			
 					else
 						# Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0))
 						Se_Mat = Se₁ * (θs - θr) / (θsMacMat - θr)
 
-						return Kunsat_Mat =  Ks_Mat * (Se_Mat^τaMac) * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + Tb * σ) / √2.0)) ^ 2.0
-					end				
-		
+						return Kunsat_Mat =  KsMat * (Se_Mat^τaMac) * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + Tb * σ) / √2.0)) ^ 2.0
+					end
+					
+								
+				
 				else
 					error("option.hydro.Option_KosugiModel_KΨ⍰ = $Option_KosugiModel_KΨ⍰ not yet available pls modify ?_Option.toml")
 				end

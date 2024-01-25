@@ -43,18 +43,18 @@ module θψ_2_KsψModel
 				
 				Se_Mat = (θ_Mat- θr) / (θs - θr)
 				
-				Ks_Mat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
+				KsMat = T1 * cst.KunsatModel * π * ((θsMacMat - θr) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
 				
-				Kunsat_Mat = Ks_Mat * √Se_Mat * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
+				Kunsat_Mat = KsMat * √Se_Mat * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 			
 			# Macropore ===
 				θ_Mac = 0.5 * (θs - θsMacMat) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
 				
 				Se_Mac = θ_Mac / (θs - θr)
 
-				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
+				KsMac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
-				Kunsat_Mac = Ks_Mac * √Se_Mac * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+				Kunsat_Mac = KsMac * √Se_Mac * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 		return Kunsat_Mat + Kunsat_Mac
 		end  # function: KsΨMODEL_NOINTEGRAL
 	# ------------------------------------------------------------------
@@ -69,14 +69,14 @@ module θψ_2_KsψModel
 				Se = wrc.Ψ_2_Se(optionₘ, Ψ₁, iZ, hydro)
 
 			# Matrix ====	
-				Ks_Mat = T1 * cst.KunsatModel * π * (((θsMacMat - θr) ^ (Tclay / T3)) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
+				KsMat = T1 * cst.KunsatModel * π * (((θsMacMat - θr) ^ (Tclay / T3)) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ) ^ 2.0) / 2.0)) ^ T3
 
-				Kunsat_Mat = Ks_Mat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
+				Kunsat_Mat = KsMat * √Se * (0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)) ^ 2.0
 
 			# Macropore ===
-				Ks_Mac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
+				KsMac = T1Mac * cst.KunsatModel * π * ((θs - θsMacMat) * ((cst.Y / ΨmMac) ^ T2Mac) * exp(((T2Mac * σMac) ^ 2.0) / 2.0)) ^ T3Mac
 
-				Kunsat_Mac = Ks_Mac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
+				Kunsat_Mac = KsMac * √Se * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
 	return  Kunsat_Mat + Kunsat_Mac
 	end  # function: KsΨMODEL_CLAY
