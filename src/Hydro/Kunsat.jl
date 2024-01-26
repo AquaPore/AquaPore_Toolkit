@@ -198,37 +198,19 @@ module kunsat
 					Kunsat_Mac =  KsMac * √Se₁ * (0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + σMac) / √2.0)) ^ 2.0
 
 					return Kunsat_Mat + Kunsat_Mac
-				
-
-				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat0" # =====
-				
-					KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
-					KsMac = Ks * min(max((θs - θsMacMat) / (θs - θr), 0.0), 1.0)
-					
-					
-					if Ψ₁ ≤ ΨmacMat		
-
-						Kr_Mac(Ψ₀) = 0.5 * erfc(((log(Ψ₀ / ΨmMac)) / σMac + σMac) / √2.0)
-
-					return Kunsat_Mac =  KsMac * √Se₁ * (Kr_Mac(Ψ₁) - (Ψ₁ / ΨmacMat) * Kr_Mac(ΨmacMat)) ^ 2.0 + KsMat
-			
-					else
-						# Se_Mat = 0.5 * erfc((log( max(Ψ₁ - ΨmacMat, 0.0) / Ψm)) / (σ * √2.0))
-						Se_Mat = Se₁ * (θs - θr) / (θsMacMat - θr)
-
-					return Kunsat_Mat =  KsMat * √Se_Mat * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + σ) / √2.0)) ^ 2.0
-					end				
+	
 				
 				
 				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat" # =====
 					# Parameters
-						Tb_Max = 3.0; Tc_Max = 4.0
+						Tb_Max = 2.0; Tc_Max = 2.0
                	Tb    = Tb_Max * (1.0 - τb)
                   TbMac = Tb_Max * (1.0 - τbMac)
                	Tc    = Tc_Max * (1.0 - τc)
 						# Tc= σ ^ -0.59
                	TcMac = Tc_Max * (1.0 - τcMac)
-	
+
+
 
 					# Deriving KsMac and KsMat
 					KsMac, KsMat = KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks, Tb, Tc, TbMac, TcMac,  Option_KosugiModel_KΨ⍰)

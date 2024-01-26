@@ -26,7 +26,9 @@ export OPTIMIZE_ALLSOILS
 
 		SearchRange_AllSoils = optimize.SEARCHRANGE(optionₘ, optimAllSoils)
 
-		Optimization = BlackBoxOptim.bboptimize(X -> optAllSoil.OF_HYDROLAB(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, X, θ_θΨobs, θϵ, Ψ_KΨobs, Ψ_θΨobs), optimAllSoils.InitialGuess; SearchRange=SearchRange_AllSoils, NumDimensions=optimAllSoils.NparamOpt, TraceMode=:silent, MaxSteps=10)
+# optimAllSoils.InitialGuess
+
+		Optimization = BlackBoxOptim.bboptimize(X -> optAllSoil.OF_HYDROLAB(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, X, θ_θΨobs, θϵ, Ψ_KΨobs, Ψ_θΨobs) ; SearchRange=SearchRange_AllSoils, NumDimensions=optimAllSoils.NparamOpt, TraceMode=:silent)
 		# MaxTime=10, 
 
 		# Best parameter set

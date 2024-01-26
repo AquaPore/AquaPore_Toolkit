@@ -36,7 +36,7 @@ module pumiceManuscript
 				Ψm_Min  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat= √ΨmacMat, σ, Pσ=Pσ₃)
 				Ψm_Max  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat=ΨmacMat, σ, Pσ=Pσ₃)
 
-				Tb_Max = 3.0; Tc_Max = 4.0
+				Tb_Max = 2.0; Tc_Max = 4.0
 				Tb    = Tb_Max * (1.0 - τb)
 				TbMac = Tb_Max * (1.0 - τbMac)
 				Tc    = Tc_Max * (1.0 - τc)
@@ -98,8 +98,10 @@ module pumiceManuscript
          xgridstyle         = :dash
          xgridvisible       = true
          xlabelSize         = 20
+         xlabelpadding      = 5
+         xminortickalign    = 1.0
          xminorticksvisible = true
-         xtickalign         = 1 # 0 is inside and 1 is outside
+         xtickalign         = 0.9 # 0 is inside and 1 is outside
          xticklabelrotation = π/4
          xticksize          = 10
          xticksmirrored     = false
@@ -107,7 +109,9 @@ module pumiceManuscript
          xtrimspine         = false
          ygridstyle         = :dash
          ygridvisible       = false
+         ylabelpadding      = xlabelpadding
          ylabelsize         = xlabelSize
+         yminortickalign    = xminortickalign
          yminorticksvisible = true
          ytickalign         = xtickalign
          yticksize          = xticksize
@@ -126,11 +130,11 @@ module pumiceManuscript
 			Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif")) 
 
 
-		Axis_θΨ = Axis(Fig[1,1], xlabel= L"$ψ$ [kPa]", ylabel=L"$θ$ [L³ L⁻³]", title="Sandy soil", titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height,   titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored,  xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5))
+		Axis_θΨ = Axis(Fig[1,1], xlabel= L"$ψ$ [kPa]", ylabel=L"$θ$ [L³ L⁻³]", title="Sandy soil", titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height,   titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored,  xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign)
 
 		Label(Fig[1, 1, TopRight()], "(A1)", fontsize=18, font=:bold, padding=(-50, 5, -50, 5), halign=:right)
 
-		Ks, KsMac_Max, KsMac_Max, KsMac_Min, KsMac_Min, KsMat_Max, KsMat_Min, Kunsat_Max, Kunsat_Min, N, Pσ_Mac, θDual_Max, θDual_Min, θs, θsMacMat, σ, Ψ, ΨmacMat =HYDRO_MODELS(θs=0.5, θsMacMat_η=0.75, θr=0.0, σ=1.0, Ks=0.08, ΨmacMat=100.0, τa=0.5, τb=0.6, τc=0.6, τaMac=0.5, τbMac=0.6, τcMac=0.0, KosugiModel_θΨ⍰="ΨmacMat", Option_KosugiModel_KΨ⍰="ΨmacMat")
+		Ks, KsMac_Max, KsMac_Max, KsMac_Min, KsMac_Min, KsMat_Max, KsMat_Min, Kunsat_Max, Kunsat_Min, N, Pσ_Mac, θDual_Max, θDual_Min, θs, θsMacMat, σ, Ψ, ΨmacMat =HYDRO_MODELS(θs=0.5, θsMacMat_η=0.75, θr=0.0, σ=1.0, Ks=0.08, ΨmacMat=100.0, τa=0.5, τb=0.5, τc=0.5, τaMac=0.5, τbMac=0.5, τcMac=0.0, KosugiModel_θΨ⍰="ΨmacMat", Option_KosugiModel_KΨ⍰="ΨmacMat")
 
 				Label(Fig[1, 1:2, Top()], "Functions θ(ψ) & K(ψ) macropore Pσ_Mac=$Pσ_Mac", valign=:bottom, font=:bold, padding=(0, 0,50, 0), color=:navajowhite4,  fontsize=titlesize*1.2)
 					
@@ -159,7 +163,7 @@ module pumiceManuscript
 				lines!(Axis_θΨ, Ψ_Log, θDual_Max_Trad, linewidth=Linewidth, label="Trad σ =$σ, ψₘ_Max",  color=Colormap[2])
 
 
-		Axis_KΨ = Axis(Fig[2,1], xlabel=L"$ψ$ [kPa]", ylabel=L"$K(ψ)$ [cm h⁻¹]", xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize,	xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xticksmirrored=xticksmirrored,  yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xtickalign=xtickalign, ytickalign=ytickalign, yminorticks=IntervalsBetween(5), xgridstyle=xgridstyle, ygridstyle=ygridstyle, )
+		Axis_KΨ = Axis(Fig[2,1], xlabel=L"$ψ$ [kPa]", ylabel=L"$K(ψ)$ [cm h⁻¹]", xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize,	xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xticksmirrored=xticksmirrored,  yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xtickalign=xtickalign, ytickalign=ytickalign, yminorticks=IntervalsBetween(5), xgridstyle=xgridstyle, ygridstyle=ygridstyle, xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign)
 
 			Label(Fig[2, 1, TopRight()], "(A2)", fontsize=18, font=:bold, padding = (-50, 5, -50, 5), halign=:right)
 
@@ -186,11 +190,11 @@ module pumiceManuscript
 
 		# ========================================
 
-		Axis_θΨ2 = Axis(Fig[1,2], xlabel= L"$ψ$ [kPa]", ylabel=L"$θ$ [L³ L⁻³]", title="Clay soils",  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored,  xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5))
+		Axis_θΨ2 = Axis(Fig[1,2], xlabel= L"$ψ$ [kPa]", ylabel=L"$θ$ [L³ L⁻³]", title="Clay soils",  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored,  xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign)
 
 			Label(Fig[1, 2, TopRight()], "(B1)", fontsize=18, font=:bold, padding=(-50, 5, -50, 5), halign=:right)
 
-			Ks, KsMac_Max, KsMac_Max, KsMac_Min, KsMac_Min, KsMat_Max, KsMat_Min, Kunsat_Max, Kunsat_Min, N, Pσ_Mac, θDual_Max, θDual_Min, θs, θsMacMat, σ, Ψ, ΨmacMat =HYDRO_MODELS(θs=0.5, θsMacMat_η=0.75, θr=0.0, σ=3.0, Ks=0.08, ΨmacMat=100.0, τa=0.5, τb=0.6, τc=0.6, τaMac=0.5, τbMac=0.6, τcMac=0.0, KosugiModel_θΨ⍰="ΨmacMat", Option_KosugiModel_KΨ⍰="ΨmacMat")
+			Ks, KsMac_Max, KsMac_Max, KsMac_Min, KsMac_Min, KsMat_Max, KsMat_Min, Kunsat_Max, Kunsat_Min, N, Pσ_Mac, θDual_Max, θDual_Min, θs, θsMacMat, σ, Ψ, ΨmacMat =HYDRO_MODELS(θs=0.5, θsMacMat_η=0.75, θr=0.0, σ=3.0, Ks=0.08, ΨmacMat=100.0, τa=0.5, τb=0.5, τc=0.6, τaMac=0.5, τbMac=0.6, τcMac=0.0, KosugiModel_θΨ⍰="ΨmacMat", Option_KosugiModel_KΨ⍰="ΨmacMat")
 
 				Ψ_Log = Array{Float64}(undef, N)
 				for iZ=1:N
@@ -217,7 +221,7 @@ module pumiceManuscript
 				lines!(Axis_θΨ2, Ψ_Log, θDual_Max_Trad, linewidth=Linewidth, label="Trad σ =$σ, ψₘ_Max",  color=Colormap[4])
 
 
-		Axis_KΨ2 = Axis(Fig[2,2], xlabel=L"$ψ$ [kPa]", ylabel=L"$K(ψ)$ [cm h⁻¹]", xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize,	xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xticksmirrored=xticksmirrored,  yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xtickalign=xtickalign, ytickalign=ytickalign, yminorticks=IntervalsBetween(5), xgridstyle=xgridstyle, ygridstyle=ygridstyle, )
+		Axis_KΨ2 = Axis(Fig[2,2], xlabel=L"$ψ$ [kPa]", ylabel=L"$K(ψ)$ [cm h⁻¹]", xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize,	xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xticksmirrored=xticksmirrored,  yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xtickalign=xtickalign, ytickalign=ytickalign, yminorticks=IntervalsBetween(5), xgridstyle=xgridstyle, ygridstyle=ygridstyle, xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign )
 
 			Label(Fig[2, 2, TopRight()], "(B2)", fontsize=18, font=:bold, padding = (-50, 5, -50, 5), halign=:right)
 

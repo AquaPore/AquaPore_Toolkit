@@ -83,7 +83,8 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNCTION_σ_2_Ψm_SOFTWARE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0, Pσ_Mac=3)
+		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0, Pσ_Mac=2)
+
 
 			if option₂.ΨmacMat_2_σMac_ΨmMac
 				# ΨmacMat₁ = FUNC_θsMacMatη_2_ΨmacMat(θs=hydro₂.θs[iZ], θsMacMat=hydro₂.θsMacMat[iZ], θr=hydro₂.θr[iZ], ΨmacMat_Max=hydro₂.ΨmacMat[iZ])
