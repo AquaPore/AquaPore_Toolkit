@@ -178,12 +178,12 @@ module reading
 				# Determeining if data has only 3 columns: Id, H and Theta
 				if length(Header) ≤ 6
 					# Get the data of interest
-						try
+						# try
                   	Ψ_θΨobs, N_θΨobs = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "H[mm]", NiZ)
-						catch
-							Ψ_θΨobs, N_θΨobs = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "H[kPa]", NiZ)
-							Ψ_θΨobs = Ψ_θΨobs .* cst.kPa_2_Mm
-						end
+						# catch
+						# 	Ψ_θΨobs, N_θΨobs = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "H[kPa]", NiZ)
+						# 	Ψ_θΨobs = Ψ_θΨobs .* cst.kPa_2_Mm
+						# end
 				
                   θ_θΨobs, ~       = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "Theta[0-1]", NiZ)
 				
@@ -254,6 +254,7 @@ module reading
 			∑Psd , ~            = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header, "Cumul_Psd", NiZ)
 
 			Rpart = @. Diameter_Psd / 2.0
+
 		return Rpart, ∑Psd, N_Psd
 		end  # function: PSD
 	#----------------------------------------------------------------------

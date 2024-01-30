@@ -104,7 +104,7 @@ module AquaPore_Toolkit
 				else
 					K_KΨobs = []
 					Ψ_KΨobs = []
-					N_KΨobs = 1
+					N_KΨobs = zeros(Int64, NiZ)
 				end  # if: Kθ			
 
 			# IF WE HAVE THE HYDRAULIC PARAMETERS PRECOMPUTED FROM PREVIOUS SIMULATIONS	
@@ -120,7 +120,7 @@ module AquaPore_Toolkit
 				if option.data.Φ⍰ == "ρᵦ"
 					RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil = reading.BULKDENSITY(IdSelect, NiZ, path.inputSoilwater.BulkDensity)
 
-					# Φ  corrected for RockFragments
+					# Φ corrected for RockFragments
 					hydro = rockFragment.ρᵦ_2_Φ(hydro, NiZ, option, RockFragment, ρₚ_Fine, ρₚ_Rock, ρᵦ_Soil)
 
 				elseif option.data.Φ⍰ == "Φ" # Total Porosity
@@ -159,12 +159,13 @@ module AquaPore_Toolkit
                smap                                 = readSmap.SMAP(IdSelect_True, NiZ, path)
                Dict_SoilNames_2_HypixBottomBoundary = readSmap.BOUNDARY_BOTTOM(path)
 
-               RockFragment                         = copy(smap.RockFragment)
-               RockClass                            = copy(smap.RockClass)
-               IsTopsoil                            = copy(smap.IsTopsoil)
-               Ks_Impermeable                       = copy(smap.Ks_Impermeable)
+               RockFragment   = copy(smap.RockFragment)
+               RockClass      = copy(smap.RockClass)
+               IsTopsoil      = copy(smap.IsTopsoil)
+               Ks_Impermeable = copy(smap.Ks_Impermeable)
+               OrganicMatter  = copy(smap.OrganicMatter)
 				else
-					IsTopsoil=[]; Ks_Impermeable=[]
+					IsTopsoil=[]; Ks_Impermeable=[]; OrganicMatter=zeros(Float64, NiZ)
 				end  # if: option.data.Pedological⍰
 
 
@@ -206,7 +207,8 @@ module AquaPore_Toolkit
 
 				if option.rockFragment.CorectStoneRockWetability
 					@info "\n Correction for rock wettability for θ(Ψ)\n" 
-					θ_θΨobs = rockFragment.CORECTION_θΨ_WETABLE!(NiZ, N_θΨobs, rfWetable, RockClass, RockFragment, θ_θΨobs, Ψ_θΨobs)
+					θ_θΨobs = rockFragment.CORECTION_θΨ_WETABLE!(N_θΨobs, NiZ, OrganicMatter, rfWetable, RockClass, RockFragment, θ_θΨobs, Ψ_θΨobs)
+
 				end # option.rockFragment.CorrectStoneWetability
 			end # if:option.run.RockCorection
 
@@ -319,23 +321,15 @@ module AquaPore_Toolkit
 		end  # if: Smap2Hypix 
 
 		# ------------------------END: Smap_2_HyPix---------------------------
-		
-		# _______________________ START: Temporary _______________________ 
-
-		# if option.run.Temporary
-		# 	temporary.KS_SMAP()
-		# end
-
-		# ------------------------END: Temporary---------------------------  
 
 
 		#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		# _______________________ START: table _______________________ 
 
 
-		if option.run.HydroLabθΨ⍰ ≠ "No" && option.run.HydroLabθΨ⍰ ≠ "HydroParamPrecomputed" # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-			# CORE OUTPUT
-				table.hydroLab.θΨK(hydro, hydroOther, IdSelect[1:NiZ], KₛModel[1:NiZ],  N_KΨobs[1:NiZ], N_θΨobs[1:NiZ], NiZ, path.tableSoilwater.Table_θΨK, RockFragment)
+		if option.run.HydroLabθΨ⍰ ≠ "No" && option.run.HydroLabθΨ⍰ ≠ "HydroParamPrecomputed" 
+
+				table.hydroLab.θΨK(hydro, hydroOther, IdSelect[1:NiZ], KₛModel[1:NiZ], N_KΨobs[1:NiZ], N_θΨobs[1:NiZ], NiZ, path.tableSoilwater.Table_θΨK, RockFragment[1:NiZ])
 		
 
 				# When optimising other model than Kosugi we do not have a model for σ_2_Ψm⍰. Therefore we assume that θ(Ψ) and K(θ) derived by Kosugi from very dry to very wet are physical points
@@ -454,11 +448,11 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 	#  @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Convert")
 
 	
-	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
+	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
 
 		# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Pumice")
 
-		# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
+		@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
 
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)

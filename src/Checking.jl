@@ -19,7 +19,7 @@ module checking
 				@warn("*** If  optim.ParamOpt && option.data.Kθ && option.run.HydroLabθΨ⍰==Opt ⇒ Ks ∈ optim.ParamOpt  ***")
 
 		 	elseif "Ks" ∈ optim.ParamOpt && !(option.data.Kθ) 
-				error("*** If Ks ∈ optim.ParamOpt ⇒ option.data.θΨ ***")
+				error("*** If Ks ∈ optim.ParamOpt ⇒ option.data.Kθ ***")
 
 			elseif "θr"∉ optim.ParamOpt && option.hydro.θrOpt⍰=="Opt" 
 				error("*** AquaPore-ToolKit Error: option.hydro.θrOpt⍰==Opt ⇒ θr ∈ optim.ParamOpt ***")

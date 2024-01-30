@@ -21,16 +21,22 @@ module rockFragment
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : STONECORRECTION_WETABLE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function CORECTION_θΨ_WETABLE!(NiZ::Int64, N_θΨobs::Vector{Int64}, rfWetable, RockClass::Vector{String}, RockFragment::Vector{Float64}, θ_θΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
+		function CORECTION_θΨ_WETABLE!(N_θΨobs::Vector{Int64}, NiZ::Int64, OrganicMatter::Vector{Float64}, rfWetable, RockClass::Vector{String}, RockFragment::Vector{Float64}, θ_θΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
 			for iZ = 1:NiZ	
 				iRockClass = rfWetable.RockClass_Dict[RockClass[iZ]]
 
 				WettableFunction = Polynomials.Polynomial(rfWetable.RockClass_Polynomial_Array[iRockClass][1])
 
+
 				for iθ=1:N_θΨobs[iZ]
 					θ_Wettable = WettableFunction(log1p(Ψ_θΨobs[iZ,iθ]))
 
-					θ_θΨobs[iZ,iθ] =  θ_θΨobs[iZ,iθ] + θ_Wettable * RockFragment[iZ]
+					# Special case for Pumice soils
+					if θ_Wettable < 0.0
+						θ_Wettable = θ_θΨobs[iZ,iθ] * 0.75 
+					end
+
+					θ_θΨobs[iZ,iθ] = θ_θΨobs[iZ,iθ] + θ_Wettable * RockFragment[iZ] * (1.0 - OrganicMatter[iZ])
 				end # for iθ=1:N_θΨobs[iZ]
 			end #  for iZ = 1:NiZ			
 		return  θ_θΨobs

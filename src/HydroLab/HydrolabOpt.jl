@@ -10,7 +10,7 @@ module hydrolabOpt
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : HYPIXOPT_START
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function HYDROLABOPT_START(;∑Psd, hydro, hydroOther, K_KΨobs=[0], N_KΨobs=1, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, θ_θΨobs, Ψ_KΨobs=[0], Ψ_θΨobs)
+	function HYDROLABOPT_START(;∑Psd, hydro, hydroOther, K_KΨobs=zeros(Float64,1,1), N_KΨobs=1, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, θ_θΨobs, Ψ_KΨobs=zeros(Float64,1,1), Ψ_θΨobs)
 		
 
 		if optimAllSoils.🎏_Opt

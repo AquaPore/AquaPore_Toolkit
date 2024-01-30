@@ -12,16 +12,17 @@
 		#		STRUCTURE : SMAP
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			Base.@kwdef mutable struct SMAPSTRUCT # <>=<>=<>=<>=<>=<>=<>=<>=<>
-				IsTopsoil              :: Vector{Int64}    = Int64[]
-				Ks_Impermeable 		  :: Vector{Float64}  = Float64[]
-				RockClass              :: Vector{String}   = String[]
-				RockFragment           :: Vector{Float64}  = Float64[]
-				Smap_Depth             :: Vector{Float64}  = Float64[]
-				Smap_ImpermClass       :: Vector{String}   = String[]
-				Smap_MaxRootingDepth   :: Vector{Float64}  = Float64[]
-				Smap_PermeabilityClass :: Vector{String}   = String[]
-				Smap_SmapFH            :: Vector{String}   = String[]
-				Soilname               :: Vector{String}   = String[]
+            IsTopsoil              :: Vector{Int64}    = Int64[]
+            Ks_Impermeable         :: Vector{Float64}  = Float64[]
+            RockClass              :: Vector{String}   = String[]
+            RockFragment           :: Vector{Float64}  = Float64[]
+            Smap_Depth             :: Vector{Float64}  = Float64[]
+            Smap_ImpermClass       :: Vector{String}   = String[]
+            Smap_MaxRootingDepth   :: Vector{Float64}  = Float64[]
+            Smap_PermeabilityClass :: Vector{String}   = String[]
+            Smap_SmapFH            :: Vector{String}   = String[]
+            Soilname               :: Vector{String}   = String[]
+            OrganicMatter          :: Vector{Float64}  = Float64[]
 			end
 		# ............................................................
 
@@ -58,14 +59,17 @@
             smap.Smap_MaxRootingDepth   = convert(Vector{Float64}, Data."MaxRootingDepth_mm")
             smap.Smap_MaxRootingDepth   = smap.Smap_MaxRootingDepth[IdSelect]
 				
-				smap.Smap_PermeabilityClass = convert(Vector{String}, Data."SoilImpermClass")
-				smap.Smap_PermeabilityClass = smap.Smap_PermeabilityClass[IdSelect]
+            smap.Smap_PermeabilityClass = convert(Vector{String}, Data."SoilImpermClass")
+            smap.Smap_PermeabilityClass = smap.Smap_PermeabilityClass[IdSelect]
 
-				smap.Smap_SmapFH            = convert(Vector{String}, Data."SmapFH")
-				smap.Smap_SmapFH            = smap.Smap_SmapFH[IdSelect]
+            smap.Smap_SmapFH            = convert(Vector{String}, Data."SmapFH")
+            smap.Smap_SmapFH            = smap.Smap_SmapFH[IdSelect]
 
-				smap.Soilname               = convert(Vector{String}, Data."Soilname")
+            smap.Soilname               = convert(Vector{String}, Data."Soilname")
             smap.Soilname               = smap.Soilname[IdSelect]
+
+            smap.OrganicMatter          = convert(Vector{Float64}, Data."OrganicMatter")
+            smap.OrganicMatter          = smap.OrganicMatter[IdSelect]
 
 				NiZ = length(smap.Smap_ImpermClass)
 
