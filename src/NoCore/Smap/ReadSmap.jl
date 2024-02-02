@@ -70,6 +70,8 @@
 
             smap.OrganicMatter          = convert(Vector{Float64}, Data."OrganicMatter")
             smap.OrganicMatter          = smap.OrganicMatter[IdSelect]
+            smap.OrganicMatter          = smap.OrganicMatter ./ 100.0
+
 
 				NiZ = length(smap.Smap_ImpermClass)
 

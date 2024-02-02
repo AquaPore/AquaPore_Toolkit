@@ -3,15 +3,19 @@
 #		module: optIndivSoil
 # =============================================================
 module optIndivSoil
-	import ..hydroRelation, ..ofHydrolab, ..optimize, ..psdThetar
+	import ..hydroRelation, ..ofHydrolab, ..optimize, ..psdThetar, ..optimizeOptim
 	using BlackBoxOptim
+	using PRIMA, Optim
 	export OPTIMIZE_INDIVIDUALSOILS
 
+   global CountIndiv_NoImprovement = 1::Int64
+   global CountIndiv_Opt           = 1::Int64
+   global OfIndiv_Soil          = Inf ::Float64
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OPTIMIZE_INDIVIDUALSOILS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function OPTIMIZE_INDIVIDUALSOILS(;∑Psd::Matrix{Float64}, hydro::Main.hydroStruct.KOSUGI, hydroOther::Main.hydroStruct.HYDRO_OTHER, K_KΨobs::Matrix{Float64}, N_KΨobs=1, N_θΨobs::Vector{Int64}, NiZ::Int64, optim::Main.reading.OPTIM, option::Main.options.OPTION, optionₘ::Main.options.HYDRO, param::Main.params.PARAM, θ_θΨobs::Matrix{Float64}, θϵ=0.005::Float64, Ψ_KΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
+	function OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther::Main.hydroStruct.HYDRO_OTHER, K_KΨobs::Matrix{Float64}, N_KΨobs=1, N_θΨobs::Vector{Int64}, NiZ::Int64, optim::Main.reading.OPTIM, option::Main.options.OPTION, optionₘ::Main.options.HYDRO, param::Main.params.PARAM, θ_θΨobs::Matrix{Float64}, θϵ=0.005::Float64, Ψ_KΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
 
 		# Initiating arrays 
 			Of_Sample = zeros(Float64, NiZ)
@@ -31,7 +35,7 @@ module optIndivSoil
 
 
 			# CORRECTING θr  ~~~~~
-				hydro.θr_Max[iZ] = min(max(θobs_Min - θϵ, 0.0), hydro.θr_Max[iZ]) # Maximum value of θr
+				hydro.θr_Max[iZ] = max(min(max(θobs_Min - θϵ, 0.0), hydro.θr_Max[iZ]),  hydro.θr_Min[iZ] + θϵ) # Maximum value of θr
 
 				if ("θr" ∈ optim.ParamOpt)
 					# Changing the feasible range of θr
@@ -110,15 +114,87 @@ module optIndivSoil
 
 			# OPTIMIZATION: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""Arguments * optimizer initialized optimization method * evaluator the evaluator of the problem fitness * params controller settings, see DefaultParameters for the default values: 
+
+:MaxTime max time in seconds (takes precedence over the other budget-related params if specified), 0.0 disables the check * :MaxFuncEvals max fitness evals (takes precedence over max iterations, but not max time), 0 disables the check * 
+
+:MaxSteps max iterations gives the least control since different optimizers have different "size" of their "iterations" 
+
+* :MaxStepsWithoutProgress max iterations without fitness improvement 
+
+*:MinDeltaFitnessTolerance minimum delta fitness (difference between the two consecutive best fitness improvements) we can accept before terminating  
+
+
+* :MaxNumStepsWithoutFuncEvals stop optimization if no new fitness evals in this many steps (indicates a converged/degenerate search) 
+
+* :NumRepetitions number of repetitions to run for each optimizer for each problem 
+
+* :TraceMode how the optimizer state is traced to the STDOUT during the optimization (one of :silent, :verbose) 
+
+* :TraceInterval the trace interval (in seconds) 
+
+* :SaveTrace whether to save it to a file (defaults to false) 
+
+* :SaveFitnessTraceToCsv whether the history of fitness changes during optimization should be save to a csv file 
+
+* :SaveParameters save method/controller parameters to a JSON file"""
+
+			🎏_Model = :BlackBox # :Optim, :Prima, :BlackBox 
 			
+			if  🎏_Model == :BlackBox
+
+				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=1000)
+					function WHEN_TO_STOP_INDIV(oc; CountIndiv_NoImprovement_Max=CountIndiv_NoImprovement_Max)
+						global CountIndiv_Opt += 1
+
+						if OfIndiv_Soil > BlackBoxOptim.best_fitness(oc)
+							global CountIndiv_NoImprovement = 1
+							global OfIndiv_Soil = BlackBoxOptim.best_fitness(oc)
+						else
+							global CountIndiv_NoImprovement += 1
+						end
+
+					return CountIndiv_NoImprovement > CountIndiv_NoImprovement_Max
+					end# ===========
+
+					if WHEN_TO_STOP_INDIV(oc)
+						BlackBoxOptim.shutdown!(oc)
+					end
+				end
+				
 				# Updated searchrange
 				SearchRange_IndivSoil = optimize.SEARCHRANGE(optionₘ, optim)
 
-				Optimization = BlackBoxOptim.bboptimize(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs); SearchRange=SearchRange_IndivSoil, NumDimensions=optim.NparamOpt, TraceMode=:silent)
+            global CountIndiv_NoImprovement = 1::Int64
+            global CountIndiv_Opt           = 1::Int64
+            global OfIndiv_Soil             = Inf ::Float64
+
+				Optimization = BlackBoxOptim.bboptimize(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs); SearchRange=SearchRange_IndivSoil, NumDimensions=optim.NparamOpt, TraceMode=:silent, CallbackFunction=FORCING_STOPPING_INDIV, CallbackInterval=0.0, MinDeltaFitnessTolerance=1e-9)
 				
-				# Best parameter set 
+				# Best parameter set .
 					X = BlackBoxOptim.best_candidate(Optimization)
-					hydro = optIndivSoil.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
+
+			elseif 🎏_Model == :Prima
+				Lower, Upper = optimizeOptim.SEARCHRANGE_OPTIM(optionₘ, optim)
+				Initial = (Lower + Upper) .* 0.5
+
+				rhobeg=2.5e-8
+				rhobeg = max(0.25 * minimum(Upper .- Lower), rhobeg)
+				rhoend=1.0e-16
+
+				X, info = PRIMA.bobyqa(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs), Initial; xl=Lower, xu=Upper, rhobeg=rhobeg, rhoend=rhoend, maxfun=100000)
+
+			elseif 🎏_Model == :Optim
+				Lower, Upper = optimizeOptim.SEARCHRANGE_OPTIM(optionₘ, optim)
+				Initial = (Lower + Upper) .* 0.5
+
+				Result = Optim.optimize(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs), Lower, Upper, Initial, Fminbox(NelderMead()), Optim.Options(show_trace = false))
+
+				X = Optim.minimizer(Result)
+
+			end
+
+				hydro = optIndivSoil.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
 
 				# FINAL CORRECTION
 					# if optionₘ.σ_2_Ψm⍰ ≠ "No"
@@ -162,7 +238,7 @@ module optIndivSoil
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : PARAM_2_hydro
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X; ΔMinΘₛ_Θᵣ=0.05, 🎏_CheckError=false)
+		function PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X; ΔMinΘₛ_Θᵣ=0.05, 🎏_CheckError=true)
 
 			for iParam = 1:optim.NparamOpt	
 				# Determening if parameters are Log transformed

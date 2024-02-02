@@ -38,12 +38,12 @@ module table
 		import  ...tool, ...wrc, ...kunsat
 		# import DelimitedFiles
 		import CSV, Tables
-		export θΨK
+		export θΨK, θΨK_OPTIMISATION
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : θΨK
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function θΨK(hydro::Main.hydroStruct.KOSUGI, hydroOther:: Main.hydroStruct.HYDRO_OTHER, IdSelect::Vector{Int64}, KₛModel::Vector{Float64}, N_KΨobs::Vector{Int64}, N_θΨobs::Vector{Int64}, NiZ::Int64, Path::String, RockFragment::Vector{Float64})
+			function θΨK(hydro, hydroOther, IdSelect::Vector{Int64}, KₛModel::Vector{Float64}, N_KΨobs::Vector{Int64}, N_θΨobs::Vector{Int64}, NiZ::Int64, Path::String, RockFragment::Vector{Float64})
 				println("    ~  $(Path) ~")
 
 
@@ -57,6 +57,24 @@ module table
 			return nothing
 			end  # function:  θΨK
 		#---------------------------------------------------------------------
+
+
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : θΨK_OPTIMISATION
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function θΨK_OPTIMISATION(hydro, hydroOther, NiZ, Path)
+
+				Matrix₁, FieldName_String = tool.readWrite.STRUCT_2_FIELDNAME(NiZ, hydro)
+
+				Matrix₂, FieldName_String2 = tool.readWrite.STRUCT_2_FIELDNAME(NiZ, hydroOther)
+
+				Header = vcat( FieldName_String, FieldName_String2 )
+
+				CSV.write(Path, Tables.table([ Matrix₁ Matrix₂ ]), writeheader=true, header=Header, bom=true)
+			return nothing
+			end  # function:  θΨK
+		#---------------------------------------------------------------------
+
 
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

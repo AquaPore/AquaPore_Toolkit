@@ -67,13 +67,13 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMac
 	#		FUNCTION : FUNC_σ_2_Ψm
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function FUNC_σ_2_Ψm(;ΨmacMat, σ, Pσ, Ψm_Min=ΨmacMat, Ψm_Max=10.0^8, Option_Mode=false)
-			if Option_Mode
-				Ψm = (1.0 + ΨmacMat) * exp(σ * Pσ + σ^2)
-			else
+			# if Option_Mode
+			# 	Ψm = (1.0 + ΨmacMat) * exp(σ * Pσ + σ^2)
+			# else
 				Ψm = (1.0 + ΨmacMat) * exp(σ * Pσ)
-			end	
+			# end	
 
-			Ψm = min(Ψm, Ψm_Max)
+			Ψm = max(min(Ψm, Ψm_Max), Ψm_Min) 
 
 		return Ψm
 		end # function: FUNC_σ_2_Ψm

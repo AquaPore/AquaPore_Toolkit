@@ -210,8 +210,6 @@ module kunsat
 						# Tc= σ ^ -0.59
                	TcMac = Tc_Max * (1.0 - τcMac)
 
-
-
 					# Deriving KsMac and KsMat
 					KsMac, KsMat = KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks, Tb, Tc, TbMac, TcMac,  Option_KosugiModel_KΨ⍰)
 
@@ -227,7 +225,6 @@ module kunsat
 
 						return Kunsat_Mat =  KsMat * (Se_Mat^τaMac) * (0.5 * erfc(((log( max(Ψ₁- ΨmacMat, 0.0)/ Ψm)) / σ + Tb * σ) / √2.0)) ^ 2.0
 					end
-					
 								
 				
 				else

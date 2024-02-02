@@ -76,7 +76,7 @@ module ofHydrolab
 		function OF_ALLSOILS(NiZ::Int64, Of_Sample::Vector{Float64})
 			Of_AllSoil = 0.0::Float64
 			for iZ=1:NiZ		
-				Of_AllSoil += Of_Sample[iZ]
+				Of_AllSoil += round(Of_Sample[iZ], digits=4)
 			end
 		return Of_AllSoil = Of_AllSoil / NiZ
 		end  # function: OF_ALL

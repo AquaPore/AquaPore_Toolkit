@@ -1,22 +1,17 @@
-using BlackBoxOptim
+using Optim
+f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2
+lower= [0.0 ,0.0 ]
+upper= [0.9, 1.0] 
+initial_x = [-1.0, -1.0]
+res = optimize(x->f(x),   lower, upper, NelderMead(), Optim.Options(g_tol = 1e-12,
+                             iterations = 10,
+                             store_trace = true,
+                             show_trace = true))
 
-rosenbrock(x) = sum( 100*( x[2:end] .- x[1:end-1].^2 ).^2 .+ ( x[1:end-1] .- 1 ).^2 )
+X = Optim.minimizer(res)
 
-const MyFitnessGoal = 30.0
+println(X)
 
-function myfitnessgoalachieved(oc)
-    best_fitness(oc) < MyFitnessGoal
-end
+Of = Optim.minimum(res)
 
-function cbearlystopping(oc)
-    if myfitnessgoalachieved(oc)
-        BlackBoxOptim.shutdown!(oc)
-    end
-end
-
-# We give max 1000 seconds to optimize but expect this to stop much earlier
-@time res = bboptimize(rosenbrock; SearchRange = (-100.0, 100.0), NumDimensions = 100, 
-        CallbackFunction = cbearlystopping, CallbackInterval = 0.0, MaxTime = 1000.0);
-
-@assert best_fitness(res) < MyFitnessGoal
-@assert BlackBoxOptim.stop_reason(res) == "Run explicitly stopped via shutdown method"
+println(Of)

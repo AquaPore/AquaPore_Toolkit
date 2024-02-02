@@ -134,7 +134,7 @@ module pumiceManuscript
 
 		Label(Fig[1, 1, TopRight()], "(A1)", fontsize=18, font=:bold, padding=(-50, 5, -50, 5), halign=:right)
 
-		Ks, KsMac_Max, KsMac_Max, KsMac_Min, KsMac_Min, KsMat_Max, KsMat_Min, Kunsat_Max, Kunsat_Min, N, Pσ_Mac, θDual_Max, θDual_Min, θs, θsMacMat, σ, Ψ, ΨmacMat =HYDRO_MODELS(θs=0.5, θsMacMat_η=0.75, θr=0.0, σ=1.0, Ks=0.08, ΨmacMat=100.0, τa=0.5, τb=0.5, τc=0.5, τaMac=0.5, τbMac=0.5, τcMac=0.0, KosugiModel_θΨ⍰="ΨmacMat", Option_KosugiModel_KΨ⍰="ΨmacMat")
+		Ks, KsMac_Max, KsMac_Max, KsMac_Min, KsMac_Min, KsMat_Max, KsMat_Min, Kunsat_Max, Kunsat_Min, N, Pσ_Mac, θDual_Max, θDual_Min, θs, θsMacMat, σ, Ψ, ΨmacMat =HYDRO_MODELS(θs=0.5, θsMacMat_η=0.75, θr=0.0, σ=1.0, Ks=0.08, ΨmacMat=100.0, τa=0.5, τb=0.6, τc=0.5, τaMac=0.5, τbMac=0.9, τcMac=0.03, KosugiModel_θΨ⍰="ΨmacMat", Option_KosugiModel_KΨ⍰="ΨmacMat")
 
 				Label(Fig[1, 1:2, Top()], "Functions θ(ψ) & K(ψ) macropore Pσ_Mac=$Pσ_Mac", valign=:bottom, font=:bold, padding=(0, 0,50, 0), color=:navajowhite4,  fontsize=titlesize*1.2)
 					
@@ -266,24 +266,6 @@ end #module pumiceManuscript
 pumiceManuscript.PLOTTING_PORESIZE()
 
 
-	# Input hydro parameters
-	θs         = 0.5
-	θr         = 0.0
-	σ          = 1.0
-	θsMacMat_η = 0.75
-
-	Ks         = 0.008
-	ΨmacMat    = 100.0
-
-
-	# Tortuosity parameters
-		τa         = 0.5
-		τb         = 0.7
-		τc         = 0.65
-		τaMac      = 0.5
-		τbMac      = 0.87
-		τcMac      = 0.
-		
 
 # include( raw"D:\MAIN\MODELS\AquaPore_Toolkit\src\Temporary\Manuscript\PumiceManuscript.jl")
 

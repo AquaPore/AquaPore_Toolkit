@@ -17,7 +17,7 @@ module hydrolabOpt
 			# OPTIMISATION ALL SOILS
 				hydro = optAllSoil.OPTIMIZE_ALLSOILS(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, θ_θΨobs, θϵ=0.005, Ψ_KΨobs, Ψ_θΨobs)
 
-				hydro, hydroOther, Of_Sample = optIndivSoil.OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, option, optionₘ, param, θ_θΨobs, θϵ=0.005, Ψ_KΨobs, Ψ_θΨobs)
+				 hydro, hydroOther, Of_Sample = optIndivSoil.OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther, K_KΨobs, N_KΨobs, N_θΨobs, NiZ, optim, option, optionₘ, param, θ_θΨobs, θϵ=0.005, Ψ_KΨobs, Ψ_θΨobs)
 
 				OfAllSoil = ofHydrolab.OF_ALLSOILS(NiZ::Int64, Of_Sample::Vector{Float64})
 

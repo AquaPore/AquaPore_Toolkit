@@ -76,7 +76,7 @@ module AquaPore_Toolkit
 
 				elseif option.data.θΨ && option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠ "Kosugi" && option.hydro.σ_2_Ψm⍰=="Constrained" # Ading extra data
 					try
-						@info "\n	*** Reading θ(Ψ) data from $(path.tableSoilwater.TableComplete_θΨ) *** \n"
+						@info "\n	*** Reading θ(Ψ) data from $(path.inputSoilwater.Ψθ) *** \n"
 						θ_θΨobs, Ψ_θΨobs, N_θΨobs = reading.θΨ(IdSelect, NiZ, path)
 					catch
 						@warn "\n option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠:Kosugi && param.hydro.σ_2_Ψm⍰==Constrained => Kosugi simulation not performed yet! \n" 
@@ -92,7 +92,8 @@ module AquaPore_Toolkit
 
 				elseif option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ ≠ "Kosugi" 
 					try
-						@info "\n	*** Reading K(Ψ) data from $(path.tableSoilwater.Table_Smap_θΨK.csv) *** \n"
+						@info "\n	*** Reading K(Ψ) data from $( path.tableSoilwater.TableComplete_KΨ)
+					catch) *** \n"
 						println(path.tableSoilwater.TableComplete_KΨ)
 						K_KΨobs, Ψ_KΨobs, N_KΨobs = reading.KUNSATΨ(IdSelect, NiZ, path, path.tableSoilwater.TableComplete_KΨ)
 					catch
@@ -221,6 +222,9 @@ module AquaPore_Toolkit
 				hydro, hydroOther = hydrolabOpt.HYDROLABOPT_START(NiZ=NiZ, ∑Psd=∑Psd, θ_θΨobs=θ_θΨobs, Ψ_θΨobs=Ψ_θΨobs, N_θΨobs=N_θΨobs, hydro=hydro, hydroOther=hydroOther, option=option, optionₘ=option.hydro, optim=optim, optimAllSoils=optimAllSoils, param=param)
 
 			end # option.data.Kθ
+
+			#Temperary
+				table.hydroLab.θΨK(hydro, hydroOther, IdSelect[1:NiZ], zeros(Float64,NiZ), N_KΨobs[1:NiZ], N_θΨobs[1:NiZ], NiZ, path.tableSoilwater.Table_θΨK, RockFragment[1:NiZ])
 
 			# SPECIAL CASE
 				if option.hydro.HydroModel⍰=="BrooksCorey" || option.hydro.HydroModel⍰=="ClappHornberger"
@@ -447,12 +451,11 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 
 	#  @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Convert")
 
-	
-	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
+	AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
 
-		# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Pumice")
+	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Pumice")
 
-		@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
+	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
 
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)
