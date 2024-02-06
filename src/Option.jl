@@ -6,7 +6,7 @@ module options
 	using Configurations, TOML
 
 	# What available data we have?
-	@option struct DATA
+	@option mutable struct DATA
 		Infiltration::Bool
 		Kθ::Bool
 		Pedological⍰::String

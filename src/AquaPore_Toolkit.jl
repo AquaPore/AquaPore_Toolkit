@@ -47,12 +47,20 @@ module AquaPore_Toolkit
 			Scenarios = option.hydro.HydroModel_List
 			N_Scenario = length(Scenarios)
 		end 
+
+
+
 		for iSim =1:N_Scenario
 			if option.run.Smap
 				option.hydro.HydroModel⍰ = Scenarios[iSim]
 				path = paths.PATH(option, PathData_SoilWater, SiteName_Soilwater)
 				printstyled("\n +++++++++++++++++ SCENARIOS: option.hydro.HydroParam=$(option.hydro.HydroModel⍰)  $iSim / $N_Scenario, +++++++++++++++++ \n")
 			end
+
+			if option.data.SimulationKosugiθΨK && option.hydro.HydroModel⍰ == "Kosugi"
+				option.data.SimulationKosugiθΨK = false
+				@warn ("\n Changed option.data.SimulationKosugiθΨK == false as option.hydro.HydroModel⍰ == Kosugi \n")
+			end  
 		#..............................................................................
 
 
@@ -451,11 +459,11 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 
 	#  @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Convert")
 
-	AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
+	# AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Unsoda")
 
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Pumice")
 
-	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
+	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
 
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)

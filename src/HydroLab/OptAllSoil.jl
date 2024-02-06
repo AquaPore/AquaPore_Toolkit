@@ -21,7 +21,7 @@ export OPTIMIZE_ALLSOILS
 
 				println("=       ", Count_NoImprovement, "            =")
 
-				if Of_AllSoil > round(BlackBoxOptim.best_fitness(oc), digits=Accuracy)
+				if Of_AllSoil > BlackBoxOptim.best_fitness(oc) + 0.001
 
 					# Initiating
 					global Count_NoImprovement = 1

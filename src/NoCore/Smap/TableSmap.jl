@@ -2,7 +2,7 @@
 #		module: tableSmap
 # =============================================================
 module tableSmap
-   import ..tool, ..wrc, ..kunsat
+   import ..tool, ..wrc, ..kunsat, ..cst
    import CSV, Tables
 
    	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,20 +46,20 @@ module tableSmap
           # User input
             HeaderSmap = true # <true> the greek characters are replaced by alphabet; <false> original parameter names with no units usefull to use values in SoilWater-ToolBox
 
-            Option_BrooksCorey       = true
-            Option_ClappHornberger   = true
-            Option_VanGenuchten      = true
-            Option_VanGenuchtenJules = false
-            Option_Kosugi            = true
-            Option_Kosugi_Table_θψ   = true
-            Option_Kosugi_Table_Kψ   = true
+            🎏_BrooksCorey       = true 
+            🎏_ClappHornberger   = true
+            🎏_VanGenuchten      = false
+            🎏_VanGenuchtenJules = false
+            🎏_Kosugi            = true
+            🎏_Kosugi_Table_θψ   = true
+            🎏_Kosugi_Table_Kψ   = true
 
          Header = ["Id"; "SoilName"; "Depth_mm"; "IsTopsoil"; "RockFragment_%";"MaxRootingDepth_mm"; "PermeabilityClass"; "SmapFH"; "ImpermClass"]
          Data = []
       
       # Select data
          # HydroModel_θΨ == "BrooksCorey"
-         if Option_BrooksCorey # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
+         if 🎏_BrooksCorey # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
             HydroModel_θΨ = "BrooksCorey"
 
             Path_θΨ =  path.tableSoilwater.Path_Soilwater_Table *  "_" * string(HydroModel_θΨ) *  "_" * "Table_Smap_θΨK.csv"
@@ -85,11 +85,11 @@ module tableSmap
             else
                @warn("\n \n WARNING Smap_Output: model simulation not found: $HydroModel_θΨ \n")
             end # if isfile(Path_θΨ)
-         end # Option_BrooksCorey
+         end # 🎏_BrooksCorey
 
 
          # HydroModel_θΨ == "ClappHornberger"
-         if  Option_ClappHornberger # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
+         if  🎏_ClappHornberger # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
             HydroModel_θΨ = "ClappHornberger"
 
             Path_θΨ =  path.tableSoilwater.Path_Soilwater_Table *  "_" * string(HydroModel_θΨ) *  "_" * "Table_Smap_θΨK.csv"
@@ -115,11 +115,11 @@ module tableSmap
             else
                @warn("\n \n WARNING Smap_Output: model simulation not found: $HydroModel_θΨ \n")
             end # if isfile(Path_θΨ)
-         end #  Option_ClappHornberger
+         end #  🎏_ClappHornberger
 
          
          # HydroModel_θΨ == "Vangenuchten"
-         if Option_VanGenuchten # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
+         if 🎏_VanGenuchten # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
             HydroModel_θΨ = "Vangenuchten"
 
             Path_θΨ =  path.tableSoilwater.Path_Soilwater_Table *  "_" * string(HydroModel_θΨ) *  "_" * "Table_Smap_θΨK.csv"
@@ -145,11 +145,11 @@ module tableSmap
             else
                @warn("\n \n WARNING Smap_Output: model simulation not found: $HydroModel_θΨ \n")
             end # if isfile(Path_θΨ)
-         end # Option_VanGenuchten
+         end # 🎏_VanGenuchten
 
 
          # HydroModel_θΨ == "VangenuchtenJules"
-         if Option_VanGenuchtenJules # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
+         if 🎏_VanGenuchtenJules # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
             HydroModel_θΨ = "VangenuchtenJules"
 
             Path_θΨ =  path.tableSoilwater.Path_Soilwater_Table *  "_" * string(HydroModel_θΨ) *  "_" * "Table_Smap_θΨK.csv"
@@ -175,11 +175,11 @@ module tableSmap
             else
                @warn("\n \n WARNING Smap_Output: model simulation not found: $HydroModel_θΨ \n")
             end # if isfile(Path_θΨ)
-         end # Option_VanGenuchten
+         end # 🎏_VanGenuchten
 
 
          # HydroModel_θΨ == "Kosugi"
-         if Option_Kosugi # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
+         if 🎏_Kosugi # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
             HydroModel_θΨ = "Kosugi"
 
             Path_θΨ =  path.tableSoilwater.Path_Soilwater_Table *  "_" * string(HydroModel_θΨ) *  "_" * "Table_Smap_θΨK.csv"
@@ -200,66 +200,71 @@ module tableSmap
                else
                   Header_θΨ = Select_θΨ
                end
-
                Header =  append!(Header, Header_θΨ)
             else
                @warn("\n \n WARNING Smap_Output: model simulation not found: $HydroModel_θΨ \n")
             end # if isfile(Path_θΨ)
-         end # Option_Kosugi
+         end # 🎏_Kosugi
 
-
-      # HydroModel_θΨ == "Option_Kosugi_Table_θψ"
-      if Option_Kosugi_Table_θψ # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-         HydroModel_θΨ = "Kosugi"
-
-         N_Ψ = length(param.smap.Ψ_Table[:])
-         θ₂ = fill(0.0::Float64, (NiZ, N_Ψ))
-
-         for iZ=1:NiZ
-            for iΨ =1:N_Ψ
-               Ψ₂ = param.smap.Ψ_Table[iΨ]
-               θ₂[iZ, iΨ] = wrc.Ψ_2_θ(optionₘ, Ψ₂, iZ, hydro)
-            end # iΨ
-         end # iZ
-
-         if isfile(Path_θΨ)
-            Select_θΨ = "ThetaH_" .* string.(Int64.(param.smap.Ψ_Table)) .* "_mm"            
-
-            Data = hcat(Data[1:NiZ, :], θ₂[1:NiZ, :])
-      
-            Header_θΨ = Select_θΨ
-
-            Header =  append!(Header, Header_θΨ)
-         end
-      end # Option_Kosugi
-
-
-      # HydroModel_θΨ == "Option_Kosugi_Table_Kψ"
-      if Option_Kosugi_Table_Kψ # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-         HydroModel_θΨ = "Kosugi"
-
-         N_Ψ = length(param.hydro.K_Table[:])
-         K₂ = fill(0.0::Float64, (NiZ, N_Ψ))
-
-         for iZ=1:NiZ
-            for iΨ =1:N_Ψ
-               Ψ₂ = param.hydro.K_Table[iΨ]
-               K₂[iZ, iΨ] = kunsat.KUNSAT_θΨSe(optionₘ, Ψ₂, iZ, hydro)
-            end # iΨ
-         end # iZ
-
-         if isfile(Path_θΨ)
-            Select_θΨ = "KunsatH_" .* string.(Int64.(param.hydro.K_Table)) .* "_mm s1"            
-
-            Data = hcat(Data[1:NiZ, :], K₂[1:NiZ, :])
-      
-            Header_θΨ = Select_θΨ
-
-            Header =  append!(Header, Header_θΨ)
-         end
-      end # Option_Kosugi
+      # CREATING TABLES θ(ψ) & TABLES K(ψ)==========
+         Path_Select_θΨ = path.tableSoilwater.Path_Soilwater_Table *  "_Kosugi_Table_Smap_Select_θΨ.csv"
+         Path_Select_KΨ = path.tableSoilwater.Path_Soilwater_Table *  "_Kosugi_Table_Smap_Select_KΨ.csv"
          
-      # COMBINING OUTPUTS  
+         if optionₘ.HydroModel⍰ == "Kosugi"
+            # Creating Table θ(Ψ)
+               N_Ψ = length(param.smap.Ψ_Table[:])
+               θ₂  = fill(0.0::Float64, (NiZ, N_Ψ))
+
+               for iZ=1:NiZ
+                  for iΨ =1:N_Ψ
+                     Ψ₂         = param.smap.Ψ_Table[iΨ]
+                     θ₂[iZ, iΨ] = wrc.Ψ_2_θ(optionₘ, Ψ₂, iZ, hydro)
+                  end # iΨ
+               end # iZ
+            
+               Header_θΨ = "ThetaH_" .* string.(Int64.(param.smap.Ψ_Table)) .* "_mm"  
+               CSV.write(Path_Select_θΨ, Tables.table( θ₂[1:NiZ, :]), writeheader=true, header=Header_θΨ, bom=!(HeaderSmap))
+
+            # Creating Table K(Ψ) ======
+               N_Ψ = length(param.hydro.K_Table[:])
+               K₂  = fill(0.0::Float64, (NiZ, N_Ψ))
+
+               for iZ=1:NiZ
+                  for iΨ =1:N_Ψ
+                     Ψ₂ = param.hydro.K_Table[iΨ]
+                     K₂[iZ, iΨ] = kunsat.KUNSAT_θΨSe(optionₘ, Ψ₂, iZ, hydro)
+                  end # iΨ
+               end # iZ
+
+               Header_KΨ = "KunsatH_" .* string.(Int64.(param.hydro.K_Table)) .* "_mm s1" 
+
+               CSV.write(Path_Select_KΨ, Tables.table( K₂[1:NiZ, :]), writeheader=true, header=Header_KΨ, bom=!(HeaderSmap))
+         end # CREATING TABLES θ(ψ) & TABLES K(ψ)
+
+
+      # WRITTING DATA TO Table_Smap <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
+         if 🎏_Kosugi_Table_θψ && isfile(Path_Select_θΨ)
+               Header_θΨ = "ThetaH_" .* string.(Int64.(param.smap.Ψ_Table .* cst.Mm_2_kPa)) .* "_kPa" 
+
+               θ₂= Tables.matrix(CSV.File(Path_Select_θΨ))
+
+               Data = [Data[1:NiZ, :] θ₂[1:NiZ, :]]
+
+               Header =  append!(Header, Header_θΨ)
+         end # 🎏_Kosugi
+
+         if 🎏_Kosugi_Table_Kψ && isfile(Path_Select_KΨ)
+            K₂= Tables.matrix(CSV.File(Path_Select_KΨ))
+
+            Data = [Data[1:NiZ, :] K₂[1:NiZ, :]]
+      
+            Header_KΨ = "KunsatH_" .* string.(round.(param.hydro.K_Table .* cst.Mm_2_kPa, digits=2)) .* "kPa_[mm s-1]"            
+
+            Header =  append!(Header, Header_KΨ)
+         end # 🎏_Kosugi
+
+
+      # COMBINING OUTPUTS =====================================================  
          CSV.write(path.tableSmap.Table_Smap, Tables.table( [IdSelect[1:NiZ] smap.Soilname[1:NiZ] smap.Smap_Depth[1:NiZ] smap.IsTopsoil[1:NiZ] smap.RockFragment[1:NiZ] smap.Smap_MaxRootingDepth[1:NiZ] smap.Smap_PermeabilityClass[1:NiZ] smap.Smap_SmapFH[1:NiZ] smap.Smap_ImpermClass[1:NiZ] Data[1:NiZ,:]]), writeheader=true, header=Header, bom=!(HeaderSmap))
 
       return nothing

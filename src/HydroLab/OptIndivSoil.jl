@@ -143,7 +143,7 @@ module optIndivSoil
 			
 			if  🎏_Model == :BlackBox
 
-				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=1000)
+				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=10000)
 					function WHEN_TO_STOP_INDIV(oc; CountIndiv_NoImprovement_Max=CountIndiv_NoImprovement_Max)
 						global CountIndiv_Opt += 1
 
