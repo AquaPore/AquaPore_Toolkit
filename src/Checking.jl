@@ -21,9 +21,6 @@ module checking
 		 	elseif "Ks" ∈ optim.ParamOpt && !(option.data.Kθ) 
 				error("*** If Ks ∈ optim.ParamOpt ⇒ option.data.Kθ ***")
 
-			elseif "θr"∉ optim.ParamOpt && option.hydro.θrOpt⍰=="Opt" 
-				error("*** AquaPore-ToolKit Error: option.hydro.θrOpt⍰==Opt ⇒ θr ∈ optim.ParamOpt ***")
-
 			elseif option.run.HydroLabθΨ⍰≠"No" && !option.data.θΨ
 				error("*** If option.run.HydroLabθΨ⍰ ⇒ option.data.θΨ ***")
 			

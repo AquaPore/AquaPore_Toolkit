@@ -46,13 +46,14 @@ module tableSmap
           # User input
             HeaderSmap = true # <true> the greek characters are replaced by alphabet; <false> original parameter names with no units usefull to use values in SoilWater-ToolBox
 
-            🎏_BrooksCorey       = true 
+            🎏_BrooksCorey       = true
             🎏_ClappHornberger   = true
             🎏_VanGenuchten      = false
             🎏_VanGenuchtenJules = false
             🎏_Kosugi            = true
             🎏_Kosugi_Table_θψ   = true
             🎏_Kosugi_Table_Kψ   = true
+            🎏_Fc_Pwp_Paw        = true
 
          Header = ["Id"; "SoilName"; "Depth_mm"; "IsTopsoil"; "RockFragment_%";"MaxRootingDepth_mm"; "PermeabilityClass"; "SmapFH"; "ImpermClass"]
          Data = []
@@ -204,7 +205,11 @@ module tableSmap
             else
                @warn("\n \n WARNING Smap_Output: model simulation not found: $HydroModel_θΨ \n")
             end # if isfile(Path_θΨ)
+
          end # 🎏_Kosugi
+
+
+        
 
       # CREATING TABLES θ(ψ) & TABLES K(ψ)==========
          Path_Select_θΨ = path.tableSoilwater.Path_Soilwater_Table *  "_Kosugi_Table_Smap_Select_θΨ.csv"
@@ -242,18 +247,54 @@ module tableSmap
          end # CREATING TABLES θ(ψ) & TABLES K(ψ)
 
 
+      # FIELD CAPACITY, PERMENANT WILTING POINT, AVAILABLE WATER CONTENT 
+
+
       # WRITTING DATA TO Table_Smap <>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-         if 🎏_Kosugi_Table_θψ && isfile(Path_Select_θΨ)
+         if (🎏_Kosugi_Table_θψ || 🎏_Fc_Pwp_Paw) && isfile(Path_Select_θΨ)
                Header_θΨ = "ThetaH_" .* string.(Int64.(param.smap.Ψ_Table .* cst.Mm_2_kPa)) .* "_kPa" 
 
-               θ₂= Tables.matrix(CSV.File(Path_Select_θΨ))
+               θ₂ = Tables.matrix(CSV.File(Path_Select_θΨ))
 
                Data = [Data[1:NiZ, :] θ₂[1:NiZ, :]]
 
                Header =  append!(Header, Header_θΨ)
+
+					if 🎏_Fc_Pwp_Paw
+                  θ_0kPa        = zeros(NiZ)
+                  θ_5kPa        = zeros(NiZ)
+                  θ_10kPa       = zeros(NiZ)
+                  θ_1500kPa     = zeros(NiZ)
+                  Paw           = zeros(NiZ)
+                  Macroporosity = zeros(NiZ)
+						AirfilledMacroporosity = zeros(NiZ)
+
+						for iZ=1:NiZ
+                     iθ_0kPa           = findfirst(isequal(0.0), param.smap.Ψ_Table)
+                     θ_0kPa[iZ]        = θ₂[iZ, iθ_0kPa]
+
+							iθ_5kPa           = findfirst(isequal(500.0), param.smap.Ψ_Table)
+                     θ_5kPa[iZ]        = θ₂[iZ, iθ_5kPa]
+
+                     iθ_10kPa          = findfirst(isequal(1000.0), param.smap.Ψ_Table)
+                     θ_10kPa[iZ]       = θ₂[iZ, iθ_10kPa]
+
+                     iθ_1500kPa        = findfirst(isequal(150000.0), param.smap.Ψ_Table)
+                     θ_1500kPa[iZ]     = θ₂[iZ, iθ_1500kPa]
+
+                     Paw[iZ]                = θ_10kPa[iZ] - θ_1500kPa[iZ]
+                     Macroporosity[iZ]      = θ_0kPa[iZ] - θ_5kPa[iZ]
+                     AirfilledMacroporosity[iZ] = θ_0kPa[iZ] - θ_10kPa[iZ]
+						end
+
+						Header_Pc_Pwp_Paw = ["Fc", "Pwp", "Paw", "Macroporosity", "AirfilledMacroporosity"]
+						Header =  append!(Header, Header_Pc_Pwp_Paw)
+
+						Data = [Data[1:NiZ, :] θ_10kPa[1:NiZ] θ_1500kPa[1:NiZ] Paw[1:NiZ] Macroporosity[1:NiZ] AirfilledMacroporosity[1:NiZ]]
+					end
          end # 🎏_Kosugi
 
-         if 🎏_Kosugi_Table_Kψ && isfile(Path_Select_KΨ)
+         if 🎏_Kosugi_Table_Kψ  && isfile(Path_Select_KΨ)
             K₂= Tables.matrix(CSV.File(Path_Select_KΨ))
 
             Data = [Data[1:NiZ, :] K₂[1:NiZ, :]]

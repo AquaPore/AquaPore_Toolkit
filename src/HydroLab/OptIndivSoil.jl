@@ -20,8 +20,15 @@ module optIndivSoil
 		# Initiating arrays 
 			Of_Sample = zeros(Float64, NiZ)
 
-		for iZ = 1:NiZ # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+		# DETERMINE IF WE ARE HAVING A UNIMODAL OR BIMODAL
+			if "θsMacMat" ∈ optim.ParamOpt
+				🎏_Bimodal = true
+			else
+				🎏_Bimodal = false
+			end
+
+		for iZ = 1:NiZ # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 			# TEST IF EXIST Ψ ≈ 0  ~~~
 				if minimum(Ψ_θΨobs[iZ, 1:N_θΨobs[iZ]]) < 0.01 
 					🎏ΘΨ_0 = true
@@ -54,12 +61,18 @@ module optIndivSoil
 					if 🎏ΘΨ_0
 						hydro.Φ[iZ] = θobs_Max / param.hydro.Coeff_Φ_2_θs
 
-						hydro.θs_Min[iZ] = θobs_Max * 0.9
-						hydro.θs_Max[iZ] = θobs_Max * 1.1
+						if 🎏_Bimodal
+							hydro.θs_Min[iZ] = θobs_Max * 0.9
+							hydro.θs_Max[iZ] = θobs_Max * 1.1
+						else
+							hydro.θs_Min[iZ] = θobs_Max * 0.75
+							hydro.θs_Max[iZ] = θobs_Max * 1.0
+						end
 
 					elseif !(🎏ΘΨ_0) 
 						hydro.θs_Min[iZ] = hydro.Φ[iZ] * 0.9
 						hydro.θs_Max[iZ] = hydro.Φ[iZ] * 1.1
+
 					end  # if: 🎏ΘΨ_0
 
 					# Changing the feasible range of θs
@@ -91,9 +104,14 @@ module optIndivSoil
 				end # if option.data.Kθ
 
 				if option.data.Kθ && "Ks" ∈ optim.ParamOpt				
-					if 🎏_Ks 
-						hydro.Ks_Min[iZ] = K_KΨobs_Max * 0.95
-						hydro.Ks_Max[iZ] = K_KΨobs_Max  * 1.1
+					if 🎏_Ks
+						if 🎏_Bimodal
+							hydro.Ks_Min[iZ] = K_KΨobs_Max * 0.95
+							hydro.Ks_Max[iZ] = K_KΨobs_Max  * 1.05
+						else
+							hydro.Ks_Min[iZ] = K_KΨobs_Max * 0.75
+							hydro.Ks_Max[iZ] = K_KΨobs_Max  * 1.0
+						end
 					
 					elseif !(🎏_Ks)
 						hydro.Ks_Min[iZ] = max(hydro.Ks_Min[iZ], K_KΨobs_Max)
