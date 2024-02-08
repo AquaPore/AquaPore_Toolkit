@@ -20,16 +20,6 @@ module pumiceManuscript
 	Pσ₃ = 3.0
 	Pσ₄ = 4.0
 
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : name
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-		
-
-	# ------------------------------------------------------------------
-
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : HydroModels
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,7 +78,6 @@ module pumiceManuscript
 		end  # function: HydroModels
 	# ------------------------------------------------------------------
 
-
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : PLOTTING_PORESIZE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -134,7 +123,7 @@ module pumiceManuscript
 
 			Ψticks = [0, 50, 100, 500, 1000,5000,100_00, 500_00, 1000_00, 2000_00] # mm
 
-		# Starting to plot	
+		# Starting to plot
 			CairoMakie.activate!(type="svg", pt_per_unit=1)
 			Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif")) 
 
@@ -274,7 +263,7 @@ module pumiceManuscript
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : name
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function PLOTTING_KUNSAT_MACRO()
+	function Ks_MACROPORE()
 
 		function RELATIONSHIPS_MAC(ΨmacMat; Pσ_Mac=3)
 			σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac)
@@ -283,7 +272,7 @@ module pumiceManuscript
 		end  # function: RELATIONSHIPS_MAC
 
 		function RELATIONSHIPS_MAT(ΨmacMat, σ; Pσ=3)
-			ΨmacMat₂ = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
+			ΨmacMat₂ = exp((log(√ΨmacMat) + log(ΨmacMat₂)) * 0.5)
 			Ψm  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat=ΨmacMat₂, σ, Pσ=Pσ₃)
 		return Ψm
 		end  # function: RELATIONSHIPS_MAT
@@ -295,17 +284,11 @@ module pumiceManuscript
 		return W_Mac, W_Mat
 		end
 
-		function KUNSAT_MAT_η(;Ψ₁=Ψ₁, θs=1.0, θsMacMat=0.8, σ, ΨmacMat=80.0, τb, τbMac=τb)
+		function KUNSAT_MAT_NORME(Ψ₁, σ, Tb; ΨmacMat= 120.0)
 			Ψm = RELATIONSHIPS_MAT(ΨmacMat, σ)
-			σMac, ΨmMac = RELATIONSHIPS_MAC(ΨmacMat)
-			τa = 0.5
-			τaMac = 0.5
-			Ks = 1.0
-			τc = 1.0
-			τcMac = 2.0
-			θr = 0.0
 
-			Kunsat_Mat_Norm = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τaMac, τbMac, τcMac, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
+			 Se  = 0.5 * erfc((log(Ψ₁ / Ψm)) / (σ * √2.0))
+			Kunsat_Mat_Norm = √Se * (0.5 * erfc(((log(Ψ₁/ Ψm)) / σ + Tb * σ) / √2.0)) ^ 2.0
 		return Kunsat_Mat_Norm
 		end
 
@@ -320,15 +303,13 @@ module pumiceManuscript
 			Ψ = 10.0.^(collect(Ψ_Min_Log:0.0001:Ψ_Max_Log))
 			N_Ψ  = length(Ψ)
 
-			σ =  collect(range(0.75, stop=3.5, length=3))
-			N_σ = length(σ)
+			σ =  collect(range(0.75, stop=3.5, length=4))
+			N_σ = length(σ) 
 
-			Texture = ["Sandy soils", "Silty soils", "Clay soils"] 
-
-			Tb = collect(range(0.5, stop=1.8, length=8))
+			Tb = collect(range(0.5, stop=3.0, length=4))
 			N_Tb = length(Tb)
 
-			ΨmacMat = collect(range(50, stop=200.0, length=2))
+			ΨmacMat = collect(range(50, stop=200.0, length=4))
 			N_ΨmacMat = length(ΨmacMat)
 
 			θsMacMat_η = collect(range(0.75, stop=1.0, length=4))
@@ -341,107 +322,22 @@ module pumiceManuscript
 
 		
 		# FUNCTION Kunsat_Tb
-			KunsatMat_Tb = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
-			for (iiΨ, iΨ) in enumerate(Ψ), (iiσ, iσ) in enumerate(σ), (iiTb, iTb) in enumerate(Tb), (iiΨmacMat, iΨmacMat) in enumerate(ΨmacMat)
-			 	KunsatMat_Tb[iiΨ, iiσ, iiTb, iiΨmacMat] = KUNSAT_MAT_η(;Ψ₁=iΨ, σ=iσ, τb=iTb, τbMac=iTb, ΨmacMat=iΨmacMat)
-				# @show iTb, iσ, iTb
+			KunsatMat_Tb = zeros(N_Ψ, N_σ, N_Tb)
+			for iΨ in Ψ, iσ in σ, iTb in Tb
+			 	KunsatMat_Tb[iΨ, iσ, iTb] = KUNSAT_MAT_NORME(iΨ, iσ, iTb)
 			end
 
-		# ================================================================
-				# Plotting parameters
-         ColourOption_No    = 1
-         Linewidth          = 2
-         height             = 200
-         labelsize          = 12
-         textcolor          = :blue
-         textsize           = 17
-         titlecolor         = :darkgoldenrod4
-         titlesize          = 20.0
-         width              = height * 3.0
-         xgridstyle         = :dash
-         xgridvisible       = true
-         xlabelSize         = 20
-         xlabelpadding      = 5
-         xminortickalign    = 1.0
-         xminorticksvisible = true
-         xtickalign         = 0.9 # 0 is inside and 1 is outside
-         xticklabelrotation = π/4
-         xticksize          = 10
-         xticksmirrored     = false
-         xtickwidt          = 0.5
-         xtrimspine         = false
-         ygridstyle         = :dash
-         ygridvisible       = false
-         ylabelpadding      = xlabelpadding
-         ylabelsize         = xlabelSize
-         yminortickalign    = xminortickalign
-         yminorticksvisible = true
-         ytickalign         = xtickalign
-         yticksize          = xticksize
-         yticksmirrored     = false
-         ytickwidt          = xtickwidt
-         ytrimspine         = false
-
-			ColourOption = [:glasbey_hv_n256,:seaborn_bright,:seaborn_colorblind,:seaborn_dark,:seaborn_deep,:tab10,:tableau_10,:tol_bright]
-
-			Colormap = cgrad(colorschemes[ColourOption[ColourOption_No]], size(colorschemes[ColourOption[ColourOption_No]]), categorical = true)
-
-			Ψticks = [0, 50, 100, 500, 1000,5000,100_00, 500_00, 1000_00, 2000_00] # mm
-
-			Ψ_Log = Array{Float64}(undef, N_Ψ)
-				for iZ=1:N_Ψ
-					Ψ_Log[iZ] = log1p(Ψ[iZ])
-				end
+		
 
 
-		# Starting to plot	
-			CairoMakie.activate!(type="svg", pt_per_unit=1)
-			Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = RGBf(0.98, 0.98, 0.98)) 
+      
 
-
-			Label(Fig[1, 1:2, Top()], L"\sqrt{S_{\mathrm{e}}} * (0.5 * erfc(log \frac{\frac{Ψ}{Ψ_{m}}}{σ} + T_{b} * σ) / \sqrt{2})) ^ 2", valign=:bottom, font=:bold, padding=(0, 0,50, 0), color=:navajowhite4,  fontsize=titlesize*1.2)
-
-				
-				for (iiσ, iσ) in enumerate(σ)
-					# Label(Fig[1, iiσ, TopRight()], "(A1)", fontsize=18, font=:bold, padding=(-50, 5, -50, 5), halign=:right)
-
-					Axis_KunsatMat_Tb = Axis(Fig[iiσ, 1], xlabel= L"$ψ$ [kPa]", ylabel=L"$K_{unsat}$ [L³ L⁻³]", title=Texture[iiσ],  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored,  xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign)
-
-
-						Axis_KunsatMat_Tb.xticks = (log1p.(Ψticks), string.(cst.Mm_2_kPa .* Ψticks))
-
-						for (iiTb, iTb) in enumerate(Tb)
-							lines!(Fig[iiσ,1], Ψ_Log, KunsatMat_Tb[:, iiσ, iiTb, 1], linewidth=Linewidth, color=Colormap[iiTb], label="σ =$(floor(σ[iiσ], digits=2)) Tb=$(floor(iTb, digits=2))")
-						end
-
-						Legend(Fig[iiσ,3], Axis_KunsatMat_Tb, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor = (:grey90, 0.25))
-
-					Axis_KunsatMat_Tb = Axis(Fig[iiσ, 2], xlabel= L"$ψ$ [kPa]", ylabel=L"$K_{unsat}$ [L³ L⁻³]", title=Texture[iiσ],  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored,  xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign)
-
-
-						Axis_KunsatMat_Tb.xticks = (log1p.(Ψticks), string.(cst.Mm_2_kPa .* Ψticks))
-
-						for (iiTb, iTb) in enumerate(Tb)
-							lines!(Fig[iiσ,2], Ψ_Log, KunsatMat_Tb[:, iiσ, iiTb, 2], linewidth=Linewidth, color=Colormap[iiTb], label="σ =$(floor(σ[iiσ], digits=2)) Tb=$(floor(iTb, digits=2))")
-						end
-
-					
-				end
+      σMac, ΨmMac = RELATIONSHIPS_MAC(ΨmacMat)
+      Ψm          = RELATIONSHIPS_MAT(ΨmacMat, σ; Pσ=3)
 
 
 
-			# General
-				resize_to_layout!(Fig)
-				trim!(Fig.layout)
-				colgap!(Fig.layout, 10)
-				rowgap!(Fig.layout, 10)
-
-				Path = raw"D:\TEMP\Plots\Kunsat.svg"
-				save(Path, Fig)
-				display(Fig)
-
-
-
+		KsMac, KsMat = kunsat.kg.KS_MATMAC_ΨmacMat(θs::Float64, θsMacMat::Float64, θr::Float64, Ψm::Float64, σ::Float64, ΨmMac::Float64, σMac::Float64, Ks::Float64, Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  Option_KosugiModel_KΨ⍰="ΨmacMat")
 
 		
 	return nothing
@@ -449,11 +345,11 @@ module pumiceManuscript
 	# ------------------------------------------------------------------
 
 
-end #module pumiceManuscript
+# end #module pumiceManuscript
 # ------------------------------------------------------------------
 
 
- pumiceManuscript.PLOTTING_KUNSAT_MACRO()
+pumiceManuscript.PLOTTING_PORESIZE()
 
 
 

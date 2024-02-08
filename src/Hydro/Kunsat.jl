@@ -117,7 +117,7 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KS_MAC
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function KS_MATMAC_ΨmacMat(θs::Float64, θsMacMat::Float64, θr::Float64, Ψm::Float64, σ::Float64, ΨmMac::Float64, σMac::Float64, Ks::Float64, Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  Option_KosugiModel_KΨ⍰)
+			function KS_MATMAC_ΨmacMat(θs::Float64, θsMacMat::Float64, θr::Float64, Ψm::Float64, σ::Float64, ΨmMac::Float64, σMac::Float64, Ks::Float64, Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  Option_KosugiModel_KΨ⍰::String)
 
 				if Option_KosugiModel_KΨ⍰ == "ΨmacMat"
 					W_Mat = ((θsMacMat - θr) * exp( ((Tb * σ) ^ 2.0) / 2.0) / (Ψm ^ Tb)) ^ Tc
@@ -200,15 +200,21 @@ module kunsat
 					return Kunsat_Mat + Kunsat_Mac
 	
 				
-				
 				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat" # =====
 					# Parameters
 						Tb_Max = 2.0; Tc_Max = 2.0
                	Tb    = Tb_Max * (1.0 - τb)
                   TbMac = Tb_Max * (1.0 - τbMac)
                	Tc    = Tc_Max * (1.0 - τc)
-						# Tc= σ ^ -0.59
                	TcMac = Tc_Max * (1.0 - τcMac)
+
+						Tb    = τb
+                  TbMac = τbMac
+               	Tc    = τc
+               	TcMac = τcMac
+
+
+									# Tc= σ ^ -0.59
 
 					# Deriving KsMac and KsMat
 					KsMac, KsMat = KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks, Tb, Tc, TbMac, TcMac,  Option_KosugiModel_KΨ⍰)
