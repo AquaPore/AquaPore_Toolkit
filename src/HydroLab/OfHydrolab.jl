@@ -2,6 +2,48 @@ module ofHydrolab
 	import..stats, ..wrc, ..kunsat
 	export  OF_WRC_KUNSAT
 
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : PENALTY
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function PENALTY_KUNSAT(hydro, iZ, optionₘ; Macro_Perc_Max=0.4)
+
+			if optionₘ.HydroModel⍰ =="Kosugi" && optionₘ.KosugiModel_KΨ⍰=="ΨmacMat"
+				# COMPUTING MACROPORE %
+					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
+
+					KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.θr[iZ], hydro.Ψm[iZ], hydro.σ[iZ], hydro.ΨmMac[iZ], hydro.σMac[iZ], hydro.Ks[iZ], Tb, Tc, TbMac, TcMac, optionₘ.KosugiModel_KΨ⍰)
+
+					Macro_Perc = KsMac / (KsMac + KsMat)
+
+					Penalty_Ks = max(Macro_Perc - Macro_Perc_Max, 0.0)
+
+					return Penalty_Ks
+			else
+					return Penalty_Ks = 0.0
+			end
+		end  # function: PENALTY
+	#--------------------------------------------------------------
+
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : WEIGHT
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function WEIGHTING(; iZ, N_KΨobs, N_θΨobs, Wof_Max=0.8, Wof_Min=0.2, Ψ_KΨobs, Ψ_θΨobs)
+
+			Ψ_θΨobs_Min = log10(minimum(abs.(Ψ_θΨobs[iZ, 1:N_θΨobs[iZ]])) + 1.0)
+			Ψ_θΨobs_Max = log10(maximum(abs.(Ψ_θΨobs[iZ, 1:N_θΨobs[iZ]])) + 1.0)	
+
+			Ψ_KΨobs_Min = log10(minimum(abs.(Ψ_KΨobs[iZ, 1:N_KΨobs[iZ]])) + 1.0)
+			Ψ_KΨobs_Max = log10(maximum(abs.(Ψ_KΨobs[iZ, 1:N_KΨobs[iZ]])) + 1.0)
+			
+			Wof = 0.4 * (Ψ_θΨobs_Max - Ψ_θΨobs_Min + 1.0) / (Ψ_KΨobs_Max - Ψ_KΨobs_Min + 1.0)
+			Wof = max(min(Wof, Wof_Max), Wof_Min)
+
+		return Wof
+		end  # function: WEIGHTING
+	# ------------------------------------------------------------------
+
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_WRC_KUNSAT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
@@ -31,7 +73,6 @@ module ofHydrolab
 				# Weighting algorithm
 					Wof =  WEIGHTING(; iZ, N_KΨobs, N_θΨobs, Wof_Max=Wof_Max, Wof_Min=Wof_Min, Ψ_KΨobs, Ψ_θΨobs)
 					
-				# Of_Kunsat = 0.0
 				Kunsat_Obs_Ln = fill(0.0::Float64, N_KΨobs[iZ])
 				Kunsat_Sim_Ln = fill(0.0::Float64, N_KΨobs[iZ])
 
@@ -42,7 +83,7 @@ module ofHydrolab
 				end # for iΨ = 1:N_KΨobs[iZ]
 
 				Of_Kunsat = stats.NSE_MINIMIZE(Kunsat_Obs_Ln[1:N_KΨobs[iZ]], Kunsat_Sim_Ln[1:N_KΨobs[iZ]])			
-				Of_Sample[iZ] = Wof * Of_θΨ + (1.0 - Wof) * Of_Kunsat
+				Of_Sample[iZ] = Wof * Of_θΨ + (1.0 - Wof) * Of_Kunsat + PENALTY_KUNSAT(hydro, iZ, optionₘ)
 
 			else		
 				Of_Sample[iZ] = Of_θΨ
@@ -51,23 +92,7 @@ module ofHydrolab
 		return Of_Sample, Of_θΨ, Of_Kunsat
 		end # function OF_WRC_KUNSAT
 
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : WEIGHT
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function WEIGHTING(; iZ, N_KΨobs, N_θΨobs, Wof_Max=0.8, Wof_Min=0.2, Ψ_KΨobs, Ψ_θΨobs)
 
-			Ψ_θΨobs_Min = log10(minimum(abs.(Ψ_θΨobs[iZ, 1:N_θΨobs[iZ]])) + 1.0)
-			Ψ_θΨobs_Max = log10(maximum(abs.(Ψ_θΨobs[iZ, 1:N_θΨobs[iZ]])) + 1.0)	
-
-			Ψ_KΨobs_Min = log10(minimum(abs.(Ψ_KΨobs[iZ, 1:N_KΨobs[iZ]])) + 1.0)
-			Ψ_KΨobs_Max = log10(maximum(abs.(Ψ_KΨobs[iZ, 1:N_KΨobs[iZ]])) + 1.0)
-			
-			Wof = 0.4 * (Ψ_θΨobs_Max - Ψ_θΨobs_Min + 1.0) / (Ψ_KΨobs_Max - Ψ_KΨobs_Min + 1.0)
-			Wof = max(min(Wof, Wof_Max), Wof_Min)
-
-		return Wof
-		end  # function: WEIGHTING
-	# ------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,6 +105,9 @@ module ofHydrolab
 			end
 		return Of_AllSoil = Of_AllSoil / NiZ
 		end  # function: OF_ALL
+	# ------------------------------------------------------------------
+
+
 	# ------------------------------------------------------------------
 
 

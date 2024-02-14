@@ -156,6 +156,7 @@ module hydroStruct
 
 
 		Base.@kwdef mutable struct HYDRO_OTHER # <>=<>=<>=<>=<>=<>=<>=<>=<>
+         Macro_Perc                         :: Vector{Float64}
          Nse                                :: Vector{Float64}
          Nse_θΨ                             :: Vector{Float64}
          Nse_KΨ                             :: Vector{Float64}
@@ -294,17 +295,18 @@ module hydroStruct
 		#		FUNCTION : HYDRO_OTHER
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function HYDRO_OTHERS(NiZ::Int64)
-            Nse           = fill(0.0::Float64, NiZ)
-            Nse_θΨ        = fill(0.0::Float64, NiZ)
-            Nse_KΨ        = fill(0.0::Float64, NiZ)
-            NseWilmot_θΨ  = fill(0.0::Float64, NiZ)
-            NseWilmot_KΨ  = fill(0.0::Float64, NiZ)
-            Rmse          = fill(0.0::Float64, NiZ)
-            Rmse_θΨ       = fill(0.0::Float64, NiZ)
-            Rmse_KΨ       = fill(0.0::Float64, NiZ)
+            Macro_Perc                         = fill(0.0::Float64, NiZ)
+            Nse                                = fill(0.0::Float64, NiZ)
+            Nse_θΨ                             = fill(0.0::Float64, NiZ)
+            Nse_KΨ                             = fill(0.0::Float64, NiZ)
+            NseWilmot_θΨ                       = fill(0.0::Float64, NiZ)
+            NseWilmot_KΨ                       = fill(0.0::Float64, NiZ)
+            Rmse                               = fill(0.0::Float64, NiZ)
+            Rmse_θΨ                            = fill(0.0::Float64, NiZ)
+            Rmse_KΨ                            = fill(0.0::Float64, NiZ)
             NseConcordanceCorelationCoeficient = fill(0.0::Float64, NiZ)
 
-				hydroOther = HYDRO_OTHER(Nse, Nse_θΨ, Nse_KΨ, NseWilmot_θΨ, NseWilmot_KΨ, Rmse, Rmse_θΨ, Rmse_KΨ, NseConcordanceCorelationCoeficient)	
+				hydroOther = HYDRO_OTHER(Macro_Perc, Nse, Nse_θΨ, Nse_KΨ, NseWilmot_θΨ, NseWilmot_KΨ, Rmse, Rmse_θΨ, Rmse_KΨ, NseConcordanceCorelationCoeficient)	
 				return hydroOther
 			end  # function: HYDRO_OTHER
 end  # module: hydroStruct

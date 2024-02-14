@@ -135,6 +135,24 @@ module kunsat
 			end  # function: KS_MAC
 		# ------------------------------------------------------------------
 
+
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : TORTUOSITY
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function TORTUOSITY(; σ, τa, τaMac, τb, τbMac, τc, τcMac)
+            Ta    = τa
+            TaMac = τaMac
+            Tb    = τb 
+            TbMac = τbMac * τb
+            Tc    = τc
+            TcMac = τcMac
+
+				# Tb= min(0.5*((σ - 0.7) / (3.5 - 0.7)) ^ -τb , 1.0)
+			return Ta, Tb, Tc, TaMac, TbMac, TcMac
+			end  # function: TORTUOSITY
+		# ------------------------------------------------------------------
+
+
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KUNSAT_θΨSe
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -172,7 +190,6 @@ module kunsat
 
 					return Kunsat_Mat + Kunsat_Mac
 				
-
 				elseif Option_KosugiModel_KΨ⍰ == "Mualem" # =====
 					Kunsat_Mat = 0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + σ) / √2.0)
 			
@@ -185,7 +202,6 @@ module kunsat
 					return Ks * √Se₁ * ((W_Mat * Kunsat_Mat + W_Mac * Kunsat_Mac) / (W_Mat + W_Mac)) ^ 2.0
 
 				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat_Contimous" # =====
-
 					# ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
 
 					KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)
@@ -201,20 +217,7 @@ module kunsat
 	
 				
 				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat" # =====
-					# Parameters
-						Tb_Max = 2.0; Tc_Max = 2.0
-               	Tb    = Tb_Max * (1.0 - τb)
-                  TbMac = Tb_Max * (1.0 - τbMac)
-               	Tc    = Tc_Max * (1.0 - τc)
-               	TcMac = Tc_Max * (1.0 - τcMac)
-
-						Tb    = τb
-                  TbMac = τbMac
-               	Tc    = τc
-               	TcMac = τcMac
-
-
-									# Tc= σ ^ -0.59
+					Ta, Tb, Tc, TaMac, TbMac, TcMac = TORTUOSITY(; σ, τa, τaMac, τb, τbMac, τc, τcMac)
 
 					# Deriving KsMac and KsMat
 					KsMac, KsMat = KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac, Ks, Tb, Tc, TbMac, TcMac,  Option_KosugiModel_KΨ⍰)

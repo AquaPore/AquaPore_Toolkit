@@ -3,7 +3,7 @@
 #		module: optIndivSoil
 # =============================================================
 module optIndivSoil
-	import ..hydroRelation, ..ofHydrolab, ..optimize, ..psdThetar, ..optimizeOptim
+	import ..hydroRelation, ..ofHydrolab, ..optimize, ..psdThetar, ..optimizeOptim, ..kunsat
 	using BlackBoxOptim
 	using PRIMA, Optim
 	export OPTIMIZE_INDIVIDUALSOILS
@@ -15,11 +15,10 @@ module optIndivSoil
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OPTIMIZE_INDIVIDUALSOILS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther::Main.hydroStruct.HYDRO_OTHER, K_KΨobs::Matrix{Float64}, N_KΨobs=1, N_θΨobs::Vector{Int64}, NiZ::Int64, optim::Main.reading.OPTIM, option::Main.options.OPTION, optionₘ::Main.options.HYDRO, param::Main.params.PARAM, θ_θΨobs::Matrix{Float64}, θϵ=0.005::Float64, Ψ_KΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
+	function OPTIMIZE_INDIVIDUALSOILS(;∑Psd, hydro, hydroOther::Main.hydroStruct.HYDRO_OTHER, K_KΨobs::Matrix{Float64}, N_KΨobs=1, N_θΨobs::Vector{Int64}, NiZ::Int64, optim::Main.reading.OPTIM, optimAllSoils, option::Main.options.OPTION, optionₘ::Main.options.HYDRO, param::Main.params.PARAM, θ_θΨobs::Matrix{Float64}, θϵ=0.005::Float64, Ψ_KΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64})
 
 		# Initiating arrays 
 			Of_Sample = zeros(Float64, NiZ)
-
 
 		# DETERMINE IF WE ARE HAVING A UNIMODAL OR BIMODAL
 			if "θsMacMat" ∈ optim.ParamOpt
@@ -54,7 +53,6 @@ module optIndivSoil
 					hydro.θr[iZ] = psdThetar.PSD_2_θr_FUNC(∑Psd, hydro, iZ, param)
 					hydro.θr[iZ] = max(min(hydro.θr[iZ], hydro.θr_Max[iZ]), hydro.θr_Min[iZ])
 				end # if ("θr" ∈ optim.ParamOpt)
-
 
 			# CORRECTING θs  ~~~~~
 				if ("θs" ∈ optim.ParamOpt)
@@ -160,8 +158,7 @@ module optIndivSoil
 			🎏_Model = :BlackBox # :Optim, :Prima, :BlackBox 
 			
 			if  🎏_Model == :BlackBox
-
-				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=10000)
+				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=1000)
 					function WHEN_TO_STOP_INDIV(oc; CountIndiv_NoImprovement_Max=CountIndiv_NoImprovement_Max)
 						global CountIndiv_Opt += 1
 
@@ -187,8 +184,11 @@ module optIndivSoil
             global CountIndiv_Opt           = 1::Int64
             global OfIndiv_Soil             = Inf ::Float64
 
-				Optimization = BlackBoxOptim.bboptimize(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs); SearchRange=SearchRange_IndivSoil, NumDimensions=optim.NparamOpt, TraceMode=:silent, CallbackFunction=FORCING_STOPPING_INDIV, CallbackInterval=0.0, MinDeltaFitnessTolerance=1e-9)
-				
+				if optimAllSoils.🎏_Opt
+					Optimization = BlackBoxOptim.bboptimize(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs); SearchRange=SearchRange_IndivSoil, NumDimensions=optim.NparamOpt, TraceMode=:silent, CallbackFunction=FORCING_STOPPING_INDIV, CallbackInterval=0.0, MinDeltaFitnessTolerance=1e-9)
+				else
+					Optimization = BlackBoxOptim.bboptimize(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs); SearchRange=SearchRange_IndivSoil, NumDimensions=optim.NparamOpt, TraceMode=:silent)
+				end
 				# Best parameter set .
 					X = BlackBoxOptim.best_candidate(Optimization)
 
@@ -209,15 +209,19 @@ module optIndivSoil
 				Result = Optim.optimize(X -> optIndivSoil.OF_HYDROLAB(hydro, iZ, K_KΨobs, N_KΨobs, N_θΨobs, Of_Sample, optim, option, optionₘ, param, X, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs), Lower, Upper, Initial, Fminbox(NelderMead()), Optim.Options(show_trace = false))
 
 				X = Optim.minimizer(Result)
-
 			end
 
-				hydro = optIndivSoil.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
+			hydro = optIndivSoil.PARAM_2_hydro(hydro, iZ, optim, optionₘ, param, X)
 
-				# FINAL CORRECTION
-					# if optionₘ.σ_2_Ψm⍰ ≠ "No"
-					# 	hydro.ΨmacMat[iZ] = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ])
-					# end
+			# COMPUTING MACROPORE %
+				if optionₘ.HydroModel⍰ == "Kosugi"
+					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
+
+					KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.θr[iZ], hydro.Ψm[iZ], hydro.σ[iZ], hydro.ΨmMac[iZ], hydro.σMac[iZ], hydro.Ks[iZ], Tb, Tc, TbMac, TcMac, optionₘ.KosugiModel_KΨ⍰)
+
+					hydroOther.Macro_Perc[iZ] = KsMac / (KsMac + KsMat)
+				end # optionₘ.HydroModel⍰ == "Kosugi"
+
 
 				# STATISTICS
 					if option.data.Kθ && "Ks" ∈ optim.ParamOpt
