@@ -294,7 +294,7 @@ module optIndivSoil
 				end
 
 			# RELATIONSHIP BETWEEN σ AND Ψm
-				if (optionₘ.σ_2_Ψm⍰ ≠ "No") && ("Ψm" ∈ optim.ParamOpt)
+				if (optionₘ.σ_2_Ψm⍰ == "Constrained") && ("Ψm" ∈ optim.ParamOpt) || (optionₘ.σ_2_Ψm⍰ == "UniqueRelationship") 
 					hydro = hydroRelation.FUNCTION_σ_2_Ψm_SOFTWARE(hydro, iZ, optionₘ, param.hydro)
 				end # optionₘ.σ_2_Ψm⍰ ≠ No
 

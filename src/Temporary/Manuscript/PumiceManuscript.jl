@@ -26,12 +26,12 @@ module pumiceManuscript
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : HydroModels
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function HYDRO_MODELS(;θs, θsMacMat_η, θr=0.0, σ, Ks, ΨmacMat, τa=0.5, τb, τc, τaMac=0.5, τbMac, τcMac, KosugiModel_θΨ⍰, Option_KosugiModel_KΨ⍰, Pσ=3, Pσ_Mac=3)
+		function HYDRO_MODELS(;θs, θsMacMat_η, θr=0.0, σ, Ks, ΨmacMat, τa=0.5, τb, τc, τaMac=0.5, τbMac, τcMac, KosugiModel_θΨ⍰, Option_KosugiModel_KΨ⍰, Pσ=3, Pσ_Mac=2)
 
 			θsMacMat   = (θs - θr) * θsMacMat_η + θr
 
 			# Deriving macropore hydraulic parameters from ΨmacMat
-				σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat=ΨmacMat, Pσ_Mac=3)
+				σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat=ΨmacMat, Pσ_Mac=2)
 				ΨmMac   = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=ΨmacMat, σMac)
 
 				Ψm_Min  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat= ΨmacMat, σ, Pσ=Pσ₃, 🎏_Min=true)
@@ -269,7 +269,7 @@ module pumiceManuscript
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	function PLOTTING_KUNSAT_MACRO()
 
-		function RELATIONSHIPS_MAC(ΨmacMat; Pσ_Mac=3)
+		function RELATIONSHIPS_MAC(ΨmacMat; Pσ_Mac=2)
 			σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac)
 			ΨmMac   = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=ΨmacMat, σMac)
 		return σMac, ΨmMac
@@ -277,21 +277,22 @@ module pumiceManuscript
 
 		function RELATIONSHIPS_MAT(ΨmacMat, σ; Pσ=3)
 			ΨmacMat₂ = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
-			Ψm  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat=ΨmacMat₂, σ, Pσ=Pσ₃, 🎏_Min=false)
+			Ψm  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat=ΨmacMat₂, σ, Pσ=Pσ, 🎏_Min=false)
 		return Ψm
 		end
 
-		function KUNSAT_MAT_η(;Ψ₁=Ψ₁, θs=1.0, θsMacMat=0.8, θr=0.0, σ, ΨmacMat, τb, τbMac, Ks=1.0, τa=0.5, τaMac=0.5, τc=1.0, τcMac=2.0)
+		function θψ_KUNSAT_MAT_η(;Ψ₁=Ψ₁, θs=1.0, θsMacMat=0.8, θr=0.0, σ, ΨmacMat, τb, τbMac, Ks=1.0, τa=0.5, τaMac=0.5, τc=1.0, τcMac=2.0)
 			Ψm = RELATIONSHIPS_MAT(ΨmacMat, σ)
 			σMac, ΨmMac = RELATIONSHIPS_MAC(ΨmacMat)
 
-			Kunsat_Mat_Norm = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τaMac, τbMac, τcMac, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
+         Kunsat_Mat_Norm                 = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τaMac, τbMac, τcMac, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
 
-			Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ, τa, τaMac, τb, τbMac, τc, τcMac)
+         Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ, τa, τaMac, τb, τbMac, τc, τcMac)
 	
-			KsMac, KsMat = kunsat.kg.KS_MATMAC_ΨmacMat(θs::Float64, θsMacMat::Float64, θr::Float64, Ψm::Float64, σ::Float64, ΨmMac::Float64, σMac::Float64, Ks::Float64, Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  "ΨmacMat")
+         KsMac, KsMat                    = kunsat.kg.KS_MATMAC_ΨmacMat(θs::Float64, θsMacMat::Float64, θr::Float64, Ψm::Float64, σ::Float64, ΨmMac::Float64, σMac::Float64, Ks::Float64, Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  "ΨmacMat")
 
-		return KsMat, Kunsat_Mat_Norm
+         θDual                       		= wrc.kg.Ψ_2_θ(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="ΨmacMat")
+		return KsMat, Kunsat_Mat_Norm, θDual
 		end
 
 		# Parameters
@@ -322,15 +323,14 @@ module pumiceManuscript
 
 			# KsMac = zeros(100)
 
-
 		
 		# FUNCTION Kunsat_Tb
          KunsatMat_Tb = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
          KsMatrice    = zeros(N_σ, N_Tb, N_ΨmacMat)
+			θψ = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
 			
 			for (iiΨ, iΨ) in enumerate(Ψ), (iiσ, iσ) in enumerate(σ), (iiTb, iTb) in enumerate(Tb2), (iiΨmacMat, iΨmacMat) in enumerate(ΨmacMat)
-
-			 	KsMatrice[iiσ, iiTb, iiΨmacMat], KunsatMat_Tb[iiΨ, iiσ, iiTb, iiΨmacMat] = KUNSAT_MAT_η(;Ψ₁=iΨ, σ=iσ, τb=iTb, τbMac=iTb, ΨmacMat=iΨmacMat)
+			 	KsMatrice[iiσ, iiTb, iiΨmacMat], KunsatMat_Tb[iiΨ, iiσ, iiTb, iiΨmacMat], θψ[iiΨ, iiσ, iiTb, iiΨmacMat] = θψ_KUNSAT_MAT_η(;Ψ₁=iΨ, σ=iσ, τb=iTb, τbMac=iTb, ΨmacMat=iΨmacMat)
 			end
 
 		# ================================================================
@@ -338,9 +338,9 @@ module pumiceManuscript
          ColourOption_No    = 1
          Linewidth          = 2
          height             = 200
-         labelsize          = 16
+         labelsize          = 15
          textcolor          = :blue
-         textsize           = 17
+         textsize           = 20
          titlecolor         = :navyblue
          titlesize          = 18.0
          width              = height * 3.0
@@ -351,7 +351,188 @@ module pumiceManuscript
          xminortickalign    = 1.0
          xminorticksvisible = true
          xtickalign         = 0.9 # 0 is inside and 1 is outside
-         xticklabelrotation = π/4
+         xticklabelrotation = π / 4.0
+         xticksize          = 10
+         xticksmirrored     = false
+         xtickwidt          = 0.5
+         xtrimspine         = false
+         ygridstyle         = :dash
+         ygridvisible       = false
+         ylabelpadding      = xlabelpadding
+         ylabelsize         = xlabelSize
+         yminortickalign    = xminortickalign
+         yminorticksvisible = true
+         ytickalign         = xtickalign
+         yticksize          = xticksize
+         yticksmirrored     = false
+         ytickwidt          = xtickwidt
+         ytrimspine         = false
+
+
+			ColourOption = [:glasbey_hv_n256,:seaborn_bright,:seaborn_colorblind,:seaborn_dark,:seaborn_deep,:tab10,:tableau_10,:tol_bright]
+
+			Colormap = cgrad(colorschemes[ColourOption[ColourOption_No]], size(colorschemes[ColourOption[ColourOption_No]]), categorical = true)
+
+			Ψticks = [0, 50, 100, 500, 1000,5000,100_00, 500_00, 1000_00, 1500_00] # mm
+
+			Ψ_Log = Array{Float64}(undef, N_Ψ)
+				for iZ=1:N_Ψ
+					Ψ_Log[iZ] = log1p(Ψ[iZ])
+				end
+
+		# Starting to plot	
+			CairoMakie.activate!(type="svg", pt_per_unit=1)
+			Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :mintcream) 
+
+			Label(Fig[1, 1:N_σ, Top()], L"Macropore  $K(θ)$ model", valign=:bottom, font=:bold, padding=(0, 0, 50, 0), color=:darkblue,  fontsize=titlesize*1.5)
+
+			Axis_KunsatMat_Tb = []
+			for (iiσ, iσ) in enumerate(σ)
+				for(iiΨmacMat, iΨmacMat) in enumerate(ΨmacMat)
+
+				if iiσ==1
+					Label(Fig[iiσ, iiΨmacMat, TopRight()], "($iiσ-$iiΨmacMat)", fontsize=18, padding=(-50, 5, -100, 10), halign=:right, font=("CMU Serif"))
+					else
+						Label(Fig[iiσ, iiΨmacMat, TopRight()], "($iiσ-$iiΨmacMat)", fontsize=18, padding=(-50, 5, -50, 10), halign=:right, font=("CMU Serif"))
+					end
+
+					Axis_KunsatMat_Tb = Axis(Fig[iiσ, iiΨmacMat], xlabel= L"$ψ$ [kPa]", ylabel=L"$K(\psi)$ [L T ⁻¹]", title="$(Texture[iiσ]) ΨmacMat=$(Int32(floor(iΨmacMat, digits=0))) mm" ,  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign, titlefont = "CMU Serif")
+
+						Axis_KunsatMat_Tb.xticks = (log1p.(Ψticks), string.(cst.Mm_2_kPa .* Ψticks))
+
+						if iiσ < N_σ
+							hidexdecorations!(Axis_KunsatMat_Tb, ticks=false, grid=false)
+						end
+
+						if iiΨmacMat > 1
+							hideydecorations!(Axis_KunsatMat_Tb, ticks=false, grid=false)
+						end
+
+						for (iiTb, iTb) in enumerate(Tb2)
+							lines!(Fig[iiσ, iiΨmacMat], Ψ_Log, KunsatMat_Tb[:, iiσ, iiTb, iiΨmacMat], linewidth=Linewidth, color=Colormap[iiTb], label="σ =$(floor(σ[iiσ], digits=2)) τᵦ =$(floor(iTb, digits=2))")
+
+							# lines!(Fig[iiσ, iiΨmacMat], Ψ_Log, θψ[:, iiσ, iiTb, iiΨmacMat], linewidth=Linewidth, color=Colormap[iiTb], label="σ =$(floor(σ[iiσ], digits=2)) Tb=$(floor(iTb, digits=2))")
+
+							lines!(Axis_KunsatMat_Tb,[Point(log1p(0.0), KsMatrice[iiσ, iiTb, iiΨmacMat] ), Point(log1p(ΨmacMat[iiΨmacMat]), KsMatrice[iiσ, iiTb, iiΨmacMat])], color=Colormap[iiTb], linewidth=Linewidth/2.0, linestyle=:dash)
+						end
+
+						lines!(Axis_KunsatMat_Tb,[Point(log1p(ΨmacMat[iiΨmacMat]), 0.0), Point(log1p(ΨmacMat[iiΨmacMat]), 1.0)], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+						text!(log1p(ΨmacMat[iiΨmacMat]), 0, text =L"ψ_{macMat}", align=(:left,:bottom), rotation = π/2,  color=textcolor, fontsize=textsize)
+						text!(log1p(0),  0.5, text =L"K_{sMac}", align=(:left,:bottom), color=textcolor, fontsize=textsize, rotation = π/2)
+	
+				end # for(iiΨmacMat, iΨmacMat) in enumerate(ΨmacMat)
+
+				Legend(Fig[iiσ,N_ΨmacMat+1], Axis_KunsatMat_Tb, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
+			end # for (iiσ, iσ) in enumerate(σ)
+
+			# General
+				resize_to_layout!(Fig)
+				trim!(Fig.layout)
+				colgap!(Fig.layout, 20)
+				rowgap!(Fig.layout, 20)
+
+				Path = raw"D:\TEMP\Plots\MacroKunsat.svg"
+				save(Path, Fig)
+				display(Fig)
+		
+	return nothing
+	end  # function: name
+	# ------------------------------------------------------------------
+
+
+
+	
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : PLOTTING_θψ_MACRO
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	function PLOTTING_θψ_MACRO()
+
+		function RELATIONSHIPS_MAC(ΨmacMat; Pσ_Mac=2.0)
+			σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac)
+			ΨmMac   = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=ΨmacMat, σMac)
+		return σMac, ΨmMac
+		end  # function: RELATIONSHIPS_MAC
+
+		function RELATIONSHIPS_MAT(ΨmacMat, σ; Pσ=3)
+			ΨmacMat₂ = exp((log(√ΨmacMat) + log(ΨmacMat)) * 0.5)
+			Ψm  = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat=ΨmacMat₂, σ, Pσ=Pσ, 🎏_Min=false)
+		return Ψm
+		end
+
+		function θψ_η(;Ψ₁=Ψ₁, θs=1.0, θsMacMat=0.8, θr=0.0, σ, ΨmacMat, τb, τbMac, Ks=1.0, τa=0.5, τaMac=0.5, τc=1.0, τcMac=2.0)
+			Ψm = RELATIONSHIPS_MAT(ΨmacMat, σ)
+			σMac, ΨmMac = RELATIONSHIPS_MAC(ΨmacMat)
+
+         # Kunsat_Mat_Norm                 = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τaMac, τbMac, τcMac, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
+
+         # Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ, τa, τaMac, τb, τbMac, τc, τcMac)
+	
+         # KsMac, KsMat                    = kunsat.kg.KS_MATMAC_ΨmacMat(θs::Float64, θsMacMat::Float64, θr::Float64, Ψm::Float64, σ::Float64, ΨmMac::Float64, σMac::Float64, Ks::Float64, Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  "ΨmacMat")
+
+         θDual                       		= wrc.kg.Ψ_2_θ(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="ΨmacMat")
+		return θDual, θs, θsMacMat
+		end
+
+		# Parameters
+         θs = 1.0
+         θr = 0.0
+         Ks = 1.0
+
+		#  For every ψ
+			Ψ_Min_Log = log10(0.0001)
+			Ψ_Max_Log = log10(1500_00.0)
+			Ψ = 10.0.^(collect(Ψ_Min_Log:0.0001:Ψ_Max_Log))
+			N_Ψ  = length(Ψ)
+
+			σ =  collect(range(0.75, stop=3.5, length=3))
+			N_σ = length(σ)
+
+			Texture = ["Sandy soils", "Silty soils", "Clay soils"] 
+
+			Tb2 = collect(range(0.0, stop=1.0, length=5))
+			N_Tb = length(Tb2)
+
+			ΨmacMat = collect(range(60.0, stop=100.0, length=3))
+			N_ΨmacMat = length(ΨmacMat)
+
+			# θsMacMat_η = collect(range(0.75, stop=1.0, length=4))
+			# N_θsMacMat_η  = length(θsMacMat_η)
+      	# θsMacMat = θs .* θsMacMat_η
+
+			# KsMac = zeros(100)
+
+		
+		# FUNCTION Kunsat_Tb
+         KunsatMat_Tb = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
+         KsMatrice    = zeros(N_σ, N_Tb, N_ΨmacMat)
+			θψ = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
+			θs = 0.0
+			θsMacMat = 0.0
+			
+			
+			for (iiΨ, iΨ) in enumerate(Ψ), (iiσ, iσ) in enumerate(σ), (iiTb, iTb) in enumerate(Tb2), (iiΨmacMat, iΨmacMat) in enumerate(ΨmacMat)
+			 	θψ[iiΨ, iiσ, iiTb, iiΨmacMat], θs, θsMacMat = θψ_η(;Ψ₁=iΨ, σ=iσ, τb=iTb, τbMac=iTb, ΨmacMat=iΨmacMat)
+			end
+
+		# ================================================================
+				# Plotting parameters
+         ColourOption_No    = 1
+         Linewidth          = 2
+         height             = 200
+         labelsize          = 15
+         textcolor          = :blue
+         textsize           = 20
+         titlecolor         = :navyblue
+         titlesize          = 18.0
+         width              = height * 3.0
+         xgridstyle         = :dash
+         xgridvisible       = true
+         xlabelSize         = 20
+         xlabelpadding      = 5
+         xminortickalign    = 1.0
+         xminorticksvisible = true
+         xtickalign         = 0.9 # 0 is inside and 1 is outside
+         xticklabelrotation = π / 4.0
          xticksize          = 10
          xticksmirrored     = false
          xtickwidt          = 0.5
@@ -370,7 +551,7 @@ module pumiceManuscript
 
 			ColourOption = [:glasbey_hv_n256,:seaborn_bright,:seaborn_colorblind,:seaborn_dark,:seaborn_deep,:tab10,:tableau_10,:tol_bright]
 
-			Colormap = cgrad(colorschemes[ColourOption[ColourOption_No]], size(colorschemes[ColourOption[ColourOption_No]]), categorical = true)
+			Colormap = cgrad(colorschemes[ColourOption[ColourOption_No]], size(colorschemes[ColourOption[ColourOption_No]]), categorical=true)
 
 			Ψticks = [0, 50, 100, 500, 1000,5000,100_00, 500_00, 1000_00, 1500_00] # mm
 
@@ -381,44 +562,50 @@ module pumiceManuscript
 
 		# Starting to plot	
 			CairoMakie.activate!(type="svg", pt_per_unit=1)
-			Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :seashell2) 
+			Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory) 
 
-			Label(Fig[1, 1:N_σ, Top()], "Macropore parsimenous K(θ) model", valign=:bottom, font=:bold, padding=(0, 0, 50, 0), color=:darkblue,  fontsize=titlesize*1.2)
+			Label(Fig[1, 1:N_σ, Top()], L"Macropore constrained bimodal $θ(\psi)$ model", valign=:bottom, font=:bold, padding=(0, 0, 50, 0), color=:darkblue,  fontsize=titlesize*1.5)
 
-			Axis_KunsatMat_Tb = []
+			Axis_θψ = []
 			for (iiσ, iσ) in enumerate(σ)
 				for(iiΨmacMat, iΨmacMat) in enumerate(ΨmacMat)
 
 				if iiσ==1
-					Label(Fig[iiσ, iiΨmacMat, TopRight()], "($iiσ-$iiΨmacMat)", fontsize=18, font=:bold, padding=(-50, 5, -100, 10), halign=:right)
+					Label(Fig[iiσ, iiΨmacMat, TopRight()], "($iiσ-$iiΨmacMat)", fontsize=18,  padding=(-50, 5, -100, 10), halign=:right,  font=("CMU Serif"))
 					else
-						Label(Fig[iiσ, iiΨmacMat, TopRight()], "($iiσ-$iiΨmacMat)", fontsize=18, font=:bold, padding=(-50, 5, -50, 10), halign=:right)
+						Label(Fig[iiσ, iiΨmacMat, TopRight()], "($iiσ-$iiΨmacMat)", fontsize=18, padding=(-50, 5, -50, 10), halign=:right,  font="CMU Serif")
 					end
 
-					Axis_KunsatMat_Tb = Axis(Fig[iiσ, iiΨmacMat], xlabel= L"$ψ$ [kPa]", ylabel=L"$K_{unsat}$ [L³ L⁻³]", title="$(Texture[iiσ]) ΨmacMat=$(Int32(floor(iΨmacMat, digits=0))) mm" ,  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign)
+					Axis_θψ = Axis(Fig[iiσ, iiΨmacMat], xlabel= L"$ψ$ [kPa]", ylabel=L"$\theta(\psi)$ [L³ L⁻³]", title="$(Texture[iiσ]) ΨmacMat=$(Int32(floor(iΨmacMat, digits=0))) mm" ,  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")
 
-						Axis_KunsatMat_Tb.xticks = (log1p.(Ψticks), string.(cst.Mm_2_kPa .* Ψticks))
+						Axis_θψ.xticks = (log1p.(Ψticks), string.(cst.Mm_2_kPa .* Ψticks))
 
 						if iiσ < N_σ
-							hidexdecorations!(Axis_KunsatMat_Tb, ticks=false, grid=false)
+							hidexdecorations!(Axis_θψ, ticks=false, grid=false)
 						end
 
 						if iiΨmacMat > 1
-							hideydecorations!(Axis_KunsatMat_Tb, ticks=false, grid=false)
+							hideydecorations!(Axis_θψ, ticks=false, grid=false)
 						end
 
-						for (iiTb, iTb) in enumerate(Tb2)
-							lines!(Fig[iiσ, iiΨmacMat], Ψ_Log, KunsatMat_Tb[:, iiσ, iiTb, iiΨmacMat], linewidth=Linewidth, color=Colormap[iiTb], label="σ =$(floor(σ[iiσ], digits=2)) Tb=$(floor(iTb, digits=2))")
+						# for (iiTb, iTb) in enumerate(Tb2)
+							lines!(Fig[iiσ, iiΨmacMat], Ψ_Log, θψ[:, iiσ, 1, iiΨmacMat], linewidth=Linewidth, color=:darkcyan, label="σ =$(floor(σ[iiσ], digits=2))")
+							lines!(Axis_θψ,[Point(log1p(ΨmacMat[iiΨmacMat]),0), Point(log1p(ΨmacMat[iiΨmacMat]), θs)], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+							lines!(Axis_θψ,[Point(log1p(0), θsMacMat), Point(log1p(ΨmacMat[iiΨmacMat]), θsMacMat)], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+							lines!(Axis_θψ,[Point(log1p(0), θs), Point(log1p(ΨmacMat[iiΨmacMat]), θs)], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+						# end
 
-							lines!(Axis_KunsatMat_Tb,[Point(log1p(0.0), KsMatrice[iiσ, iiTb, iiΨmacMat] ), Point(log1p(ΨmacMat[iiΨmacMat]), KsMatrice[iiσ, iiTb, iiΨmacMat])], color=Colormap[iiTb], linewidth=Linewidth/2.0, linestyle=:dash)
-						end
+						text!(log1p(0), θsMacMat, text =L"θ_{sMacMat}", align=(:left,:top),  color=textcolor, fontsize=textsize)
+						text!(log1p(0), θs, text =L"θ_{s}", align=(:left,:top),  color=textcolor, fontsize=textsize)
+						text!(log1p(ΨmacMat[iiΨmacMat]), 0, text =L"ψ_{macMat}", align=(:left,:bottom), rotation = π/2,  color=textcolor, fontsize=textsize)
 
-						lines!(Axis_KunsatMat_Tb,[Point(log1p(ΨmacMat[iiΨmacMat]), 0.0), Point(log1p(ΨmacMat[iiΨmacMat]), 1.0)], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+
+		
+				# 		lines!(Axis_θψ,[Point(log1p(ΨmacMat[iiΨmacMat]), 0.0), Point(log1p(ΨmacMat[iiΨmacMat]), 1.0)], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
 	
 				end # for(iiΨmacMat, iΨmacMat) in enumerate(ΨmacMat)
 
-				Legend(Fig[iiσ,N_ΨmacMat+1], Axis_KunsatMat_Tb, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:seashell
-)
+				Legend(Fig[iiσ,N_ΨmacMat+1], Axis_θψ, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
 			end # for (iiσ, iσ) in enumerate(σ)
 
 			# General
@@ -427,7 +614,7 @@ module pumiceManuscript
 				colgap!(Fig.layout, 10)
 				rowgap!(Fig.layout, 10)
 
-				Path = raw"D:\TEMP\Plots\MacroKunsat.svg"
+				Path = raw"D:\TEMP\Plots\MacroThetaH.svg"
 				save(Path, Fig)
 				display(Fig)
 		
@@ -436,11 +623,13 @@ module pumiceManuscript
 	# ------------------------------------------------------------------
 
 
+
 end #module pumiceManuscript
 # ------------------------------------------------------------------
 
 
  pumiceManuscript.PLOTTING_KUNSAT_MACRO()
+  pumiceManuscript.PLOTTING_θψ_MACRO()
 
 #   include(raw"D:\MAIN\MODELS\AquaPore_Toolkit\src\Temporary\Manuscript\PumiceManuscript.jl")
 
