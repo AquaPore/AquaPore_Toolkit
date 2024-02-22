@@ -4,7 +4,7 @@
 module hydroRelation
 import BlackBoxOptim
 import ..tool
-export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_θsMacMatη_2_ΨmacMat, FUNC_ΨmacMat_2_σMac, FUNC_σ_2_Ψm, FUNC_ΨmMode, FUNC_θsMacMatη
+export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacMat_2_σMac, FUNC_σ_2_Ψm, FUNC_ΨmMode, FUNC_θsMacMatη
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

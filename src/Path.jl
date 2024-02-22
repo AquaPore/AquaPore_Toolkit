@@ -5,9 +5,10 @@ module paths
 
 	using Configurations
 
-	@option struct OPTIONS 
+	@option mutable struct OPTIONS 
 		ModelName::String
 		Select::String
+		OutputNumber::Int64
 	end # struct OPTION
 
 	@option mutable struct INPUT_SMAP
@@ -168,7 +169,7 @@ module paths
 		# =============================================================
 		#		TABLE_SOILWATER
 		# =============================================================
-		Path_Soilwater_Table    = Path_Home * "/OUTPUT/SoilWater/" * SiteName_Soilwater * "/Table/"
+		Path_Soilwater_Table    = Path_Home * "/OUTPUT/SoilWater/" * SiteName_Soilwater  * "_" * string(path.option.OutputNumber) *  "/Table/"
 				mkpath(Path_Soilwater_Table) 
 	
 			Path_Soilwater_Table                     = Path_Soilwater_Table * SiteName_Soilwater
@@ -202,28 +203,28 @@ module paths
 		# =============================================================
 		#		PLOT AQUAPORE
 		# =============================================================
-			Path_Soilwater_Plot = Path_Home * "/OUTPUT/SoilWater/" * SiteName_Soilwater * "/Plots/"
+			Path_Soilwater_Plot = Path_Home * "/OUTPUT/SoilWater/" * SiteName_Soilwater  * "_" * string(path.option.OutputNumber) * "/Plots/"
 
 			if opt.run.HydroLabθΨ⍰ == "Opt"
 				Plot_θΨK = Path_Soilwater_Plot * "/Lab/" 
 					mkpath(Plot_θΨK)
-					path.plotSoilwater.Plot_θΨK = Plot_θΨK * SiteName_Soilwater * "_" * path.option.ModelName *  "_"
+					path.plotSoilwater.Plot_θΨK = Plot_θΨK * SiteName_Soilwater * "_" * string(path.option.OutputNumber) * "_" * path.option.ModelName *  "_"
 			end
 
 			if opt.run.KsModel
 				Plot_KsModel₀ = Path_Soilwater_Plot * "/KsModel/"
 					mkpath(Plot_KsModel₀)
-					path.plotSoilwater.Plot_KsModel = Plot_KsModel₀ * SiteName_Soilwater * "_"  * path.option.ModelName  * "_" * opt.ksModel.KₛModel⍰  * "_" * path.plotSoilwater.Plot_KsModel
+					path.plotSoilwater.Plot_KsModel = Plot_KsModel₀ * SiteName_Soilwater * "_" * string(path.option.OutputNumber) * "_"  * path.option.ModelName  * "_" * opt.ksModel.KₛModel⍰  * "_" * path.plotSoilwater.Plot_KsModel
 			end
 
 			if opt.run.IntergranularMixingPsd
 				Plot_Psd_θΨ = Path_Soilwater_Plot * "/Psd/IMP_ThetaH/"
 					mkpath(Plot_Psd_θΨ)				
-					path.plotSoilwater.Plot_Psd_θΨ = Plot_Psd_θΨ * SiteName_Soilwater * "_"  * path.option.ModelName *  "_"
+					path.plotSoilwater.Plot_Psd_θΨ = Plot_Psd_θΨ * SiteName_Soilwater * "_" * string(path.option.OutputNumber) * "_"  * path.option.ModelName *  "_"
 
 				Plot_IMP_model = Path_Soilwater_Plot * "/Psd/IMP/"
 				mkpath(Plot_IMP_model)
-				path.plotSoilwater.Plot_IMP_model = Plot_IMP_model * SiteName_Soilwater * "_"  * path.option.ModelName *  "_"
+				path.plotSoilwater.Plot_IMP_model = Plot_IMP_model * SiteName_Soilwater * "_" * string(path.option.OutputNumber) * "_"  * path.option.ModelName *  "_"
 
 				Plot_Psd_θr = Path_Soilwater_Plot * "/Psd/ThetaR/" 
 				mkpath(Plot_Psd_θr)
@@ -233,11 +234,11 @@ module paths
 			if opt.run.Infiltration
 				Plot_∑infilt_Opt = Path_Soilwater_Plot * "/Infiltration/Optimize/"
 					mkpath(Plot_∑infilt_Opt)
-					path.plotSoilwater.Plot_∑infilt_Opt = Plot_∑infilt_Opt * SiteName_Soilwater * "_"  * path.option.ModelName *  "_"
+					path.plotSoilwater.Plot_∑infilt_Opt = Plot_∑infilt_Opt * SiteName_Soilwater * "_" * string(path.option.OutputNumber) * "_"  * path.option.ModelName *  "_"
 
 				Plot_∑infilt_θΨ = Path_Soilwater_Plot * "/Infiltration/ThetaH/"
 					mkpath(Plot_∑infilt_θΨ)
-					path.plotSoilwater.Plot_∑infilt_θΨ = Plot_∑infilt_θΨ * SiteName_Soilwater * "_"  * path.option.ModelName *  "_"
+					path.plotSoilwater.Plot_∑infilt_θΨ = Plot_∑infilt_θΨ * SiteName_Soilwater * "_" * string(path.option.OutputNumber) * "_"  * path.option.ModelName *  "_"
 			end
 	
 	return path
