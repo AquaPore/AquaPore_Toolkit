@@ -158,7 +158,7 @@ module optIndivSoil
 			🎏_Model = :BlackBox # :Optim, :Prima, :BlackBox 
 			
 			if  🎏_Model == :BlackBox
-				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=1000)
+				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=2000)
 					function WHEN_TO_STOP_INDIV(oc; CountIndiv_NoImprovement_Max=CountIndiv_NoImprovement_Max)
 						global CountIndiv_Opt += 1
 
@@ -306,6 +306,12 @@ module optIndivSoil
 			# Converting θsMacMat_ƞ -> θsMacMat
 				if  optionₘ.HydroModel⍰ == "Kosugi"
 					hydro.θsMacMat[iZ] = min(hydro.θsMacMat_ƞ[iZ] * (hydro.θs[iZ] - hydro.θr[iZ]) + hydro.θr[iZ], hydro.θs[iZ])
+
+					if hydro.θsMacMat_ƞ[iZ] > 0.94
+						hydro.θsMacMat_ƞ[iZ] = 1.0
+						hydro.θsMacMat[iZ]   = hydro.θs[iZ]
+						# hydro.ΨmacMat[iZ]    = hydro.ΨmacMat_Min[iZ]
+					end
 				end
 
 			# Reinforcing θs >> Θr

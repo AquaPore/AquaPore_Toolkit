@@ -100,7 +100,11 @@ module reading
 			RockFragment, ~   = tool.readWrite.READ_ROW_SELECT(IdSelect, Data, Header,"RockFragment[0-1]", NiZ, N_Point_Max=1)
 
 			for iZ =1:NiZ
-				hydro.Φ[iZ]= Φ[iZ]	
+				hydro.Φ[iZ] = Φ[iZ]
+				# Testing that no empty cell 
+				if  hydro.Φ[iZ]  < 0.01
+					error("hydro.Φ[$iZ]  < 0.01")
+				end
 			end
 		return hydro, RockFragment
 		end # function: Φ

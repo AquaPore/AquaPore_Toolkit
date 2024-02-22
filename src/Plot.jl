@@ -10,110 +10,254 @@ module lab
 	import ...cst, ...kunsat, ...wrc, ...θψ_2_KsψModel
 	using CairoMakie, ColorSchemes
 
-		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		#		FUNCTION : HYDROPARAM
-		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function HYDROPARAM(hydro, hydroOther, IdSelect, K_KΨobs, NiZ, N_KΨobs, N_θΨobs, optim, option, param, path, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs; N_Se=1000)
-				println("  ==  START: Plotting HydroParam  ==")
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : name
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function HYDROPARAM(hydro, hydroOther, IdSelect, K_KΨobs, NiZ, N_KΨobs, N_θΨobs, optim, option, param, path, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs; N_Se=1000)
 
-				# ===================== DATA =====================
-            θ_Sim      = fill(0.0,N_Se)
-            Kunsat_Sim = fill(0.0,N_Se)
-            KsMat      = fill(0.0, param.globalparam.N_iZ_Plot_End)
+			println("  ==  START: Plotting HydroParam  ==")
 
-				Ψ_θΨobs_Min = 0.0
-				for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
+			#  For every ψ
+				Ψ_Min_Log = log10(0.0001)
+				Ψ_Max_Log = log10(1500_00.0)
+				Ψ_Sim = 10.0.^(collect(Ψ_Min_Log:0.001:Ψ_Max_Log))
+				N_Ψ  = length(Ψ_Sim)
 
-					Ψ_θΨobs_Max = maximum(Ψ_θΨobs[iZ,N_θΨobs[iZ]]) + 100000.0
+			for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
+				# Simulated 
+               θ_Sim      = zeros(N_Ψ)
+               Kunsat_Sim = zeros(N_Ψ)
+               KsMat      = zeros(N_Ψ)
+               KsMac      = zeros(N_Ψ)
 
-					Ψ_Sim = expm1.(range(log1p(Ψ_θΨobs_Min), stop=log1p(Ψ_θΨobs_Max), length=N_Se)) 
+					for iΨ = 1:N_Ψ
+						θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
+						Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
+					end # iΨ = 1:N_Se
 
-					KsMat[iZ] =hydro.Ks[iZ] * min(max((hydro.θsMacMat[iZ] - hydro.θr[iZ]) / (hydro.θs[iZ] - hydro.θr[iZ]), 0.0), 1.0)
-
-					θ_θΨobs_Max = hydro.Φ[iZ]
-
-					# Simulated 
-						for iΨ = 1:N_Se
-							θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
-							Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
-						end # iΨ = 1:N_Se
-
-					# _______________________ START: Plotting _______________________
-								
-					Fig = Figure(size = (2500, 1000),  font="Sans", fontsize=16)
-
-					Title = "iZ= $(IdSelect[iZ]) " * "θ(Ψ) Nse_θΨ=" * string(round(hydroOther.Nse_θΨ[iZ], digits=2)) * "; Nse_KΨ=" * string(round(hydroOther.Nse_KΨ[iZ], digits=2)) * "; Wilmot_θΨ=" *  string(round(hydroOther.NseWilmot_θΨ[iZ],digits=2)) * "; Wilmot_KΨ=" * string(round(hydroOther.NseWilmot_KΨ[iZ], digits=2))
-					
-					#  == Plot_θ_Ψ  ==
-						Axis1 = Axis(Fig[1,1], title=Title, titlesize=24, xlabel="ln(1 + Ψ) [kPa]", ylabel="θ [mm³ mm⁻³]", xlabelsize=10, backgroundcolor=:white)
-
-						xlims!(Axis1, log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Min), log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Max ))
-						ylims!( Axis1, 0.0, max(hydro.Φ[iZ], maximum(θ_θΨobs[iZ,1:N_θΨobs[iZ]])) )
-
-						Axis1.xticks = (log1p.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]), string.( floor.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]], digits=1)))
-
-						Fig_θΨobs = scatter!(Fig[1,1], log1p.(cst.Mm_2_kPa .* Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]), Float64.(θ_θΨobs[iZ,1:N_θΨobs[iZ]]), color=:red, markersize=25, marker = '■')
-
-						Fig_θΨsim = lines!(Fig[1,1], log1p.(cst.Mm_2_kPa .* Ψ_Sim[1:N_Se]), θ_Sim[1:N_Se], color=:blue, linewidth=3)
-
-						lines!(Fig[1,1], [Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), 0), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
-
-						lines!(Fig[1,1], [Point(log1p(0.0), hydro.θsMacMat[iZ]), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
-				
-						Fig_TotalPorosity = scatter!(Fig[1,1], [log1p.(cst.Mm_2_kPa .* 0.0)], [hydro.Φ[iZ]], color=:green, markersize=25, marker ='●')
-
-					# == Plot_K_Ψ  ==
-					# If Ks is not computed it is computed from Ks_Model
-
-						Axis2 = Axis(Fig[1,2], title="K(Ψ)", titlesize=24, xlabel = "ln(1 + Ψ) [kPa]", ylabel = "ln (1 + K (Ψ)) [mm h⁻¹]")
-
-						xlims!(Axis2, log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Min), log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Max))
-
-						ylims!(Axis2, 0.0, log1p(hydro.Ks[iZ]*cst.MmS_2_MmH))
-
-						Axis2.xticks = (log1p.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]), string.(floor.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]], digits=1)))
-						Yticks = 1:1:6
-						Axis2.yticks = (Yticks,string.(Yticks))
-
-						if option.data.Kθ
-							Fig_Kθobs = scatter!(Fig[1,2], log1p.(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]].*cst.Mm_2_kPa), log1p.(K_KΨobs[iZ,1:N_KΨobs[iZ]].*cst.MmS_2_MmH), color=:red, markersize=25, marker = '■')
-						end
-
-						Fig_Kθsim = lines!(Fig[1,2], log1p.(Ψ_Sim[1:N_Se].*cst.Mm_2_kPa), log1p.(Kunsat_Sim[1:N_Se] .* cst.MmS_2_MmH), color=:blue, linewidth=3)
-
-						Fig_Ks = scatter!(Fig[1,2], [log1p.(cst.Mm_2_kPa .* 0.0)], [log1p(hydro.Ks[iZ] * cst.MmS_2_MmH)], color=:green, markersize=25, marker ='●')
-
-						lines!(Fig[1,2], [ Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), 0) , Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), log1p(KsMat[iZ]* cst.MmS_2_MmH))], color=:brown, linewidth=3)
-
-						lines!(Fig[1,2], [Point(log1p(0.0), log1p(KsMat[iZ] * cst.MmS_2_MmH)), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), log1p.(KsMat[iZ]* cst.MmS_2_MmH))], color=:brown, linewidth=3)
-						
-
-					# TAGGING
-						if option.data.Kθ
-							Leg = Fig[1, end+1] = Legend(Fig, [Fig_θΨobs, Fig_θΨsim, Fig_TotalPorosity, Fig_Kθobs, Fig_Kθsim, Fig_Ks], ["θobs(Ψ)", "θsim(Ψ)", "Φ", "Kobs(Ψ)", "Ksim(Ψ)", "Ksₛᵢₘ"])
-						else
-							Leg = Fig[1, end+1] = Legend(Fig, [Fig_θΨobs, Fig_θΨsim, Fig_TotalPorosity, Fig_Kθsim, Fig_Ks], ["θobs(Ψ)", "θsim(Ψ)", "Φ", "Ksim(Ψ)", "Ksₛᵢₘ"])
-						end
-
-					Fig[2, 1:2] = Leg
-					trim!(Fig.layout)
-					Leg.orientation = :horizontal
-					Leg.tellheight = true
-					
-					Path = path.plotSoilwater.Plot_θΨK * "Lab_ThetaH_" * string(path.option.ModelName) * "_" * string(IdSelect[iZ]) * ".svg" 
-					save(Path, Fig)
+					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
 	
-					# Displaying figure in VScode
-					if option.general.PlotVscode
+					KsMac[iZ], KsMat[iZ]                    = kunsat.kg.KS_MATMAC_ΨmacMat(hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.θr[iZ], hydro.Ψm[iZ], hydro.σ[iZ], hydro.ΨmMac[iZ], hydro.σMac[iZ], hydro.Ks[iZ], Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  "ΨmacMat")
+
+				# ================================================================
+				# Plotting parameters
+					ColourOption_No    = 1
+					Linewidth          = 2
+					height             = 200
+					labelsize          = 15
+					textcolor          = :blue
+					textsize           = 20
+					titlecolor         = :navyblue
+					titlesize          = 18.0
+					width              = height * 3.0
+					xgridstyle         = :dash
+					xgridvisible       = true
+					xlabelSize         = 15
+					xlabelpadding      = 5
+					xminortickalign    = 1.0
+					xminorticksvisible = true
+					xtickalign         = 0.9 # 0 is inside and 1 is outside
+					xticklabelrotation = π / 4.0
+					xticksize          = 10
+					xticksmirrored     = false
+					xtickwidt          = 0.5
+					xtrimspine         = false
+					ygridstyle         = :dash
+					ygridvisible       = false
+					ylabelpadding      = xlabelpadding
+					ylabelsize         = xlabelSize
+					yminortickalign    = xminortickalign
+					yminorticksvisible = true
+					ytickalign         = xtickalign
+					yticksize          = xticksize
+					yticksmirrored     = false
+					ytickwidt          = xtickwidt
+					ytrimspine         = false
+
+					Markersize = 12
+
+					ColourOption = [:glasbey_hv_n256,:seaborn_bright,:seaborn_colorblind,:seaborn_dark,:seaborn_deep,:tab10,:tableau_10,:tol_bright]
+
+					Colormap = cgrad(colorschemes[ColourOption[ColourOption_No]], size(colorschemes[ColourOption[ColourOption_No]]), categorical=true)
+
+					Ψticks = [0, 50, 100, 500, 1000,5000,100_00, 500_00, 1000_00, 1500_00] # mm
+
+						Ψ_Log = Array{Float64}(undef, N_Ψ)
+						for iZ=1:N_Ψ
+							Ψ_Log[iZ] = log1p(Ψ_Sim[iZ])
+						end
+
+				# Starting to plot	
+					CairoMakie.activate!(type="svg", pt_per_unit=1)
+					Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
+
+					Title = "Id = $(Int64(IdSelect[iZ])); No = $iZ"
+
+					Axis_θψ = Axis(Fig[1, 1], xlabel= L"$ψ$ [kPa]", ylabel=L"$\theta(\psi)$ [L³ L⁻³]", title=Title ,  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")
+
+						Axis_θψ.xticks = (log1p.(Ψticks), string.(cst.Mm_2_kPa .* Ψticks))
+
+						hidexdecorations!(Axis_θψ, ticks=false, grid=false)
+
+							lines!(Axis_θψ, Ψ_Log, θ_Sim, linewidth=Linewidth, color=:darkcyan, label=L"\theta(\psi)_{sim}")
+							scatter!(Fig[1,1], log1p.(Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]), Float64.(θ_θΨobs[iZ,1:N_θΨobs[iZ]]), color=:red, markersize=Markersize, marker = '●', label=L"\theta(\psi)_{obs}")
+							lines!(Axis_θψ, [Point(log1p(hydro.ΨmacMat[iZ]),0), Point(log1p(hydro.ΨmacMat[iZ]), hydro.θs[iZ])], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+							lines!(Axis_θψ, [Point(log1p(0), hydro.θsMacMat[iZ]), Point(log1p(hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+							lines!(Axis_θψ, [Point(log1p(0), hydro.θs[iZ]), Point(log1p(hydro.ΨmacMat[iZ]), hydro.θs[iZ])], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+							scatter!(Axis_θψ, [log1p.(cst.Mm_2_kPa .* 0.0)], [hydro.Φ[iZ]], color=:green, markersize=Markersize*1.2, marker =:diamond, label=L"Φ_{obs}")
+
+							text!(log1p(hydro.ΨmacMat[iZ]), 0, text =L"ψ_{macMat}", align=(:left,:bottom), rotation = π/2,  color=textcolor, fontsize=textsize)
+							text!(log1p(0.0), hydro.θsMacMat[iZ], text =L"θ_{sMacMat}", align=(:left,:top),  color=textcolor, fontsize=textsize)
+
+							Legend(Fig[1,2], Axis_θψ, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
+		
+
+					Axis_Kunsat = Axis(Fig[2, 1], xlabel= L"$ψ$ [kPa]", ylabel=L"$K(\psi)$ [mm h ⁻¹]", title=" " ,  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign, titlefont = "CMU Serif")
+
+						Axis_Kunsat.xticks = (log1p.(Ψticks), string.(cst.Mm_2_kPa .* Ψticks))
+
+						lines!(Axis_Kunsat, Ψ_Log, (Kunsat_Sim.*cst.MmS_2_MmH), linewidth=Linewidth, color=Colormap[ColourOption_No], label=L"K(\psi)_{sim}")
+						lines!(Axis_Kunsat,[Point(0.0, (cst.MmS_2_MmH * hydro.Ks[iZ]) ), Point(log1p(hydro.ΨmacMat[iZ]), (cst.MmS_2_MmH * hydro.Ks[iZ]))], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+						lines!(Axis_Kunsat,[Point(log1p(hydro.ΨmacMat[iZ]),log1p(0.0)), Point(log1p(hydro.ΨmacMat[iZ]), (cst.MmS_2_MmH * hydro.Ks[iZ]))], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
+
+						lines!(Axis_Kunsat,[Point(log1p(0.0), cst.MmS_2_MmH*KsMat[iZ] ), Point(log1p(hydro.ΨmacMat[iZ]), cst.MmS_2_MmH*KsMat[iZ])], color=:navy, linewidth=Linewidth/2.0, linestyle=:dash)
+
+						text!(log1p(hydro.ΨmacMat[iZ]), 0, text =L"ψ_{macMat}", align=(:left,:bottom), rotation = π/2,  color=textcolor, fontsize=textsize)
+
+						text!(log1p(0), cst.MmS_2_MmH*KsMat[iZ], text =L"K_{sMacMat}", align=(:left,:top), color=textcolor, fontsize=textsize)
+						
+						if option.data.Kθ
+							scatter!(Axis_Kunsat, log1p.(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]), K_KΨobs[iZ,1:N_KΨobs[iZ]].*cst.MmS_2_MmH, color=:firebrick, markersize=Markersize, marker='●',  label=L"K(\psi)_{obs}")
+						end
+
+						scatter!(Axis_Kunsat, log1p.(0.0), cst.MmS_2_MmH * hydro.Ks[iZ], color=:aquamarine4, markersize=Markersize*1.2, marker=:diamond, label=L"K_{s}")
+
+						Legend(Fig[2,2], Axis_Kunsat, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
+
+					# General
+						resize_to_layout!(Fig)
+						trim!(Fig.layout)
+						colgap!(Fig.layout, 10)
+						rowgap!(Fig.layout, 10)
+
+						Path = path.plotSoilwater.Plot_θΨK * "Lab_ThetaH_" * string(path.option.ModelName) * "_" * string(IdSelect[iZ]) * ".svg" 
+						save(Path, Fig)
 						display(Fig)
-					end
+
+
+			end # iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
+			
+		return nothing
+	end  # function: HYDROPARAM
+	# ------------------------------------------------------------------
+
+
+
+
+
+		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		# #		FUNCTION : HYDROPARAM
+		# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		# 	function HYDROPARAM0(hydro, hydroOther, IdSelect, K_KΨobs, NiZ, N_KΨobs, N_θΨobs, optim, option, param, path, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs; N_Se=1000)
+		# 		println("  ==  START: Plotting HydroParam  ==")
+
+		# 		# ===================== DATA =====================
+      #       θ_Sim      = fill(0.0,N_Se)
+      #       Kunsat_Sim = fill(0.0,N_Se)
+      #       KsMat      = fill(0.0, param.globalparam.N_iZ_Plot_End)
+
+		# 		Ψ_θΨobs_Min = 0.0
+		# 		for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
+
+		# 			Ψ_θΨobs_Max = maximum(Ψ_θΨobs[iZ,N_θΨobs[iZ]]) + 100000.0
+
+		# 			Ψ_Sim = expm1.(range(log1p(Ψ_θΨobs_Min), stop=log1p(Ψ_θΨobs_Max), length=N_Se)) 
+
+		# 			KsMat[iZ] =hydro.Ks[iZ] * min(max((hydro.θsMacMat[iZ] - hydro.θr[iZ]) / (hydro.θs[iZ] - hydro.θr[iZ]), 0.0), 1.0)
+
+		# 			θ_θΨobs_Max = hydro.Φ[iZ]
+
+		# 			# Simulated 
+		# 				for iΨ = 1:N_Se
+		# 					θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
+		# 					Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
+		# 				end # iΨ = 1:N_Se
+
+		# 			# _______________________ START: Plotting _______________________
+								
+		# 			Fig = Figure(size = (2500, 1000),  font="Sans", fontsize=16)
+
+		# 			Title = "iZ= $(IdSelect[iZ]) " * "θ(Ψ) Nse_θΨ=" * string(round(hydroOther.Nse_θΨ[iZ], digits=2)) * "; Nse_KΨ=" * string(round(hydroOther.Nse_KΨ[iZ], digits=2)) * "; Wilmot_θΨ=" *  string(round(hydroOther.NseWilmot_θΨ[iZ],digits=2)) * "; Wilmot_KΨ=" * string(round(hydroOther.NseWilmot_KΨ[iZ], digits=2))
+					
+		# 			#  == Plot_θ_Ψ  ==
+		# 				Axis1 = Axis(Fig[1,1], title=Title, titlesize=24, xlabel="ln(1 + Ψ) [kPa]", ylabel="θ [mm³ mm⁻³]", xlabelsize=10, backgroundcolor=:white)
+
+		# 				xlims!(Axis1, log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Min), log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Max ))
+		# 				ylims!( Axis1, 0.0, max(hydro.Φ[iZ], maximum(θ_θΨobs[iZ,1:N_θΨobs[iZ]])) )
+
+		# 				Axis1.xticks = (log1p.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]), string.( floor.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]], digits=1)))
+
+		# 				Fig_θΨobs = scatter!(Fig[1,1], log1p.(cst.Mm_2_kPa .* Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]), Float64.(θ_θΨobs[iZ,1:N_θΨobs[iZ]]), color=:red, markersize=25, marker = '■')
+
+		# 				Fig_θΨsim = lines!(Fig[1,1], log1p.(cst.Mm_2_kPa .* Ψ_Sim[1:N_Se]), θ_Sim[1:N_Se], color=:blue, linewidth=3)
+
+		# 				lines!(Fig[1,1], [Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), 0), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
+
+		# 				lines!(Fig[1,1], [Point(log1p(0.0), hydro.θsMacMat[iZ]), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
 				
-				end # for iZ
+		# 				Fig_TotalPorosity = scatter!(Fig[1,1], [log1p.(cst.Mm_2_kPa .* 0.0)], [hydro.Φ[iZ]], color=:green, markersize=25, marker ='●')
+
+		# 			# == Plot_K_Ψ  ==
+		# 			# If Ks is not computed it is computed from Ks_Model
+
+		# 				Axis2 = Axis(Fig[1,2], title="K(Ψ)", titlesize=24, xlabel = "ln(1 + Ψ) [kPa]", ylabel = "ln (1 + K (Ψ)) [mm h⁻¹]")
+
+		# 				xlims!(Axis2, log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Min), log1p.(cst.Mm_2_kPa * Ψ_θΨobs_Max))
+
+		# 				ylims!(Axis2, 0.0, log1p(hydro.Ks[iZ]*cst.MmS_2_MmH))
+
+		# 				Axis2.xticks = (log1p.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]]), string.(floor.(cst.Mm_2_kPa * Ψ_θΨobs[iZ,1:N_θΨobs[iZ]], digits=1)))
+		# 				Yticks = 1:1:6
+		# 				Axis2.yticks = (Yticks,string.(Yticks))
+
+		# 				if option.data.Kθ
+		# 					Fig_Kθobs = scatter!(Fig[1,2], log1p.(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]].*cst.Mm_2_kPa), log1p.(K_KΨobs[iZ,1:N_KΨobs[iZ]].*cst.MmS_2_MmH), color=:red, markersize=25, marker = '■')
+		# 				end
+
+		# 				Fig_Kθsim = lines!(Fig[1,2], log1p.(Ψ_Sim[1:N_Se].*cst.Mm_2_kPa), log1p.(Kunsat_Sim[1:N_Se] .* cst.MmS_2_MmH), color=:blue, linewidth=3)
+
+		# 				Fig_Ks = scatter!(Fig[1,2], [log1p.(cst.Mm_2_kPa .* 0.0)], [log1p(hydro.Ks[iZ] * cst.MmS_2_MmH)], color=:green, markersize=25, marker ='●')
+
+		# 				lines!(Fig[1,2], [ Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), 0) , Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), log1p(KsMat[iZ]* cst.MmS_2_MmH))], color=:brown, linewidth=3)
+
+		# 				lines!(Fig[1,2], [Point(log1p(0.0), log1p(KsMat[iZ] * cst.MmS_2_MmH)), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), log1p.(KsMat[iZ]* cst.MmS_2_MmH))], color=:brown, linewidth=3)
+
+		# 			# TAGGING
+		# 				if option.data.Kθ
+		# 					Leg = Fig[1, end+1] = Legend(Fig, [Fig_θΨobs, Fig_θΨsim, Fig_TotalPorosity, Fig_Kθobs, Fig_Kθsim, Fig_Ks], ["θobs(Ψ)", "θsim(Ψ)", "Φ", "Kobs(Ψ)", "Ksim(Ψ)", "Ksₛᵢₘ"])
+		# 				else
+		# 					Leg = Fig[1, end+1] = Legend(Fig, [Fig_θΨobs, Fig_θΨsim, Fig_TotalPorosity, Fig_Kθsim, Fig_Ks], ["θobs(Ψ)", "θsim(Ψ)", "Φ", "Ksim(Ψ)", "Ksₛᵢₘ"])
+		# 				end
+
+		# 			Fig[2, 1:2] = Leg
+		# 			trim!(Fig.layout)
+		# 			Leg.orientation = :horizontal
+		# 			Leg.tellheight = true
+					
+		# 			Path = path.plotSoilwater.Plot_θΨK * "Lab_ThetaH_" * string(path.option.ModelName) * "_" * string(IdSelect[iZ]) * ".svg" 
+		# 			save(Path, Fig)
+	
+		# 			# Displaying figure in VScode
+		# 			if option.general.PlotVscode
+		# 				display(Fig)
+		# 			end
 				
-			# ------------------------END: Plotting---------------------------  
-			println("  ==  END: Plotting HydroParam  == \n")		
-			return nothing
-			end  # function: HYDROPARAM
+		# 		end # for iZ
+				
+			# # ------------------------END: Plotting---------------------------  
+			# println("  ==  END: Plotting HydroParam  == \n")		
+			# return nothing
+			# end  # function: HYDROPARAM
 	
 	end  # module lab
 	# ............................................................

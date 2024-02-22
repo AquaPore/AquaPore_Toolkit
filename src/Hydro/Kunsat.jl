@@ -142,8 +142,8 @@ module kunsat
 			function TORTUOSITY(; σ, τa, τaMac, τb, τbMac, τc, τcMac)
             Ta    = τa
             TaMac = τaMac
-            Tb    = τb 
-            TbMac = τbMac * τb
+            Tb    = τb
+				TbMac = τbMac * τb
             Tc    = τc
             TcMac = τcMac
 

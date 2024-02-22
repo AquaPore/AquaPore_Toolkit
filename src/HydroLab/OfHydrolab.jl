@@ -14,7 +14,7 @@ module ofHydrolab
 
 					KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.θr[iZ], hydro.Ψm[iZ], hydro.σ[iZ], hydro.ΨmMac[iZ], hydro.σMac[iZ], hydro.Ks[iZ], Tb, Tc, TbMac, TcMac, optionₘ.KosugiModel_KΨ⍰)
 
-					Macro_Perc = KsMac / (KsMac + KsMat)
+					Macro_Perc = KsMac / hydro.Ks[iZ]
 
 					Penalty_Ks = max(Macro_Perc - Macro_Perc_Max, 0.0)
 
@@ -82,8 +82,11 @@ module ofHydrolab
 					Kunsat_Sim_Ln[iΨ] = log1p(kunsat.KUNSAT_θΨSe(optionₘ, Ψ_KΨobs[iZ,iΨ], iZ, hydro))
 				end # for iΨ = 1:N_KΨobs[iZ]
 
-				Of_Kunsat = stats.NSE_MINIMIZE(Kunsat_Obs_Ln[1:N_KΨobs[iZ]], Kunsat_Sim_Ln[1:N_KΨobs[iZ]])			
-				Of_Sample[iZ] = Wof * Of_θΨ + (1.0 - Wof) * Of_Kunsat + PENALTY_KUNSAT(hydro, iZ, optionₘ)
+				Of_Kunsat = stats.NSE_MINIMIZE(Kunsat_Obs_Ln[1:N_KΨobs[iZ]], Kunsat_Sim_Ln[1:N_KΨobs[iZ]])
+
+				# Of_Sample[iZ] = Wof * Of_θΨ + (1.0 - Wof) * Of_Kunsat + PENALTY_KUNSAT(hydro, iZ, optionₘ)
+
+				Of_Sample[iZ] = Wof * Of_θΨ + (1.0 - Wof) * Of_Kunsat
 
 			else		
 				Of_Sample[iZ] = Of_θΨ
@@ -91,8 +94,7 @@ module ofHydrolab
 			end #  "Ks" ∈ optim.ParamOpt
 		return Of_Sample, Of_θΨ, Of_Kunsat
 		end # function OF_WRC_KUNSAT
-
-
+	# ------------------------------------------------------------------
 
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,9 +107,6 @@ module ofHydrolab
 			end
 		return Of_AllSoil = Of_AllSoil / NiZ
 		end  # function: OF_ALL
-	# ------------------------------------------------------------------
-
-
 	# ------------------------------------------------------------------
 
 

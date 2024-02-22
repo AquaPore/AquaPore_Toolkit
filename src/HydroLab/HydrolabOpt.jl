@@ -42,10 +42,10 @@ module hydrolabOpt
 			end
 
 		# OVERALL STATISTICS OF THE OPTIMIZATION
-         Nse_θΨ_Aver       = Statistics.mean(hydroOther.Nse_θΨ[1:NiZ])
+         Nse_θΨ_Aver       = Statistics.mean(max.(hydroOther.Nse_θΨ[1:NiZ],0.0))
          Nse_KΨ_Aver       = Statistics.mean(max.(hydroOther.Nse_KΨ[1:NiZ], 0.0))
 
-         NseWilmot_θΨ_Aver = Statistics.mean(hydroOther.NseWilmot_θΨ[1:NiZ])
+         NseWilmot_θΨ_Aver = Statistics.mean(max.(hydroOther.NseWilmot_θΨ[1:NiZ], 0.0))
          NseWilmot_KΨ_Aver = Statistics.mean(max.(hydroOther.NseWilmot_KΨ[1:NiZ], 0.0))
 
          Rmse_Aver         = Statistics.mean(hydroOther.Rmse[1:NiZ])
@@ -58,10 +58,11 @@ module hydrolabOpt
 				Nse_Aver = Nse_θΨ_Aver
 			end
 
-			println("	=== === Optimizing Hydraulic parameters === ")
-			println("    		~  Nse_θΨ= $(round(Nse_θΨ_Aver,digits=3)),  NseWilmot_θΨ= $(round(NseWilmot_θΨ_Aver,digits=3)), Nse_KΨ_Aver= $(round(Nse_KΨ_Aver,digits=3)), NseWilmot_KΨ= $(round(NseWilmot_KΨ_Aver,digits=3)), Nse = $(round(Nse_Aver,digits=3))  ~")
-			println("    		~  Rmse_θΨ = $(round(Rmse_θΨ_Aver,digits=4)),  RmseLog10_KΨ = $(round(Rmse_KΨ_Aver,digits=4)), Rmse = $(round(Rmse_Aver,digits=4))  ~ \n")
-			println( "	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === ===")
+			printstyled("	=== === Optimizing Hydraulic parameters === \n", color=:green)
+			printstyled("    		~  Nse_θΨ= $(round(Nse_θΨ_Aver,digits=3)), Nse_KΨ= $(round(Nse_KΨ_Aver,digits=3)), Nse = $(round(Nse_Aver,digits=3))  ~\n", color=:cyan)
+			printstyled("    		~  NseWilmot_θΨ= $(round(NseWilmot_θΨ_Aver,digits=3)), NseWilmot_KΨ= $(round(NseWilmot_KΨ_Aver,digits=3)), NseWilmot= $(round((NseWilmot_θΨ_Aver+NseWilmot_KΨ_Aver)*0.5,digits=3)) ~\n", color=:cyan)
+			printstyled("    		~  Rmse_θΨ = $(round(Rmse_θΨ_Aver,digits=4)),  RmseLog10_KΨ = $(round(Rmse_KΨ_Aver,digits=4)), Rmse = $(round(Rmse_Aver,digits=4))  ~ \n", color=:cyan)
+			# println( "	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === ===")
 
 	return hydro, hydroOther
 	end  # function: HYPIXOPT_START
