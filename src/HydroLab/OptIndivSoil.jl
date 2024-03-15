@@ -92,7 +92,7 @@ module optIndivSoil
 
 			# ~~~~ TEST IF EXIST K(Ψ=0)  ~~~
 				if option.data.Kθ
-					if minimum(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]) <  0.01 
+					if minimum(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]) <  0.001 
 						🎏_Ks = true
 					else
 						🎏_Ks = false
@@ -108,13 +108,11 @@ module optIndivSoil
 							hydro.Ks_Max[iZ] = K_KΨobs_Max  * 1.05
 						else
 							hydro.Ks_Min[iZ] = K_KΨobs_Max * 0.75
-							hydro.Ks_Max[iZ] = K_KΨobs_Max  * 1.0
-						end
-					
-					elseif !(🎏_Ks)
+							hydro.Ks_Max[iZ] = K_KΨobs_Max  * 1.25
+						end	
+					else
 						hydro.Ks_Min[iZ] = max(hydro.Ks_Min[iZ], K_KΨobs_Max)
-						hydro.Ks_Max[iZ] = max(hydro.Ks_Max[iZ], K_KΨobs_Max + 0.0015)
-					
+						hydro.Ks_Max[iZ] = max(hydro.Ks_Max[iZ], 10.0 ^ (log10(K_KΨobs_Max) + 0.5))
 					end # "Ks" ∈ optim.ParamOpt
 
 					# Modifying the searchrange
@@ -215,11 +213,11 @@ module optIndivSoil
 
 			# COMPUTING MACROPORE %
 				if optionₘ.HydroModel⍰ == "Kosugi"
-					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
+					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ],  σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
 
-					KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.θr[iZ], hydro.Ψm[iZ], hydro.σ[iZ], hydro.ΨmMac[iZ], hydro.σMac[iZ], hydro.Ks[iZ], Tb, Tc, TbMac, TcMac, optionₘ.KosugiModel_KΨ⍰)
+					KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(optionₘ.KosugiModel_θΨ⍰, hydro.Ks[iZ], optionₘ.KosugiModel_KΨ⍰, Tb, TbMac, Tc, TcMac, hydro.θr[iZ], hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.σ[iZ], hydro.σMac[iZ], hydro.Ψm[iZ], hydro.ΨmacMat[iZ], hydro.ΨmMac[iZ])
 
-					hydroOther.Macro_Perc[iZ] = KsMac / (KsMac + KsMat)
+					hydroOther.Macro_Perc[iZ] = KsMac / hydro.Ks[iZ]
 				end # optionₘ.HydroModel⍰ == "Kosugi"
 
 

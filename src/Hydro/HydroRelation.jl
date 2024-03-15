@@ -41,7 +41,8 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacM
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac=2)
 			# return σMac = log1p(ΨmacMat) / (2.0 * Pσ_Mac)
-			return σMac = log(√(ΨmacMat + 1.0)) / Pσ_Mac
+			# return σMac = log(√(ΨmacMat + 1.0)) / Pσ_Mac
+			return σMac = log(√(ΨmacMat)) / Pσ_Mac
 		end  # function: FUNC_ΨmacMat_2_σMac
 	# ------------------------------------------------------------------
 
@@ -57,7 +58,8 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacM
 				# if Option_Mode
 				# 	return ΨmMac = √(ΨmacMat + 1.0) * exp(σMac ^ 2.0)
 				# else 
-					return ΨmMac = √(ΨmacMat + 1.0)
+					# return ΨmMac = √(ΨmacMat + 1.0)
+					return ΨmMac = √ΨmacMat
 				# end			
 		end  # function: FUNC_ΨmacMat_2_ΨmMac
 	# ------------------------------------------------------------------
@@ -72,13 +74,12 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacM
 			# else
 
 			if 🎏_Min
-				Ψm = (√ΨmacMat) * exp(σ * Pσ)
+				Ψm = √ΨmacMat * exp(σ * Pσ)
 				Ψm = min(max(Ψm, ΨmacMat), Ψm_Max)
 			else
 				Ψm = ΨmacMat * exp(σ * Pσ)
 				Ψm = min(Ψm, Ψm_Max)
 			end
-
 		return Ψm
 		end # function: FUNC_σ_2_Ψm
 	# ----------------------------------------------------------------
@@ -87,7 +88,7 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacM
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNCTION_σ_2_Ψm_SOFTWARE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0, Pσ_Mac=2)
+		function FUNCTION_σ_2_Ψm_SOFTWARE(hydro₂, iZ, option₂, param; Pσ=3.0, Pσ_Mac=2.0)
 
 			if option₂.ΨmacMat_2_σMac_ΨmMac
 				# ΨmacMat₁ = FUNC_θsMacMatη_2_ΨmacMat(θs=hydro₂.θs[iZ], θsMacMat=hydro₂.θsMacMat[iZ], θr=hydro₂.θr[iZ], ΨmacMat_Max=hydro₂.ΨmacMat[iZ])

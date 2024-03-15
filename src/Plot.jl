@@ -11,7 +11,7 @@ module lab
 	using CairoMakie, ColorSchemes
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : name
+	#		FUNCTION : HYDROPARAM
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function HYDROPARAM(hydro, hydroOther, IdSelect, K_KΨobs, NiZ, N_KΨobs, N_θΨobs, optim, option, param, path, θ_θΨobs, Ψ_KΨobs, Ψ_θΨobs; N_Se=1000)
 
@@ -35,9 +35,9 @@ module lab
 						Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 					end # iΨ = 1:N_Se
 
-					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
+					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], σMac_Max=hydro.σMac_Max[iZ], σMac_Min=hydro.σMac_Min[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
 	
-					KsMac[iZ], KsMat[iZ]                    = kunsat.kg.KS_MATMAC_ΨmacMat(hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.θr[iZ], hydro.Ψm[iZ], hydro.σ[iZ], hydro.ΨmMac[iZ], hydro.σMac[iZ], hydro.Ks[iZ], Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  "ΨmacMat")
+					KsMac[iZ], KsMat[iZ]                    = kunsat.kg.KS_MATMAC_ΨmacMat(option.hydro.KosugiModel_θΨ⍰, hydro.Ks[iZ], option.hydro.KosugiModel_KΨ⍰, Tb, TbMac, Tc, TcMac, hydro.θr[iZ], hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.σ[iZ], hydro.σMac[iZ], hydro.Ψm[iZ], hydro.ΨmacMat[iZ], hydro.ΨmMac[iZ])
 
 				# ================================================================
 				# Plotting parameters

@@ -124,7 +124,7 @@ module stats
 			Obs_Mean = Statistics.mean(Obs[1:N])
 			Obs_Mean_Err = Statistics.sum(abs.(Obs_Mean .- Obs[1:N]) .^ Power)
 
-			if Obs_Mean_Err < 0.000000000000001   
+			if Obs_Mean_Err < 0.00000000001   
 				Obs_Mean_Err = 1.0
 			end
 			
@@ -132,7 +132,7 @@ module stats
 			for i = 1:N
 				Err += abs(Sim[i] - Obs[i]) ^ Power
 			end
-		return Err / Obs_Mean_Err 
+		return max(min(Err / Obs_Mean_Err, 1.0), 0.0) 
 		end  # function: NSE_MINIMIZE
 	#.................................................................
 
@@ -196,7 +196,7 @@ module stats
 				for iΨ = 1:N_Data[iZ]
 					KΨsim[iΨ] = kunsat.KUNSAT_θΨSe(optionₘ, Ψobs[iZ,iΨ], iZ, hydro)
 				end
-				Nse_KΨ[iZ] = 1.0 - NSE_MINIMIZE(log.(Kobs[iZ,1:N_Data[iZ]]), log.(KΨsim[1:N_Data[iZ]]))	
+				Nse_KΨ[iZ] = 1.0 - NSE_MINIMIZE(log10.(Kobs[iZ,1:N_Data[iZ]]), log10.(KΨsim[1:N_Data[iZ]]))	
 			end
 
 			# Cumulating the objective function to get the overview

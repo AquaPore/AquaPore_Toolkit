@@ -2,27 +2,26 @@ module ofHydrolab
 	import..stats, ..wrc, ..kunsat
 	export  OF_WRC_KUNSAT
 
-
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : PENALTY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function PENALTY_KUNSAT(hydro, iZ, optionₘ; Macro_Perc_Max=0.4)
+		# function PENALTY_KUNSAT(hydro, iZ, optionₘ; Macro_Perc_Max=0.4)
 
-			if optionₘ.HydroModel⍰ =="Kosugi" && optionₘ.KosugiModel_KΨ⍰=="ΨmacMat"
-				# COMPUTING MACROPORE %
-					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
+		# 	if optionₘ.HydroModel⍰ =="Kosugi" && optionₘ.KosugiModel_KΨ⍰=="ΨmacMat"
+		# 		# COMPUTING MACROPORE %
+		# 			Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
 
-					KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.θr[iZ], hydro.Ψm[iZ], hydro.σ[iZ], hydro.ΨmMac[iZ], hydro.σMac[iZ], hydro.Ks[iZ], Tb, Tc, TbMac, TcMac, optionₘ.KosugiModel_KΨ⍰)
+		# 			KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.θr[iZ], hydro.Ψm[iZ], hydro.σ[iZ], σMac=hydro.σMac[iZ],hydro.ΨmMac[iZ], hydro.σMac[iZ], hydro.Ks[iZ], Tb, Tc, TbMac, TcMac, optionₘ.KosugiModel_KΨ⍰)
 
-					Macro_Perc = KsMac / hydro.Ks[iZ]
+		# 			Macro_Perc = KsMac / hydro.Ks[iZ]
 
-					Penalty_Ks = max(Macro_Perc - Macro_Perc_Max, 0.0)
+		# 			Penalty_Ks = max(Macro_Perc - Macro_Perc_Max, 0.0)
 
-					return Penalty_Ks
-			else
-					return Penalty_Ks = 0.0
-			end
-		end  # function: PENALTY
+		# 			return Penalty_Ks
+		# 	else
+		# 			return Penalty_Ks = 0.0
+		# 	end
+		# end  # function: PENALTY
 	#--------------------------------------------------------------
 
 
@@ -48,7 +47,6 @@ module ofHydrolab
 	#		FUNCTION : OF_WRC_KUNSAT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 		function OF_WRC_KUNSAT(hydro, iZ::Int64, N_θΨobs::Vector{Int64}, Of_Sample::Vector{Float64}, optim, optionₘ, θ_θΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64}; K_KΨobs=[0.0 0.0; 0.0 0.0]::Matrix{Float64}, N_KΨobs=[0]::Vector{Int64}, Ψ_KΨobs=[0.0 0.0; 0.0 0.0]::Matrix{Float64}, Wof_Min=0.1::Float64, Wof_Max=0.9::Float64)
-
 			
 			# === OF θΨ ====
 				θ_Obs = fill(0.0::Float64, N_θΨobs[iZ])
@@ -77,14 +75,12 @@ module ofHydrolab
 				Kunsat_Sim_Ln = fill(0.0::Float64, N_KΨobs[iZ])
 
 				for iΨ = 1:N_KΨobs[iZ]
-					Kunsat_Obs_Ln[iΨ] = log1p(K_KΨobs[iZ,iΨ])
+					Kunsat_Obs_Ln[iΨ] = log10(K_KΨobs[iZ,iΨ])
 						
-					Kunsat_Sim_Ln[iΨ] = log1p(kunsat.KUNSAT_θΨSe(optionₘ, Ψ_KΨobs[iZ,iΨ], iZ, hydro))
+					Kunsat_Sim_Ln[iΨ] = log10(kunsat.KUNSAT_θΨSe(optionₘ, Ψ_KΨobs[iZ,iΨ], iZ, hydro))
 				end # for iΨ = 1:N_KΨobs[iZ]
 
 				Of_Kunsat = stats.NSE_MINIMIZE(Kunsat_Obs_Ln[1:N_KΨobs[iZ]], Kunsat_Sim_Ln[1:N_KΨobs[iZ]])
-
-				# Of_Sample[iZ] = Wof * Of_θΨ + (1.0 - Wof) * Of_Kunsat + PENALTY_KUNSAT(hydro, iZ, optionₘ)
 
 				Of_Sample[iZ] = Wof * Of_θΨ + (1.0 - Wof) * Of_Kunsat
 
@@ -103,7 +99,7 @@ module ofHydrolab
 		function OF_ALLSOILS(NiZ::Int64, Of_Sample::Vector{Float64})
 			Of_AllSoil = 0.0::Float64
 			for iZ=1:NiZ		
-				Of_AllSoil += round(Of_Sample[iZ], digits=4)
+				Of_AllSoil += round(max(min(Of_Sample[iZ], 1.0), 0.0), digits=4)
 			end
 		return Of_AllSoil = Of_AllSoil / NiZ
 		end  # function: OF_ALL

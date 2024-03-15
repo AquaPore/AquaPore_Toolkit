@@ -6,7 +6,7 @@ module θψ_2_KsψModel
 	import QuadGK, Polynomials
 	import SpecialFunctions: erfc, erfcinv
 	
-	export KSΨMODEL_START, KsΨMODEL_NOINTEGRAL
+	export KSΨMODEL_START, KsΨMODEL_NOINTEGRAL, TORTUOSITY_CLAY
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSΨMODEL_START

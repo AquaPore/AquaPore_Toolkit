@@ -29,6 +29,8 @@ module pumiceManuscript
 		function HYDRO_MODELS(;θs, θsMacMat_η, θr=0.0, σ, Ks, ΨmacMat, τa=0.5, τb, τc, τaMac=0.5, τbMac, τcMac, KosugiModel_θΨ⍰, Option_KosugiModel_KΨ⍰, Pσ=3, Pσ_Mac=2)
 
 			θsMacMat   = (θs - θr) * θsMacMat_η + θr
+			σ_Min=0.7
+			σ_Max=4.0
 
 			# Deriving macropore hydraulic parameters from ΨmacMat
 				σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat=ΨmacMat, Pσ_Mac=2)
@@ -72,9 +74,9 @@ module pumiceManuscript
 				
 				θDual_Max[iΨ] = wrc.kg.Ψ_2_θ(;Ψ₁=Ψ[iΨ], θs, θsMacMat, θr, Ψm=Ψm_Max, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰)
 
-				Kunsat_Min[iΨ] = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, Ks=Ks, τa=τa, τb=τb, τc=τc, τaMac=τaMac, τbMac=τbMac, τcMac=τcMac, Option_KosugiModel_KΨ⍰, KosugiModel_θΨ⍰)
+				Kunsat_Min[iΨ] = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Min, σ=σ, θsMacMat=θsMacMat, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, Ks=Ks, τa=τa, τb=τb, τc=τc, τaMac=τaMac, τbMac=τbMac, τcMac=τcMac, σ_Min=σ_Min, σ_Max=σ_Max, Option_KosugiModel_KΨ⍰, KosugiModel_θΨ⍰)
 
-				Kunsat_Max[iΨ] = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, Ks=Ks, τa=τa, τb=τb, τc=τc, τaMac=τaMac, τbMac=τbMac, τcMac=τcMac, Option_KosugiModel_KΨ⍰, KosugiModel_θΨ⍰)
+				Kunsat_Max[iΨ] = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ[iΨ], θs=θs, θr=θr, Ψm=Ψm_Max, σ=σ, θsMacMat=θsMacMat,ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, Ks=Ks, τa=τa, τb=τb, τc=τc, τaMac=τaMac, τbMac=τbMac, τcMac=τcMac, σ_Min=σ_Min, σ_Max=σ_Max, Option_KosugiModel_KΨ⍰, KosugiModel_θΨ⍰)
 			end
 			
 		return Ks, KsMac_Max, KsMac_Max, KsMac_Min, KsMac_Min, KsMat_Max, KsMat_Min, Kunsat_Max, Kunsat_Min, N, Pσ_Mac, θDual_Max, θDual_Min, θs, θsMacMat, σ, Ψ, ΨmacMat
@@ -284,12 +286,14 @@ module pumiceManuscript
 		function θψ_KUNSAT_MAT_η(;Ψ₁=Ψ₁, θs=1.0, θsMacMat=0.8, θr=0.0, σ, ΨmacMat, τb, τbMac, Ks=1.0, τa=0.5, τaMac=0.5, τc=1.0, τcMac=2.0)
 			Ψm = RELATIONSHIPS_MAT(ΨmacMat, σ)
 			σMac, ΨmMac = RELATIONSHIPS_MAC(ΨmacMat)
+			σ_Min=0.7
+			σ_Max=4.0
 
-         Kunsat_Mat_Norm                 = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τaMac, τbMac, τcMac, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
+         Kunsat_Mat_Norm                 = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τaMac, τbMac, τcMac, σ_Min, σ_Max, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
 
-         Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ, τa, τaMac, τb, τbMac, τc, τcMac)
+         Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ, σ_Max, σ_Min, σMac, τa, τaMac, τb, τbMac, τc, τcMac)
 	
-         KsMac, KsMat                    = kunsat.kg.KS_MATMAC_ΨmacMat(θs::Float64, θsMacMat::Float64, θr::Float64, Ψm::Float64, σ::Float64, ΨmMac::Float64, σMac::Float64, Ks::Float64, Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  "ΨmacMat")
+         KsMac, KsMat                    = kunsat.kg.KS_MATMAC_ΨmacMat("ΨmacMat", Ks::Float64, "ΨmacMat", Tb::Float64, TbMac::Float64, Tc::Float64, TcMac::Float64, θr::Float64, θs::Float64, θsMacMat::Float64, σ::Float64, σMac::Float64, Ψm::Float64, ΨmacMat::Float64, ΨmMac::Float64)
 
          θDual                       		= wrc.kg.Ψ_2_θ(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="ΨmacMat")
 		return KsMat, Kunsat_Mat_Norm, θDual
@@ -462,12 +466,6 @@ module pumiceManuscript
 		function θψ_η(;Ψ₁=Ψ₁, θs=1.0, θsMacMat=0.8, θr=0.0, σ, ΨmacMat, τb, τbMac, Ks=1.0, τa=0.5, τaMac=0.5, τc=1.0, τcMac=2.0)
 			Ψm = RELATIONSHIPS_MAT(ΨmacMat, σ)
 			σMac, ΨmMac = RELATIONSHIPS_MAC(ΨmacMat)
-
-         # Kunsat_Mat_Norm                 = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τaMac, τbMac, τcMac, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
-
-         # Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ, τa, τaMac, τb, τbMac, τc, τcMac)
-	
-         # KsMac, KsMat                    = kunsat.kg.KS_MATMAC_ΨmacMat(θs::Float64, θsMacMat::Float64, θr::Float64, Ψm::Float64, σ::Float64, ΨmMac::Float64, σMac::Float64, Ks::Float64, Tb::Float64, Tc::Float64, TbMac::Float64, TcMac::Float64,  "ΨmacMat")
 
          θDual                       		= wrc.kg.Ψ_2_θ(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="ΨmacMat")
 		return θDual, θs, θsMacMat
