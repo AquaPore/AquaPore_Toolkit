@@ -58,7 +58,7 @@ module hydrolabOpt
 				Nse_Aver = Nse_θΨ_Aver
 			end
 
-			printstyled("	=== === Optimizing Hydraulic parameters === \n", color=:green)
+			printstyled("	=== === Optimizing Hydraulic parameters  === \n", color=:green)
 			printstyled("    		~  Nse_θΨ= $(round(Nse_θΨ_Aver,digits=3)), Nse_KΨ= $(round(Nse_KΨ_Aver,digits=3)), Nse = $(round(Nse_Aver,digits=3))  ~\n", color=:cyan)
 			printstyled("    		~  NseWilmot_θΨ= $(round(NseWilmot_θΨ_Aver,digits=3)), NseWilmot_KΨ= $(round(NseWilmot_KΨ_Aver,digits=3)), NseWilmot= $(round((NseWilmot_θΨ_Aver+NseWilmot_KΨ_Aver)*0.5,digits=3)) ~\n", color=:cyan)
 			printstyled("    		~  Rmse_θΨ = $(round(Rmse_θΨ_Aver,digits=4)),  RmseLog10_KΨ = $(round(Rmse_KΨ_Aver,digits=4)), Rmse = $(round(Rmse_Aver,digits=4))  ~ \n", color=:cyan)

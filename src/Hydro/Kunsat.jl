@@ -118,7 +118,7 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			# function TORTUOSITY_CLAY(KosugiModel_θΨ⍰::String, θr::Float64, θs::Float64, θsMacMat::Float64, σ::Float64, σMac::Float64, Ψm::Float64, ΨmacMat::Float64, ΨmMac::Float64; τclay₀=0.2135, τclayₘₐₓ=14.00, τclayΔθsr=0.0011087)
 
-			function TORTUOSITY_CLAY(KosugiModel_θΨ⍰::String, θr::Float64, θs::Float64, θsMacMat::Float64, σ::Float64, σMac::Float64, Ψm::Float64, ΨmacMat::Float64, ΨmMac::Float64; τclay₀=0.14, τclayₘₐₓ=99.80, τclayΔθsr=0.34)
+			function TORTUOSITY_CLAY(KosugiModel_θΨ⍰::String, θr::Float64, θs::Float64, θsMacMat::Float64, σ::Float64, σMac::Float64, Ψm::Float64, ΨmacMat::Float64, ΨmMac::Float64, Tc; τclay₀=0.14, τclayₘₐₓ=99.80, τclayΔθsr=0.34)
 
 				Ψ_Clay = 160000.0 * (((cst.Y / 0.002) - (cst.Y / 0.5) ) / ((cst.Y / 0.002) - (cst.Y / 0.5))) ^ 2.0
 
@@ -130,7 +130,7 @@ module kunsat
 
 				ΔθsMacθr = θsMacMat - θr
 
-				ΔθsMacθrₙ =  max(ΔθsMacθr - τclayΔθsr , 0.0) / (1.0 - τclayΔθsr)
+				ΔθsMacθrₙ =  max(ΔθsMacθr - τclayΔθsr , 0.0) / (1.0 - Tc * τclayΔθsr)
 
 				Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
 
@@ -152,9 +152,9 @@ module kunsat
 					KsMac = Ks * W_Mac / (W_Mat + W_Mac)
 
 				elseif Option_KosugiModel_KΨ⍰ == "ΨmacMat_Clay"
-					Tclay = TORTUOSITY_CLAY(KosugiModel_θΨ⍰, θr, θs, θsMacMat, σ, σMac, Ψm, ΨmacMat, ΨmMac)
+					Tclay = TORTUOSITY_CLAY(KosugiModel_θΨ⍰, θr, θs, θsMacMat, σ, σMac, Ψm, ΨmacMat, ΨmMac, Tc)
 
-					W_Mat = ((θsMacMat - θr) ^ Tclay) * ( exp( ((Tb * σ) ^ 2.0) / 2.0) / (Ψm ^ Tb)) ^ Tc
+					W_Mat = ((θsMacMat - θr) ^ Tclay) * ( exp( ((Tb * σ) ^ 2.0) / 2.0) / (Ψm ^ Tb))
 
 					W_Mac = (max(θs - θsMacMat, 0.0) * exp(((TbMac * σMac) ^ 2.0) / 2.0) / (ΨmMac ^ TbMac)) ^ TcMac
 
@@ -181,18 +181,18 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : TORTUOSITY
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function TORTUOSITY(; σ, σ_Max, σ_Min, σMac, σMac_Max=1.4, σMac_Min=0.86, τa, τaMac, τb, τbMac, τc, τcMac, 🎏_σ_2_Tb=false, 🎏_σmac_2_Tb=true)
-            Ta    = τa
-            TaMac = τaMac
+			function TORTUOSITY(; σ, σ_Max, σ_Min, σMac, σMac_Max=1.4, σMac_Min=0.85, τa, τaMac, τb, τbMac, τc, τcMac, 🎏_σ_2_Tb=true, 🎏_σmac_2_Tb=false)
+            Ta    = 0.5
+            TaMac = 0.5
 				
 				if 🎏_σ_2_Tb
 					Xa  = 0.0
 					Ya  = τb
 					Xb  = 1.0
-					Yb  = 0.0
+					Yb  = 0.4
 					B   = Yb - Xb * (Yb - Ya) / (Xb - Xa)
 					σ_η = min(max((σ - σ_Min) / (σ_Max - σ_Min), 0.0), 1.0)
-					Tb  = (σ_η ^ 4.0) * (Yb - Ya) / (Xb - Xa) + B
+					Tb  = max((σ_η ^ τa) * (Yb - Ya) / (Xb - Xa) + B, 0.0)
 				else
 					Tb = τb 
 				end
@@ -203,8 +203,8 @@ module kunsat
 					Xb  = 1.0
 					Yb  = τbMac
 					B   = Yb - Xb * (Yb - Ya) / (Xb - Xa)
-					σ_η = min(max((σMac - 0.8) / (1.5 - 0.8), 0.0), 1.0)
-					TbMac  = (σ_η ^ 2.0) * (Yb - Ya) / (Xb - Xa) + B
+					σ_η = min(max((σMac - σMac_Min) / (σMac_Max - σMac_Min), 0.0), 1.0)
+					TbMac  = (σ_η ^ τaMac) * (Yb - Ya) / (Xb - Xa) + B
 				else
 					TbMac = τbMac 
 				end

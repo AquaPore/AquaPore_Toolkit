@@ -112,7 +112,7 @@ module optIndivSoil
 						end	
 					else
 						hydro.Ks_Min[iZ] = max(hydro.Ks_Min[iZ], K_KΨobs_Max)
-						hydro.Ks_Max[iZ] = max(hydro.Ks_Max[iZ], 10.0 ^ (log10(K_KΨobs_Max) + 0.5))
+						hydro.Ks_Max[iZ] = max(hydro.Ks_Max[iZ], 10.0 ^ (log10(K_KΨobs_Max) + 1.0))
 					end # "Ks" ∈ optim.ParamOpt
 
 					# Modifying the searchrange
@@ -156,7 +156,7 @@ module optIndivSoil
 			🎏_Model = :BlackBox # :Optim, :Prima, :BlackBox 
 			
 			if  🎏_Model == :BlackBox
-				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=2000)
+				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=2500)
 					function WHEN_TO_STOP_INDIV(oc; CountIndiv_NoImprovement_Max=CountIndiv_NoImprovement_Max)
 						global CountIndiv_Opt += 1
 
