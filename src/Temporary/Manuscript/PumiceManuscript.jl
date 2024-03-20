@@ -31,6 +31,7 @@ module pumiceManuscript
 			θsMacMat   = (θs - θr) * θsMacMat_η + θr
 			σ_Min=0.7
 			σ_Max=4.0
+			τₚ = 90.0
 
 			# Deriving macropore hydraulic parameters from ΨmacMat
 				σMac    = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat=ΨmacMat, Pσ_Mac=2)
@@ -46,8 +47,8 @@ module pumiceManuscript
 				# Tc= σ ^ -0.59
 				TcMac = Tc_Max * (1.0 - τcMac)
 			
-				KsMac_Min, KsMat_Min = kunsat.kg.KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm_Min, σ, ΨmMac, σMac, Ks, Tb, Tc, TbMac, TcMac, KosugiModel_θΨ⍰)
-				KsMac_Max, KsMat_Max = kunsat.kg.KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm_Max, σ, ΨmMac, σMac, Ks, Tb, Tc, TbMac, TcMac, KosugiModel_θΨ⍰)
+				KsMac_Min, KsMat_Min = kunsat.kg.KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm_Min, σ, ΨmMac, σMac, Ks, Tb, Tc, τₚ, TbMac, TcMac, KosugiModel_θΨ⍰)
+				KsMac_Max, KsMat_Max = kunsat.kg.KS_MATMAC_ΨmacMat(θs, θsMacMat, θr, Ψm_Max, σ, ΨmMac, σMac, Ks, Tb, Tc, τₚ, TbMac, TcMac, KosugiModel_θΨ⍰)
 
 			#  For every ψ
             Ψ_Min_Log = log10(0.0001)
@@ -283,17 +284,17 @@ module pumiceManuscript
 		return Ψm
 		end
 
-		function θψ_KUNSAT_MAT_η(;Ψ₁=Ψ₁, θs=1.0, θsMacMat=0.8, θr=0.0, σ, ΨmacMat, τb, τbMac, Ks=1.0, τa=0.5, τaMac=0.5, τc=1.0, τcMac=2.0)
+		function θψ_KUNSAT_MAT_η(;Ψ₁=Ψ₁, θs=0.4, θsMacMat=0.3, θr=0.0, σ, ΨmacMat, τb, τbMac, Ks=1.0, τa=0.5, τaMac=0.5, τc=1.0, τcMac=2.0, τₚ=2.0)
 			Ψm = RELATIONSHIPS_MAT(ΨmacMat, σ)
 			σMac, ΨmMac = RELATIONSHIPS_MAC(ΨmacMat)
 			σ_Min=0.7
 			σ_Max=4.0
 
-         Kunsat_Mat_Norm                 = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τaMac, τbMac, τcMac, σ_Min, σ_Max, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
+         Kunsat_Mat_Norm                 = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τₚ, τaMac, τbMac, τcMac, σ_Min, σ_Max, Option_KosugiModel_KΨ⍰="ΨmacMat", KosugiModel_θΨ⍰="ΨmacMat")
 
-         Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ, σ_Max, σ_Min, σMac, τa, τaMac, τb, τbMac, τc, τcMac)
+         Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ, σ_Max, σ_Min, σMac, τa, τaMac, τb, τbMac, τc, τₚ, τcMac)
 	
-         KsMac, KsMat                    = kunsat.kg.KS_MATMAC_ΨmacMat("ΨmacMat", Ks::Float64, "ΨmacMat", Tb::Float64, TbMac::Float64, Tc::Float64, TcMac::Float64, θr::Float64, θs::Float64, θsMacMat::Float64, σ::Float64, σMac::Float64, Ψm::Float64, ΨmacMat::Float64, ΨmMac::Float64)
+         KsMac, KsMat                    = kunsat.kg.KS_MATMAC_ΨmacMat("ΨmacMat", Ks::Float64, "ΨmacMat", Tb::Float64, TbMac::Float64, Tc::Float64, τₚ::Float64, TcMac::Float64, θr::Float64, θs::Float64, θsMacMat::Float64, σ::Float64, σMac::Float64, Ψm::Float64, ΨmacMat::Float64, ΨmMac::Float64)
 
          θDual                       		= wrc.kg.Ψ_2_θ(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="ΨmacMat")
 		return KsMat, Kunsat_Mat_Norm, θDual
@@ -303,6 +304,7 @@ module pumiceManuscript
          θs = 1.0
          θr = 0.0
          Ks = 1.0
+			τbMac = 0.8
 
 		#  For every ψ
 			Ψ_Min_Log = log10(0.0001)
@@ -315,10 +317,10 @@ module pumiceManuscript
 
 			Texture = ["Sandy soils", "Silty soils", "Clay soils"] 
 
-			Tb2 = collect(range(0.0, stop=1.0, length=5))
+			Tb2 = collect(range(0.6, stop=1.5, length=5))
 			N_Tb = length(Tb2)
 
-			ΨmacMat = collect(range(60.0, stop=100.0, length=3))
+			ΨmacMat = collect(range(30.0, stop=200.0, length=3))
 			N_ΨmacMat = length(ΨmacMat)
 
 			# θsMacMat_η = collect(range(0.75, stop=1.0, length=4))
@@ -334,7 +336,7 @@ module pumiceManuscript
 			θψ = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
 			
 			for (iiΨ, iΨ) in enumerate(Ψ), (iiσ, iσ) in enumerate(σ), (iiTb, iTb) in enumerate(Tb2), (iiΨmacMat, iΨmacMat) in enumerate(ΨmacMat)
-			 	KsMatrice[iiσ, iiTb, iiΨmacMat], KunsatMat_Tb[iiΨ, iiσ, iiTb, iiΨmacMat], θψ[iiΨ, iiσ, iiTb, iiΨmacMat] = θψ_KUNSAT_MAT_η(;Ψ₁=iΨ, σ=iσ, τb=iTb, τbMac=iTb, ΨmacMat=iΨmacMat)
+			 	KsMatrice[iiσ, iiTb, iiΨmacMat], KunsatMat_Tb[iiΨ, iiσ, iiTb, iiΨmacMat], θψ[iiΨ, iiσ, iiTb, iiΨmacMat] = θψ_KUNSAT_MAT_η(;Ψ₁=iΨ, σ=iσ, τb=iTb, τbMac=τbMac, ΨmacMat=iΨmacMat)
 			end
 
 		# ================================================================
@@ -388,7 +390,7 @@ module pumiceManuscript
 			CairoMakie.activate!(type="svg", pt_per_unit=1)
 			Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :mintcream) 
 
-			Label(Fig[1, 1:N_σ, Top()], L"Macropore  $K(θ)$ model", valign=:bottom, font=:bold, padding=(0, 0, 50, 0), color=:darkblue,  fontsize=titlesize*1.5)
+			Label(Fig[1, 1:N_σ, Top()], L"Macropore $KΨ$_Macro", valign=:bottom, font=:bold, padding=(0, 0, 50, 0), color=:darkblue,  fontsize=titlesize*1.5)
 
 			Axis_KunsatMat_Tb = []
 			for (iiσ, iσ) in enumerate(σ)
@@ -463,18 +465,20 @@ module pumiceManuscript
 		return Ψm
 		end
 
-		function θψ_η(;Ψ₁=Ψ₁, θs=1.0, θsMacMat=0.8, θr=0.0, σ, ΨmacMat, τb, τbMac, Ks=1.0, τa=0.5, τaMac=0.5, τc=1.0, τcMac=2.0)
-			Ψm = RELATIONSHIPS_MAT(ΨmacMat, σ)
-			σMac, ΨmMac = RELATIONSHIPS_MAC(ΨmacMat)
 
-         θDual                       		= wrc.kg.Ψ_2_θ(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="ΨmacMat")
-		return θDual, θs, θsMacMat
+		function θψ_η(;Ψ₁=Ψ₁, θs=0.4, θsMacMat=0.3, θr=0.0, σ, ΨmacMat, τb,  τbMac)
+         Ψm          = RELATIONSHIPS_MAT(ΨmacMat, σ)
+         σMac, ΨmMac = RELATIONSHIPS_MAC(ΨmacMat)
+
+         θDual_Macro       = wrc.kg.Ψ_2_θ(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="ΨmacMat")
+			θDual_Trad       = wrc.kg.Ψ_2_θ(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional")
+		return θDual_Macro, θDual_Trad, θs, θsMacMat
 		end
 
 		# Parameters
-         θs = 1.0
-         θr = 0.0
-         Ks = 1.0
+         # θs = 1.0
+         # θr = 0.0
+
 
 		#  For every ψ
 			Ψ_Min_Log = log10(0.0001)
@@ -482,7 +486,7 @@ module pumiceManuscript
 			Ψ = 10.0.^(collect(Ψ_Min_Log:0.0001:Ψ_Max_Log))
 			N_Ψ  = length(Ψ)
 
-			σ =  collect(range(0.75, stop=3.5, length=3))
+			σ =  collect(range(0.7, stop=3., length=3))
 			N_σ = length(σ)
 
 			Texture = ["Sandy soils", "Silty soils", "Clay soils"] 
@@ -490,26 +494,16 @@ module pumiceManuscript
 			Tb2 = collect(range(0.0, stop=1.0, length=5))
 			N_Tb = length(Tb2)
 
-			ΨmacMat = collect(range(60.0, stop=100.0, length=3))
+			ΨmacMat = collect(range(30.0, stop=200.0, length=3))
 			N_ΨmacMat = length(ΨmacMat)
 
-			# θsMacMat_η = collect(range(0.75, stop=1.0, length=4))
-			# N_θsMacMat_η  = length(θsMacMat_η)
-      	# θsMacMat = θs .* θsMacMat_η
-
-			# KsMac = zeros(100)
-
-		
-		# FUNCTION Kunsat_Tb
-         KunsatMat_Tb = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
-         KsMatrice    = zeros(N_σ, N_Tb, N_ΨmacMat)
-			θψ = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
+			θψ_Macro = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
+			θψ_Trad = zeros(N_Ψ, N_σ, N_Tb, N_ΨmacMat)
 			θs = 0.0
 			θsMacMat = 0.0
 			
-			
 			for (iiΨ, iΨ) in enumerate(Ψ), (iiσ, iσ) in enumerate(σ), (iiTb, iTb) in enumerate(Tb2), (iiΨmacMat, iΨmacMat) in enumerate(ΨmacMat)
-			 	θψ[iiΨ, iiσ, iiTb, iiΨmacMat], θs, θsMacMat = θψ_η(;Ψ₁=iΨ, σ=iσ, τb=iTb, τbMac=iTb, ΨmacMat=iΨmacMat)
+			 	θψ_Macro[iiΨ, iiσ, iiTb, iiΨmacMat], θψ_Trad[iiΨ, iiσ, iiTb, iiΨmacMat], θs, θsMacMat = θψ_η(;Ψ₁=iΨ, σ=iσ, τb=iTb, τbMac=iTb, ΨmacMat=iΨmacMat)
 			end
 
 		# ================================================================
@@ -560,9 +554,9 @@ module pumiceManuscript
 
 		# Starting to plot	
 			CairoMakie.activate!(type="svg", pt_per_unit=1)
-			Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory) 
+			Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :azure) 
 
-			Label(Fig[1, 1:N_σ, Top()], L"Macropore constrained bimodal $θ(\psi)$ model", valign=:bottom, font=:bold, padding=(0, 0, 50, 0), color=:darkblue,  fontsize=titlesize*1.5)
+			Label(Fig[1, 1:N_σ, Top()], L"Lognormal bimodal $θ(\psi)$ models", valign=:bottom, font=:bold, padding=(0, 0, 50, 0), color=:darkblue,  fontsize=titlesize*1.5)
 
 			Axis_θψ = []
 			for (iiσ, iσ) in enumerate(σ)
@@ -587,7 +581,8 @@ module pumiceManuscript
 						end
 
 						# for (iiTb, iTb) in enumerate(Tb2)
-							lines!(Fig[iiσ, iiΨmacMat], Ψ_Log, θψ[:, iiσ, 1, iiΨmacMat], linewidth=Linewidth, color=:darkcyan, label="σ =$(floor(σ[iiσ], digits=2))")
+							lines!(Fig[iiσ, iiΨmacMat], Ψ_Log, θψ_Macro[:, iiσ, 1, iiΨmacMat], linewidth=Linewidth, color=:darkblue, label="θΨ_Macro, σ =$(floor(σ[iiσ], digits=2))")
+							lines!(Fig[iiσ, iiΨmacMat], Ψ_Log, θψ_Trad[:, iiσ, 1, iiΨmacMat], linewidth=Linewidth, color=:aquamarine4, label="θΨ_Trad, σ =$(floor(σ[iiσ], digits=2))", linestyle=:dash)
 							lines!(Axis_θψ,[Point(log1p(ΨmacMat[iiΨmacMat]),0), Point(log1p(ΨmacMat[iiΨmacMat]), θs)], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
 							lines!(Axis_θψ,[Point(log1p(0), θsMacMat), Point(log1p(ΨmacMat[iiΨmacMat]), θsMacMat)], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
 							lines!(Axis_θψ,[Point(log1p(0), θs), Point(log1p(ΨmacMat[iiΨmacMat]), θs)], color=:navyblue, linewidth=Linewidth/2.0, linestyle=:dash)
@@ -627,13 +622,11 @@ end #module pumiceManuscript
 
 
  pumiceManuscript.PLOTTING_KUNSAT_MACRO()
-  pumiceManuscript.PLOTTING_θψ_MACRO()
+ pumiceManuscript.PLOTTING_θψ_MACRO()
 
 #   include(raw"D:\MAIN\MODELS\AquaPore_Toolkit\src\Temporary\Manuscript\PumiceManuscript.jl")
 
 
-
-# include( raw"D:\MAIN\MODELS\AquaPore_Toolkit\src\Temporary\Manuscript\PumiceManuscript.jl")
 
 		
 		# Axis_∂θ∂R = Axis(Fig[1,1], xlabel="R [mm]", ylabel="∂θ∂R", xscale=log,  xminorticksvisible = true, xminorgridvisible = true, xminorticks = IntervalsBetween(5))

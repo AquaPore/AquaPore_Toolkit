@@ -15,57 +15,60 @@ module hydroStruct
          Ks             :: Vector{Float64}
          Ψm             :: Vector{Float64}
          σ              :: Vector{Float64}
-         θsMacMat_ƞ     ::	Vector{Float64}
+         θsMacMat_ƞ     :: Vector{Float64}
          σMac           :: Vector{Float64}
-         ΨmMac          ::	Vector{Float64}
+         ΨmMac          :: Vector{Float64}
          ΨmacMat        :: Vector{Float64}
          So             :: Vector{Float64}
-         θsMacMat       ::	Vector{Float64}
-         Φ              ::	Vector{Float64}
-         τa             ::	Vector{Float64}
-         τb             ::	Vector{Float64}
-         τc             ::	Vector{Float64}
-         τaMac          ::	Vector{Float64}       
-         τbMac          ::	Vector{Float64}
-         τcMac          ::	Vector{Float64}
+         θsMacMat       :: Vector{Float64}
+         Φ              :: Vector{Float64}
+         τa             :: Vector{Float64}
+         τb             :: Vector{Float64}
+         τc             :: Vector{Float64}
+         τₚ             :: Vector{Float64}
+         τaMac          :: Vector{Float64}
+         τbMac          :: Vector{Float64}
+         τcMac          :: Vector{Float64}
 			
          θs_Min         :: Vector{Float64}
          θr_Min         :: Vector{Float64}
          Ks_Min         :: Vector{Float64}
          Ψm_Min         :: Vector{Float64}
          σ_Min          :: Vector{Float64}
-         θsMacMat_ƞ_Min ::	Vector{Float64}
+         θsMacMat_ƞ_Min :: Vector{Float64}
          σMac_Min       :: Vector{Float64}
-         ΨmMac_Min      ::	Vector{Float64}
+         ΨmMac_Min      :: Vector{Float64}
          ΨmacMat_Min    :: Vector{Float64}
          So_Min         :: Vector{Float64}
-         θsMacMat_Min   ::	Vector{Float64}
-         Φ_Min          ::	Vector{Float64}
-         τa_Min         ::	Vector{Float64}
-         τb_Min         ::	Vector{Float64}
-         τc_Min         ::	Vector{Float64}
-         τaMac_Min      ::	Vector{Float64}
-         τbMac_Min      ::	Vector{Float64}
-         τcMac_Min      ::	Vector{Float64}
+         θsMacMat_Min   :: Vector{Float64}
+         Φ_Min          :: Vector{Float64}
+         τa_Min         :: Vector{Float64}
+         τb_Min         :: Vector{Float64}
+         τc_Min         :: Vector{Float64}
+         τₚ_Min         :: Vector{Float64}
+         τaMac_Min      :: Vector{Float64}
+         τbMac_Min      :: Vector{Float64}
+         τcMac_Min      :: Vector{Float64}
 
          θs_Max         :: Vector{Float64}
          θr_Max         :: Vector{Float64}
          Ks_Max         :: Vector{Float64}
          Ψm_Max         :: Vector{Float64}
          σ_Max          :: Vector{Float64}
-         θsMacMat_ƞ_Max ::	Vector{Float64}
+         θsMacMat_ƞ_Max :: Vector{Float64}
          σMac_Max       :: Vector{Float64}
-         ΨmMac_Max      ::	Vector{Float64}
+         ΨmMac_Max      :: Vector{Float64}
          ΨmacMat_Max    :: Vector{Float64}
          So_Max         :: Vector{Float64}
-         θsMacMat_Max   ::	Vector{Float64}
-         Φ_Max          ::	Vector{Float64}
-         τa_Max         ::	Vector{Float64}
-         τb_Max         ::	Vector{Float64}
-         τc_Max         ::	Vector{Float64}
-         τaMac_Max      ::	Vector{Float64}
-         τbMac_Max      ::	Vector{Float64}
-         τcMac_Max      ::	Vector{Float64}
+         θsMacMat_Max   :: Vector{Float64}
+         Φ_Max          :: Vector{Float64}
+         τa_Max         :: Vector{Float64}
+         τb_Max         :: Vector{Float64}
+         τc_Max         :: Vector{Float64}
+         τₚ_Max         :: Vector{Float64}
+         τaMac_Max      :: Vector{Float64}
+         τbMac_Max      :: Vector{Float64}
+         τcMac_Max      :: Vector{Float64}
 		end # struct KOSUGI
 
 		
@@ -204,6 +207,7 @@ module hydroStruct
             τa             = fill(0.0::Float64, NiZ)
             τb             = fill(0.0::Float64, NiZ)
             τc             = fill(0.0::Float64, NiZ)
+            τₚ             = fill(0.0::Float64, NiZ)
             τaMac          = fill(0.0::Float64, NiZ)
             τbMac          = fill(0.0::Float64, NiZ)
             τcMac          = fill(0.0::Float64, NiZ)
@@ -217,6 +221,7 @@ module hydroStruct
             τa_Min         = fill(0.0::Float64, NiZ)
             τb_Min         = fill(0.0::Float64, NiZ)
             τc_Min         = fill(0.0::Float64, NiZ)
+            τₚ_min         = fill(0.0::Float64, NiZ)
             τaMac_Min      = fill(0.0::Float64, NiZ)
             τbMac_Min      = fill(0.0::Float64, NiZ)
             τcMac_Min      = fill(0.0::Float64, NiZ)
@@ -230,11 +235,12 @@ module hydroStruct
             τa_Max         = fill(0.0::Float64, NiZ)
             τb_Max         = fill(0.0::Float64, NiZ)
             τc_Max         = fill(0.0::Float64, NiZ)
+            τₚ_max         = fill(0.0::Float64, NiZ)
             τaMac_Max      = fill(0.0::Float64, NiZ)
             τbMac_Max      = fill(0.0::Float64, NiZ)
             τcMac_Max      = fill(0.0::Float64, NiZ)
           
-				hydro = KOSUGI(θs, θr, Ks, σ, Ψm, θsMacMat_ƞ, σMac, ΨmMac, ΨmacMat, So, θsMacMat, Φ,  τa, τb, τc, τaMac, τbMac, τcMac,θs_Min, θr_Min, Ks_Min, σ_Min,Ψm_Min, θsMacMat_ƞ_Min, σMac_Min, ΨmMac_Min, ΨmacMat_Min, So_Min, θsMacMat_Min, Φ_Min,  τa_Min, τb_Min, τc_Min, τaMac_Min, τbMac_Min, τcMac_Min, θs_Max, θr_Max, Ks_Max, σ_Max, Ψm_Max, θsMacMat_ƞ_Max, σMac_Max, ΨmMac_Max, ΨmacMat_Max, So_Max, θsMacMat_Max, Φ_Max, τa_Max, τb_Max, τc_Max, τaMac_Max, τbMac_Max, τcMac_Max)   
+				hydro = KOSUGI(θs, θr, Ks, σ, Ψm, θsMacMat_ƞ, σMac, ΨmMac, ΨmacMat, So, θsMacMat, Φ,  τa, τb, τc, τₚ, τaMac, τbMac, τcMac,θs_Min, θr_Min, Ks_Min, σ_Min,Ψm_Min, θsMacMat_ƞ_Min, σMac_Min, ΨmMac_Min, ΨmacMat_Min, So_Min, θsMacMat_Min, Φ_Min,  τa_Min, τb_Min, τc_Min, τₚ_min, τaMac_Min, τbMac_Min, τcMac_Min, θs_Max, θr_Max, Ks_Max, σ_Max, Ψm_Max, θsMacMat_ƞ_Max, σMac_Max, ΨmMac_Max, ΨmacMat_Max, So_Max, θsMacMat_Max, Φ_Max, τa_Max, τb_Max, τc_Max, τₚ_max, τaMac_Max, τbMac_Max, τcMac_Max)   
            
 				return hydro
 

@@ -156,7 +156,7 @@ module optIndivSoil
 			🎏_Model = :BlackBox # :Optim, :Prima, :BlackBox 
 			
 			if  🎏_Model == :BlackBox
-				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=2500)
+				function FORCING_STOPPING_INDIV(oc; CountIndiv_NoImprovement_Max=2000)
 					function WHEN_TO_STOP_INDIV(oc; CountIndiv_NoImprovement_Max=CountIndiv_NoImprovement_Max)
 						global CountIndiv_Opt += 1
 
@@ -213,9 +213,9 @@ module optIndivSoil
 
 			# COMPUTING MACROPORE %
 				if optionₘ.HydroModel⍰ == "Kosugi"
-					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ],  σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
+					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ],  σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τₚ=hydro.τₚ[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
 
-					KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(optionₘ.KosugiModel_θΨ⍰, hydro.Ks[iZ], optionₘ.KosugiModel_KΨ⍰, Tb, TbMac, Tc, TcMac, hydro.θr[iZ], hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.σ[iZ], hydro.σMac[iZ], hydro.Ψm[iZ], hydro.ΨmacMat[iZ], hydro.ΨmMac[iZ])
+					KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(optionₘ.KosugiModel_θΨ⍰, hydro.Ks[iZ], optionₘ.KosugiModel_KΨ⍰, Tb, TbMac, Tc, hydro.τₚ[iZ], TcMac, hydro.θr[iZ], hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.σ[iZ], hydro.σMac[iZ], hydro.Ψm[iZ], hydro.ΨmacMat[iZ], hydro.ΨmMac[iZ])
 
 					hydroOther.Macro_Perc[iZ] = KsMac / hydro.Ks[iZ]
 				end # optionₘ.HydroModel⍰ == "Kosugi"

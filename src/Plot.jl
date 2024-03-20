@@ -37,7 +37,8 @@ module lab
 
 					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], σMac_Max=hydro.σMac_Max[iZ], σMac_Min=hydro.σMac_Min[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
 	
-					KsMac[iZ], KsMat[iZ]                    = kunsat.kg.KS_MATMAC_ΨmacMat(option.hydro.KosugiModel_θΨ⍰, hydro.Ks[iZ], option.hydro.KosugiModel_KΨ⍰, Tb, TbMac, Tc, TcMac, hydro.θr[iZ], hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.σ[iZ], hydro.σMac[iZ], hydro.Ψm[iZ], hydro.ΨmacMat[iZ], hydro.ΨmMac[iZ])
+					KsMac[iZ], KsMat[iZ] = kunsat.kg.KS_MATMAC_ΨmacMat(option.hydro.KosugiModel_θΨ⍰, hydro.Ks[iZ], option.hydro.KosugiModel_KΨ⍰, Tb, TbMac, Tc, hydro.τₚ[iZ], TcMac, hydro.θr[iZ], hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.σ[iZ], hydro.σMac[iZ], hydro.Ψm[iZ], hydro.ΨmacMat[iZ], hydro.ΨmMac[iZ])
+
 
 				# ================================================================
 				# Plotting parameters
@@ -400,7 +401,7 @@ module lab
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSMODEL_TCLAY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL_FUNCTIONS(Path, option, ksmodelτ, ipClass; τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τclay₀=ksmodelτ.τclay₀[ipClass],τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass],τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass])
+		function KSMODEL_FUNCTIONS(Path, option, ksmodelτ, ipClass; τₚ=ksmodelτ.τₚ[ipClass], τclay₀=ksmodelτ.τclay₀[ipClass],τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass],τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass])
 		
 			# DERIVING THE DATA TO PLOT
 				σ = 0.75:0.001:3.0
@@ -434,7 +435,7 @@ module lab
 						Clayₙ = max(Clay - X_Clay₁, 0.0) / (1.0 - X_Clay₁)
 
 						ΔθsMacθrₙ =  max(ΘsMacMatΘr[iΘsΘr] - τclayΔθsr , 0.0) 
-						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
+						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τₚ - 1.0) 
 
 						Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5) 
 

@@ -14,7 +14,7 @@ export OPTIMIZE_ALLSOILS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	function OPTIMIZE_ALLSOILS(;∑Psd, hydro::Main.hydroStruct.KOSUGI, hydroOther::Main.hydroStruct.HYDRO_OTHER, K_KΨobs::Matrix{Float64}, N_KΨobs=1, N_θΨobs::Vector{Int64}, NiZ::Int64, optim::Main.reading.OPTIM, optimAllSoils::Main.reading.OPTIM, option::Main.options.OPTION, optionₘ::Main.options.HYDRO, param::Main.params.PARAM, θ_θΨobs::Matrix{Float64}, θϵ=0.005::Float64, Ψ_KΨobs::Matrix{Float64}, Ψ_θΨobs::Matrix{Float64}, PrintTable=false)
 
-		function FORCING_STOPPING(oc; Accuracy=3, Count_NoImprovement_Max=1500)
+		function FORCING_STOPPING(oc; Accuracy=3, Count_NoImprovement_Max=1100)
 
 			function WHEN_TO_STOP(oc; Accuracy=Accuracy, Count_NoImprovement_Max=Count_NoImprovement_Max)
 				global Count_Opt += 1
