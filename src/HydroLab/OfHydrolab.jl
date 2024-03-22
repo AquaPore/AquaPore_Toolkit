@@ -3,29 +3,6 @@ module ofHydrolab
 	export  OF_WRC_KUNSAT
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#		FUNCTION : PENALTY
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		# function PENALTY_KUNSAT(hydro, iZ, optionₘ; Macro_Perc_Max=0.4)
-
-		# 	if optionₘ.HydroModel⍰ =="Kosugi" && optionₘ.KosugiModel_KΨ⍰=="ΨmacMat"
-		# 		# COMPUTING MACROPORE %
-		# 			Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
-
-		# 			KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.θr[iZ], hydro.Ψm[iZ], hydro.σ[iZ], σMac=hydro.σMac[iZ],hydro.ΨmMac[iZ], hydro.σMac[iZ], hydro.Ks[iZ], Tb, Tc, TbMac, TcMac, optionₘ.KosugiModel_KΨ⍰)
-
-		# 			Macro_Perc = KsMac / hydro.Ks[iZ]
-
-		# 			Penalty_Ks = max(Macro_Perc - Macro_Perc_Max, 0.0)
-
-		# 			return Penalty_Ks
-		# 	else
-		# 			return Penalty_Ks = 0.0
-		# 	end
-		# end  # function: PENALTY
-	#--------------------------------------------------------------
-
-
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : WEIGHT
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function WEIGHTING(; iZ, N_KΨobs, N_θΨobs, Wof_Max=0.8, Wof_Min=0.2, Ψ_KΨobs, Ψ_θΨobs)

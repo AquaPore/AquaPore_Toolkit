@@ -213,9 +213,8 @@ module optIndivSoil
 
 			# COMPUTING MACROPORE %
 				if optionₘ.HydroModel⍰ == "Kosugi"
-					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ],  σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τₚ=hydro.τₚ[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ])
 
-					KsMac, KsMat= kunsat.kg.KS_MATMAC_ΨmacMat(optionₘ.KosugiModel_θΨ⍰, hydro.Ks[iZ], optionₘ.KosugiModel_KΨ⍰, Tb, TbMac, Tc, hydro.τₚ[iZ], TcMac, hydro.θr[iZ], hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.σ[iZ], hydro.σMac[iZ], hydro.Ψm[iZ], hydro.ΨmacMat[iZ], hydro.ΨmMac[iZ])
+					KsMac, KsMat= kunsat.kg.FUNC_KsMac(;KosugiModel_σ_2_Tb=optionₘ.KosugiModel_σ_2_Tb, Ks=hydro.Ks[iZ], KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰, θr=hydro.θr[iZ], θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], σ=hydro.σ[iZ], σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ], τₚ=hydro.τₚ[iZ], Ψm=hydro.Ψm[iZ], ΨmacMat=hydro.ΨmacMat[iZ], ΨmMac=hydro.ΨmMac[iZ])
 
 					hydroOther.Macro_Perc[iZ] = KsMac / hydro.Ks[iZ]
 				end # optionₘ.HydroModel⍰ == "Kosugi"

@@ -34,10 +34,8 @@ module lab
 						θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 						Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 					end # iΨ = 1:N_Se
-
-					Ta, Tb, Tc, TaMac, TbMac, TcMac = kunsat.kg.TORTUOSITY(; σ=hydro.σ[iZ], σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], σMac_Max=hydro.σMac_Max[iZ], σMac_Min=hydro.σMac_Min[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ], τₚ=hydro.τₚ[iZ] )
 	
-					KsMac[iZ], KsMat[iZ] = kunsat.kg.KS_MATMAC_ΨmacMat(option.hydro.KosugiModel_θΨ⍰, hydro.Ks[iZ], option.hydro.KosugiModel_KΨ⍰, Tb, TbMac, Tc, hydro.τₚ[iZ], TcMac, hydro.θr[iZ], hydro.θs[iZ], hydro.θsMacMat[iZ], hydro.σ[iZ], hydro.σMac[iZ], hydro.Ψm[iZ], hydro.ΨmacMat[iZ], hydro.ΨmMac[iZ])
+					KsMac[iZ], KsMat[iZ] = kunsat.kg.FUNC_KsMac(;KosugiModel_σ_2_Tb=option.hydro.KosugiModel_σ_2_Tb, Ks=hydro.Ks[iZ], KosugiModel_KΨ⍰=option.hydro.KosugiModel_KΨ⍰, θr=hydro.θr[iZ], θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], σ=hydro.σ[iZ], σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ], τₚ=hydro.τₚ[iZ], Ψm=hydro.Ψm[iZ], ΨmacMat=hydro.ΨmacMat[iZ], ΨmMac=hydro.ΨmMac[iZ])
 
 
 				# ================================================================

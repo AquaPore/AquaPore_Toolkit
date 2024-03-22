@@ -38,14 +38,15 @@ module options
 		Nothings
 	end
 	@option mutable struct HYDRO
-		HydroModel⍰::String
-		HydroModel_List::Vector{String}
-		KosugiModel_θΨ⍰::String
-   	KosugiModel_KΨ⍰::String
-		θrOpt⍰::String
-		σ_2_Ψm⍰::String
-		ΨmacMat_2_σMac_ΨmMac::Bool
-		Plot_θΨ::Bool
+      HydroModel⍰          ::String
+      HydroModel_List      ::Vector{String}
+      KosugiModel_θΨ⍰      ::String
+      KosugiModel_KΨ⍰      ::String
+      KosugiModel_σ_2_Tb   ::Bool
+      θrOpt⍰               ::String
+      σ_2_Ψm⍰              ::String
+      ΨmacMat_2_σMac_ΨmMac ::Bool
+      Plot_θΨ              ::Bool
 	end
 
 	@option mutable struct KSMODEL
