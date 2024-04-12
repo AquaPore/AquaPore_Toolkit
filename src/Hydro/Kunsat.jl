@@ -132,8 +132,10 @@ module kunsat
 					KsMac = Ks * min(max((θs - θsMacMat) / (θs - θr), 0.0), 1.0)
 
 				elseif KosugiModel_KΨ⍰ == "Mualem" # =====
-					W_Mat = (θsMacMat - θr) * exp(((Tb * σ) ^ 2.0) / 2.0) / Ψm 
-					W_Mac = max(θs - θsMacMat, 0.0) * exp(((τbMac * σMac)^2.0) / 2.0) / ΨmMac
+					Tb = TORTUOSITY_σ_2_Tb(; σ, σ_Max, σ_Min, τb, τₚ, KosugiModel_σ_2_Tb)
+
+					W_Mat = (θsMacMat - θr) * exp(((Tb * σ) ^ 2.0) / 2.0) / (Ψm ^ Tb)
+					W_Mac = max(θs - θsMacMat, 0.0) * exp(((τbMac * σMac)^2.0) / 2.0) / (ΨmMac ^ τbMac)
 
 					KsMat = Ks * (W_Mat / (W_Mat + W_Mac)) ^ τcMac
 					KsMac = Ks * (W_Mac / (W_Mat + W_Mac)) ^ τcMac
@@ -200,13 +202,16 @@ module kunsat
 
 							
 				elseif KosugiModel_KΨ⍰ == "Mualem" # =====
+					ΨmMac = √ΨmacMat
+					σMac = log(√ΨmacMat) / Pσ_Mac
+					
 					Kunsat_Mat = 0.5 * erfc(((log(Ψ₁ / Ψm)) / σ + τb * σ) / √2.0)
 			
 					Kunsat_Mac = 0.5 * erfc(((log(Ψ₁ / ΨmMac)) / σMac + τbMac * σMac) / √2.0)
 
-					W_Mat = (θsMacMat - θr) * exp(((τb * σ)^2.0) / 2.0) / Ψm 
+					W_Mat = (θsMacMat - θr) * exp(((τb * σ)^2.0) / 2.0) / (Ψm ^ τb)
 		
-					W_Mac = max(θs - θsMacMat, 0.0) * exp(((τbMac * σMac)^2.0) / 2.0) / ΨmMac
+					W_Mac = max(θs - θsMacMat, 0.0) * exp(((τbMac * σMac)^2.0) / 2.0) / (ΨmMac ^ τbMac)
 
 					return Ks * √Se₁ * ((W_Mat * Kunsat_Mat + W_Mac * Kunsat_Mac) / (W_Mat + W_Mac)) ^ τcMac
 
