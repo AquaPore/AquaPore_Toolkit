@@ -707,7 +707,7 @@ module pumiceManuscript
 
          KsMac, KsMat    = kunsat.kg.FUNC_KsMac(;KosugiModel_σ_2_Tb=false, Ks, KosugiModel_KΨ⍰="ΨmacMat", θr, θs, θsMacMat, σ, σ_Max, σ_Min, σMac, τa, τaMac, τb=1.103, τbMac=0.61, τc, τcMac, τₚ, Ψm, ΨmacMat, ΨmMac)
 
-         Kunsat_Mat_Trad = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa=0.5, τb=1.157, τc=2.0, τₚ, τaMac=0.5, τbMac=0.006, τcMac=2.0, σ_Min, σ_Max, KosugiModel_KΨ⍰="Mualem", KosugiModel_θΨ⍰="Traditional", KosugiModel_σ_2_Tb=false)
+         Kunsat_Mat_Trad = kunsat.kg.KUNSAT_θΨSe(;Ψ₁=Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa=0.5, τb=1.587, τc=1.01, τₚ, τaMac=0.5, τbMac=0.008, τcMac=1.01, σ_Min, σ_Max, KosugiModel_KΨ⍰="Mualem", KosugiModel_θΨ⍰="Traditional", KosugiModel_σ_2_Tb=false)
 	
 
 
@@ -1421,11 +1421,11 @@ end #module pumiceManuscript
 
 
 #  pumiceManuscript.PLOTTING_Kh_MODELS()
-# pumiceManuscript.DENSITY_PLOT()
+pumiceManuscript.DENSITY_PLOT()
 # pumiceManuscript.PLOT_σ_2_τb()
 # pumiceManuscript.PLOTTING_θψ_MACRO()
 #  pumiceManuscript.PLOTTING_KUNSAT_MACRO()
- pumiceManuscript.PLOTTING_KUNSAT_MACRO_TbMac()
+#  pumiceManuscript.PLOTTING_KUNSAT_MACRO_TbMac()
 # pumiceManuscript.PLOT_ΨmacMat_2_σmac()
 
 #   include(raw"D:\MAIN\MODELS\AquaPore_Toolkit\src\Temporary\Manuscript\PumiceManuscript.jl")
