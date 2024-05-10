@@ -39,10 +39,10 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacM
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNC_ΨmacMat_2_σMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac=2)
+		function FUNC_ΨmacMat_2_σMac(;ΨmacMat, Pσ_Mac=2.0)
 			# return σMac = log1p(ΨmacMat) / (2.0 * Pσ_Mac)
-			# return σMac = log(√(ΨmacMat + 1.0)) / Pσ_Mac
-			return σMac = log(√(ΨmacMat)) / Pσ_Mac
+			return σMac = log(√(ΨmacMat + 1.0)) / Pσ_Mac
+			# return σMac = log(√(ΨmacMat)) / Pσ_Mac
 		end  # function: FUNC_ΨmacMat_2_σMac
 	# ------------------------------------------------------------------
 
@@ -50,7 +50,9 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacM
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : FUNC_ΨmacMat_2_ΨmMac
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat, σMac, Option_Mode=false)
+		function FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat)
+
+			# FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat, σMac, Option_Mode=false)
 
 			# Option 1: based on Mode of pore size distribution
 				# LONG: ΨmMac = exp(log(ΨmacMat) * 0.5 + σMac ^ 2.0)
@@ -58,8 +60,8 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacM
 				# if Option_Mode
 				# 	return ΨmMac = √(ΨmacMat + 1.0) * exp(σMac ^ 2.0)
 				# else 
-					# return ΨmMac = √(ΨmacMat + 1.0)
-					return ΨmMac = √ΨmacMat
+					return ΨmMac = √(ΨmacMat + 1.0)
+					# return ΨmMac = √ΨmacMat
 				# end			
 		end  # function: FUNC_ΨmacMat_2_ΨmMac
 	# ------------------------------------------------------------------
@@ -98,7 +100,7 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacM
 					hydro₂.σMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat=hydro₂.ΨmacMat[iZ], Pσ_Mac=Pσ_Mac)
 
 				# Deriving ΨmMac
-					hydro₂.ΨmMac[iZ] =  hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=hydro₂.ΨmacMat[iZ], σMac=hydro₂.σMac[iZ])
+					hydro₂.ΨmMac[iZ] =  hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat=hydro₂.ΨmacMat[iZ])
 			end
 			
 			#  ΨmacMat₂ = hydro₂.ΨmacMat[iZ]

@@ -281,14 +281,14 @@ module optIndivSoil
 			# ==================== SPECIAL CASES ====================
 
 			# RELATIONSHIP BETWEEN ΨmacMat ➡ σMac & ΨmMac
-				if optionₘ.ΨmacMat_2_σMac_ΨmMac
+				# if optionₘ.ΨmacMat_2_σMac_ΨmMac
 
-					# ΨmacMat₁ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat( θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=0.95) 
+				# 	# ΨmacMat₁ = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat( θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], θr=hydro.θr[iZ], ΨmacMat_Max=hydro.ΨmacMat[iZ], ΨmacMat_Min=0.0, θsMacMat_η_Tresh=0.95) 
 
-					hydro.σMac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σMac(ΨmacMat=hydro.ΨmacMat[iZ])
+				# 	hydro.σMac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σMac(ΨmacMat=hydro.ΨmacMat[iZ])
 				
-					hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ], σMac=hydro.σMac[iZ])
-				end
+				# 	hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ])
+				# end
 
 			# RELATIONSHIP BETWEEN σ AND Ψm
 				if (optionₘ.σ_2_Ψm⍰ == "Constrained") && ("Ψm" ∈ optim.ParamOpt) || (optionₘ.σ_2_Ψm⍰ == "UniqueRelationship") 

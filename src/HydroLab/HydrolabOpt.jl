@@ -3,7 +3,7 @@
 # =============================================================
 module hydrolabOpt
 
-	import   ..stats, ..optIndivSoil, ..optAllSoil, ..ofHydrolab
+	import   ..stats, ..optIndivSoil, ..optAllSoil, ..ofHydrolab, ..hydroRelation
 	using  Statistics
 	export HYDROLABOPT_START
 
@@ -11,6 +11,14 @@ module hydrolabOpt
 	#		FUNCTION : HYPIXOPT_START
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	function HYDROLABOPT_START(;∑Psd, hydro, hydroOther, K_KΨobs=zeros(Float64,1,1), N_KΨobs=1, N_θΨobs, NiZ, optim, optimAllSoils, option, optionₘ, param, θ_θΨobs, Ψ_KΨobs=zeros(Float64,1,1), Ψ_θΨobs)
+
+		# if optionₘ.ΨmacMat_2_σMac_ΨmMac
+		# 	for iZ=1:NiZ
+		# 		hydro.σMac[iZ]  = hydroRelation.FUNC_ΨmacMat_2_σMac(ΨmacMat=hydro.ΨmacMat[iZ])
+					
+		# 		hydro.ΨmMac[iZ] = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(ΨmacMat=hydro.ΨmacMat[iZ])
+		# 	end
+		# end
 		
 
 		if optimAllSoils.🎏_Opt

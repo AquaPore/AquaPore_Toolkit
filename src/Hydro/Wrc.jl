@@ -31,7 +31,7 @@ module wrc
 			Ψ₁ = max(Ψ₁, 0.0)
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.Ψ_2_θ(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
+				return wrc.kg.Ψ_2_θ(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac)
 
 			elseif optionₘ.HydroModel⍰ == "Vangenuchten"
 				return wrc.vg.Ψ_2_θ(Ψ₁, iZ::Int64, hydroParam)
@@ -56,7 +56,7 @@ module wrc
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
 	
-				return wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
+				return wrc.kg.Ψ_2_Se(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac)
 
 			elseif optionₘ.HydroModel⍰ == "Vangenuchten"
 				return wrc.vg.Ψ_2_Se(Ψ₁, iZ::Int64, hydroParam)
@@ -79,7 +79,7 @@ module wrc
 		function θ_2_Ψ(optionₘ, θ₁, iZ, hydroParam)
 			if optionₘ.HydroModel⍰ == "Kosugi"
 
-				return wrc.kg.θ_2_Ψ(θ₁=θ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
+				return wrc.kg.θ_2_Ψ(θ₁=θ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac)
 				
 			elseif optionₘ.HydroModel⍰ == "Vangenuchten"
 				return wrc.vg.θ_2_Ψ(θ₁, iZ, hydroParam)
@@ -99,7 +99,7 @@ module wrc
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function Se_2_Ψ(optionₘ, Se₁, iZ, hydroParam)
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.Se_2_Ψ(Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
+				return wrc.kg.Se_2_Ψ(Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac)
 			else
 				error("$(optionₘ.HydroModel⍰) model for Se_2_Ψ is not yet available")
 			end # function Se_2_Ψ
@@ -114,7 +114,7 @@ module wrc
 			Ψ₁ = max(Ψ₁, 0.0)
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.∂θ∂Ψ(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
+				return wrc.kg.∂θ∂Ψ(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac)
 
 			elseif optionₘ.HydroModel⍰ == "Vangenuchten"
 				return wrc.vg.∂θ∂Ψ(optionₘ, Ψ₁, iZ::Int64, hydroParam)
@@ -135,7 +135,7 @@ module wrc
 		function ∂Ψ∂θ(optionₘ, θ₁, iZ::Int64, hydroParam)	
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.∂Ψ∂θ(θ₁=θ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
+				return wrc.kg.∂Ψ∂θ(θ₁=θ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac)
 			else
 				error("$(optionₘ.HydroModel⍰) model for ∂Ψ∂θ is not yet available")	
 			end
@@ -150,7 +150,7 @@ module wrc
 			Ψ₁ = max(Ψ₁, 0.0::Float64)
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.∂Se∂Ψ(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
+				return wrc.kg.∂Se∂Ψ(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac)
 			else
 				error("$(optionₘ.HydroModel⍰) model for ∂Se∂Ψ is not yet available")	
 			end
@@ -164,7 +164,7 @@ module wrc
 		function ∂Ψ∂Se(optionₘ, Se₁, iZ::Int64, hydroParam)
 
 			if optionₘ.HydroModel⍰ == "Kosugi"
-				return wrc.kg.∂Ψ∂Se(Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰)
+				return wrc.kg.∂Ψ∂Se(Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac)
 			else
 				error("$(optionₘ.HydroModel⍰) model for ∂Ψ∂Se is not yet available")
 			end
@@ -195,14 +195,19 @@ module wrc
 	module kg
 		import SpecialFunctions: erfc, erfcinv
 		import ForwardDiff, Optim
-		import ...cst
-		import ..wrc
+		import ...cst, ...hydroRelation, ..wrc
 		export ∂Se∂Ψ, ∂θ∂Ψ, ∂Ψ∂Se, ∂Ψ∂θ, Se_2_Ψ, θ_2_Ψ, Ψ_2_Se, Ψ_2_θ
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : Ψ_2_θ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", Pσ_Mac=2.0)
+			function Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true, Pσ_Mac=2.0)
+
+				# Physically constraining the hydraulic parameters
+				if ΨmacMat_2_σMac_ΨmMac == true
+					ΨmMac = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat)
+					σMac  = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat)
+				end
 
 				if KosugiModel_θΨ⍰ == "Traditional"
 					θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
@@ -210,6 +215,7 @@ module wrc
 					θ_Mac = 0.5 * max(θs - θsMacMat, 0.0) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
 					
 					return θ_Mac + θ_Mat
+
 				
 				elseif KosugiModel_θΨ⍰ == "Traditional_Constrained"
 						θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
@@ -218,9 +224,8 @@ module wrc
 
 						return θ_Mac + θ_Mat
 				
+
 				elseif KosugiModel_θΨ⍰ == "ΨmacMat"
-					ΨmMac = √ΨmacMat
-					σMac = log(√ΨmacMat) / Pσ_Mac
 
 					if Ψ₁ ≤ ΨmacMat
 						return θ_Mac =  max(θs - θsMacMat, 0.0) * 0.5 * (erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0)) - (min(Ψ₁ / ΨmacMat, 1.0)) * erfc((log(ΨmacMat / ΨmMac)) / (σMac * √2.0))) + θsMacMat
@@ -231,7 +236,6 @@ module wrc
 				else
 					error("function Ψ_2_θ has no $KosugiModel_θΨ⍰")
 				end
-
 			end # function Ψ_2_θ
 		#-----------------------------------------------------------------
 
@@ -239,11 +243,11 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : Ψ_2_Se
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_Se(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional")
+			function Ψ_2_Se(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
 
-				θ₁ = wrc.kg.Ψ_2_θ(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰)
+				θ₁ = wrc.kg.Ψ_2_θ(;Ψ₁, θs, θsMacMat,θr, Ψm, σ=σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac)
 
-			return wrc.θ_2_Se(θ₁=θ₁, θs=θs, θr=θr)
+			return wrc.θ_2_Se(;θ₁, θs, θr)
 			end # function Ψ_2_Se
 		#-----------------------------------------------------------------
 	
@@ -251,10 +255,10 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : θ_2_Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function θ_2_Ψ(;θ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional")
+			function θ_2_Ψ(;θ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
 
 				function OF(Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, σMac)
-					θmod = wrc.kg.Ψ_2_θ(Ψ₁=Ψ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰)
+					θmod = wrc.kg.Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac)
 				return (θ₁ - θmod) ^ 4.0
 				end # OF
 
@@ -273,9 +277,9 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : Se_2_Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Se_2_Ψ(;Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional") 
-				θ₁ = wrc.Se_2_θ(Se₁=Se₁, θs=θs, θr=θr)
-			return  θ_2_Ψ(θ₁=θ₁, θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, ΨmacMat=ΨmacMat, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰)
+			function Se_2_Ψ(;Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true) 
+				θ₁ = wrc.Se_2_θ(;Se₁, θs, θr)
+			return  θ_2_Ψ(;θ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac)
 			end # Se_2_Ψ
 		#-------------------------------------------------------------------
 
@@ -283,7 +287,7 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂θ∂Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂θ∂Ψ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional")
+			function ∂θ∂Ψ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
 
 				if Ψ₁ > eps(100.0)
 
@@ -330,7 +334,7 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂θ∂R
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂θ∂R(;R₁, θs, θsMacMat, θr, Rm, σ, RmMac, σMac, KosugiModel_θΨ⍰="Traditional")
+			function ∂θ∂R(;R₁, θs, θsMacMat, θr, Rm, σ, RmMac, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
 
 				if R₁ > eps()
 					∂θ∂R_Mat = -(θsMacMat - θr) * exp( -((log(R₁ / Rm)) ^ 2.0) / (2.0 * σ ^ 2.0)) / (R₁ * σ * √(π * 2.0))
@@ -348,7 +352,7 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂θ∂R_NORM
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂θ∂R_NORM(;R₁, θs, θsMacMat, θr, Rm, σ, RmMac, σMac, KosugiModel_θΨ⍰="Traditional")
+			function ∂θ∂R_NORM(;R₁, θs, θsMacMat, θr, Rm, σ, RmMac, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
 
 			
 				# ΨmacMat = hydroRelation.FUNC_θsMacMatη_2_ΨmacMat(;θs, θsMacMat, θr)
@@ -375,13 +379,13 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂Ψ∂θ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂Ψ∂θ(;θ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional")
+			function ∂Ψ∂θ(;θ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
 
 				θ₁ = max(min(θs - eps(1000.0), θ₁), θr + eps(1000.0))
 					
 				θ₂ = fill(0.0::Float64, 1)
 				
-				∂Ψ∂θ_Numerical(θ₂::Vector) = θ_2_Ψ(θ₁=abs(θ₂[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰)
+				∂Ψ∂θ_Numerical(θ₂::Vector) = θ_2_Ψ(θ₁=abs(θ₂[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=ΨmacMat_2_σMac_ΨmMac)
 
 				θ₂[1] = θ₁
 				Func_∂Ψ∂θ_Numerical = θ₂ -> ForwardDiff.gradient(∂Ψ∂θ_Numerical, θ₂)
@@ -401,13 +405,13 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂Ψ∂Se
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂Ψ∂Se(;Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional")
+			function ∂Ψ∂Se(;Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
 
 				Se₁ = max(min(Se₁, 1.0 - eps(1000.0)), eps(1000.0))
 				
 				Se₂ = fill(0.0::Float64, 1)
 				# ∂Ψ∂Se_Numerical(Se₂::Vector) = Se_2_Ψ(optionₘ, abs(Se₂[1]), iZ, hydroParam)
-				∂Ψ∂Se_Numerical(Se₂::Vector) = Se_2_Ψ(Se₁=abs(Se₂[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰)
+				∂Ψ∂Se_Numerical(Se₂::Vector) = Se_2_Ψ(Se₁=abs(Se₂[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=ΨmacMat_2_σMac_ΨmMac)
 
 				Se₂[1] = Se₁
 				Func_∂Ψ∂Se_Numerical = Se₂ -> ForwardDiff.gradient(∂Ψ∂Se_Numerical, Se₂)
@@ -421,13 +425,13 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : ∂Se∂Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function ∂Se∂Ψ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional")
+			function ∂Se∂Ψ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
 					
 				Ψ₁ = max(Ψ₁, eps(1000.0))
 				ψ = fill(0.0::Float64, 1)
 
 				# ∂Ψ∂Se_Numerical(ψ::Vector) = Ψ_2_Se(optionₘ, abs(ψ[1]), iZ, hydroParam)
-				 ∂Ψ∂Se_Numerical(ψ::Vector) = Ψ_2_Se(Ψ₁= abs(ψ[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰)
+				 ∂Ψ∂Se_Numerical(ψ::Vector) = Ψ_2_Se(Ψ₁= abs(ψ[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=ΨmacMat_2_σMac_ΨmMac)
 				ψ[1] = Ψ₁
 				Func_∂Ψ∂Se_Numerical = ψ -> ForwardDiff.gradient(∂Ψ∂Se_Numerical, ψ)
 

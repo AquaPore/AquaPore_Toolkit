@@ -51,10 +51,12 @@ module checking
 			elseif option.run.HydroLabθΨ⍰ == "HydroParamPrecomputed" 
 				@warn("***  Running from HydroParamPrecomputed.csv ***")
 
+			elseif option.hydro.ΨmacMat_2_σMac_ΨmMac && ("ΨmMac" ∈ optim.ParamOpt || "σMac" ∈ optim.ParamOpt )
+				error("***  ΨmacMat_2_σMac_ΨmMac = true, ΨmMac ∈ optim.ParamOpt || σMac ∈ optim.ParamOpt ***") 
+
 		# ------------ CHECKING SimulationKosugiθΨK which simulates other θ(ψ) & K(ψ) functions from Kosugi  θ(ψ) & K(ψ) models --------------------
 			elseif option.data.SimulationKosugiθΨK && option.run.RockCorection
 				error("***  option.data.SimulationKosugiθΨK && option.run.RockCorection THAN rock fragments are double corrected ***")
-
 
 		# ------------ CHECKING Infiltration model--------------------
 			elseif option.run.Infiltration && !(option.data.Infiltration)
