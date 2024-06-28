@@ -118,7 +118,9 @@ export σ_2_θr, FUNCTION_σ_2_Ψm_SOFTWARE, FUNC_ΨmacMat_2_ΨmMac, FUNC_ΨmacM
 
             # Ψm_Max = hydroRelation.FUNC_σ_2_Ψm(;ΨmacMat=ΨmacMat₂, σ=hydro₂.σ[iZ], Pσ=Pσ, Ψm_Min=hydro₂.ΨmacMat[iZ], Ψm_Max=hydro₂.Ψm_Max[iZ], 🎏_Min=false)
 
-				hydro₂.Ψm[iZ] = min( ( hydro₂.ΨmacMat[iZ]^ 0.75) * exp(hydro₂.σ[iZ] * Pσ), hydro₂.Ψm_Max[iZ])
+				# hydro₂.Ψm[iZ] = min( ( hydro₂.ΨmacMat[iZ]^ 0.75) * exp(hydro₂.σ[iZ] * Pσ), hydro₂.Ψm_Max[iZ])
+
+				hydro₂.Ψm[iZ] = min(exp(log(√ hydro₂.ΨmacMat[iZ] * exp(hydro₂.σ[iZ] * Pσ)) + log( hydro₂.ΨmacMat[iZ] * exp(hydro₂.σ[iZ] * Pσ))), hydro₂.Ψm_Max[iZ])
 
 			end #option.infilt.σ_2_Ψm⍰
 		return hydro₂

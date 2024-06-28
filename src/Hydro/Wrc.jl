@@ -201,7 +201,7 @@ module wrc
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : Ψ_2_θ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true, Pσ_Mac=2.0)
+			function Ψ_2_θ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac=100.0, ΨmacMat, σMac=1.1, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true, Pσ_Mac=2.0)
 
 				# Physically constraining the hydraulic parameters
 				if ΨmacMat_2_σMac_ΨmMac == true
@@ -209,7 +209,7 @@ module wrc
 					σMac  = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat)
 				end
 
-				if KosugiModel_θΨ⍰ == "Traditional"
+				if KosugiModel_θΨ⍰ == "Traditional" || KosugiModel_θΨ⍰ == "Mualem"
 					θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
 
 					θ_Mac = 0.5 * max(θs - θsMacMat, 0.0) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
@@ -226,7 +226,6 @@ module wrc
 				
 
 				elseif KosugiModel_θΨ⍰ == "ΨmacMat"
-
 					if Ψ₁ ≤ ΨmacMat
 						return θ_Mac =  max(θs - θsMacMat, 0.0) * 0.5 * (erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0)) - (min(Ψ₁ / ΨmacMat, 1.0)) * erfc((log(ΨmacMat / ΨmMac)) / (σMac * √2.0))) + θsMacMat
 					else

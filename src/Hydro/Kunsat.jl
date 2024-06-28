@@ -115,7 +115,7 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KS_MAC
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function FUNC_KsMac(;KosugiModel_σ_2_Tb::Bool, Ks::Float64, KosugiModel_KΨ⍰::String, θr::Float64, θs::Float64, θsMacMat::Float64, σ_Max::Float64, σ_Min::Float64, σ::Float64, σMac::Float64, τa::Float64, τaMac::Float64, τb::Float64, τbMac::Float64, τc::Float64, τcMac::Float64, τₚ::Float64, Ψm::Float64, ΨmacMat::Float64, ΨmMac::Float64)
+			function FUNC_KsMac(;KosugiModel_KΨ⍰::String, KosugiModel_σ_2_Tb::Bool, Ks::Float64, θr::Float64, θs::Float64, θsMacMat::Float64, σ_Max=4.0, σ_Min=0.7, σ::Float64, σMac::Float64, τa::Float64, τaMac::Float64, τb::Float64, τbMac::Float64, τc::Float64, τcMac::Float64, τₚ::Float64, Ψm::Float64, ΨmacMat::Float64, ΨmMac::Float64)
 
 				Tb = TORTUOSITY_σ_2_Tb(; σ, σ_Max, σ_Min, τb, τₚ, KosugiModel_σ_2_Tb)
 
@@ -166,7 +166,7 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KUNSAT_θΨSe
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function KUNSAT_θΨSe(;Ψ₁=-1.0, θ₁=-1.0, Se₁ =-1.0, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, Ks, τa, τb, τc, τₚ, τaMac, τbMac, τcMac, σ_Min::Float64, σ_Max::Float64, KosugiModel_KΨ⍰="Traditional", KosugiModel_θΨ⍰="Traditional", KosugiModel_σ_2_Tb=false, Pσ_Mac=2.0, ΨmacMat_2_σMac_ΨmMac=true)
+			function KUNSAT_θΨSe(;Ψ₁=-1.0, θ₁=-1.0, Se₁ =-1.0, θs, θsMacMat, θr, Ψm, σ, ΨmMac=100.0, ΨmacMat, σMac=1.0, Ks, τa, τb, τc, τₚ, τaMac, τbMac, τcMac, σ_Min::Float64, σ_Max::Float64, KosugiModel_KΨ⍰="Traditional", KosugiModel_θΨ⍰="Traditional", KosugiModel_σ_2_Tb=false, Pσ_Mac=2.0, ΨmacMat_2_σMac_ΨmMac=true)
 
 				# Physically constraining the hydraulic parameters
 				if ΨmacMat_2_σMac_ΨmMac == true
