@@ -20,10 +20,8 @@ module ofBest
 
 		Penalty = abs(∑Infilt_Obs[iZ,N_Infilt[iZ]] - ∑Infilt_3D[iZ,N_Infilt[iZ] ]) /  ∑Infilt_Obs[iZ,N_Infilt[iZ]]
 
-		return Nse = W * Nse_Trans + (1.0 - W) * Nse_Steady  + Penalty
-		
+	return Nse = W * Nse_Trans + (1.0 - W) * Nse_Steady  + Penalty	
 	end  # function: OF_BEST
-
 
 	
 end  # module: bestOpt

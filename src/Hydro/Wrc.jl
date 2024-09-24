@@ -384,7 +384,7 @@ module wrc
 					
 				θ₂ = fill(0.0::Float64, 1)
 				
-				∂Ψ∂θ_Numerical(θ₂::Vector) = θ_2_Ψ(θ₁=abs(θ₂[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=ΨmacMat_2_σMac_ΨmMac)
+				∂Ψ∂θ_Numerical(θ₂::Vector) = θ_2_Ψ(θ₁=abs(θ₂[1]), θs=θs, θsMacMat=θsMacMat, θr=θr, Ψm=Ψm, σ=σ, ΨmMac=ΨmMac, σMac=σMac, ΨmacMat=ΨmacMat, KosugiModel_θΨ⍰=KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=ΨmacMat_2_σMac_ΨmMac)
 
 				θ₂[1] = θ₁
 				Func_∂Ψ∂θ_Numerical = θ₂ -> ForwardDiff.gradient(∂Ψ∂θ_Numerical, θ₂)

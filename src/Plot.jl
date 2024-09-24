@@ -3,6 +3,7 @@
 #
 # =============================================================
 module plot
+
 # =============================================================
 #		MODULE: lab
 # =============================================================
@@ -142,7 +143,6 @@ module lab
 						Path = path.plotSoilwater.Plot_θΨK * "Lab_ThetaH_" * string(path.option.ModelName) * "_" * string(IdSelect[iZ]) * ".svg" 
 						save(Path, Fig)
 						display(Fig)
-
 
 			end # iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
 			
@@ -617,7 +617,6 @@ module lab
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function KSMODEL_RF(Path, hydro, option, ksmodelτ, ipClass;τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass],τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass],τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass])
 
-			
 			""" The rock corection is already performed in θ(Ψ) and therefore Ks is already corected. Nevertheles, the model is wrong for RF > Rf_StartIncrease as the Ks starts to increase again"""
 					function ROCKCORRECTION!(hydro, iZ, RockFragment, θr, θs, θsMacMat; Rf_StartIncrease=0.4, Rf_EndIncrease=0.9, θs_Amplify=1.)
 
@@ -971,60 +970,119 @@ module lab
 	# # ............................................................
 
 
-	# # =============================================================
-	# #		MODULE: infilt
-	# # =============================================================
-	# module infilt
-	# 	import ...wrc, ...kunsat, ...cst, ...psdThetar, ...psdFunc, ...bestFunc, ...sorptivity
-	# 	using Plots, Plots.PlotMeasures, LaTeXStrings
-	# 	export  PLOT_∑INFILT, PLOT_∑INFILT_θΨ
+	# =============================================================
+	#		MODULE: infilt
+	# =============================================================
+	module infilt
+		import ...wrc, ...kunsat, ...cst, ...psdThetar, ...psdFunc, ...bestFunc, ...sorptivity
+		# using Plots, Plots.PlotMeasures, LaTeXStrings
+		using CairoMakie, ColorSchemes
+		export  PLOT_∑INFILT, PLOT_∑INFILT_θΨ
 
-	# 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# 	#		FUNCTION : PLOT_∑INFILT
-	# 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# 		function PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, infiltOutput, N_Infilt, NiZ, option, param, Path, Tinfilt)
-	# 		println("  ==  START: PLOT_∑INFILT  == \n")
+						# ================================================================
+				# Plotting parameters
+				ColourOption_No    = 1
+				Linewidth          = 2
+				height             = 300
+				labelsize          = 15
+				textcolor          = :blue
+				textsize           = 20
+				titlecolor         = :navyblue
+				titlesize          = 18.0
+				width              = height * 3.0
+				xgridstyle         = :dash
+				xgridvisible       = true
+				xlabelSize         = 15
+				xlabelpadding      = 5
+				xminortickalign    = 1.0
+				xminorticksvisible = true
+				xtickalign         = 0.9 # 0 is inside and 1 is outside
+				xticklabelrotation = π / 4.0
+				xticksize          = 10
+				xticksmirrored     = false
+				xtickwidt          = 0.5
+				xtrimspine         = false
+				ygridstyle         = :dash
+				ygridvisible       = false
+				ylabelpadding      = xlabelpadding
+				ylabelsize         = xlabelSize
+				yminortickalign    = xminortickalign
+				yminorticksvisible = true
+				ytickalign         = xtickalign
+				yticksize          = xticksize
+				yticksmirrored     = false
+				ytickwidt          = xtickwidt
+				ytrimspine         = false
+
+				Markersize = 12
+
+				ColourOption = [:glasbey_hv_n256,:seaborn_bright,:seaborn_colorblind,:seaborn_dark,:seaborn_deep,:tab10,:tableau_10,:tol_bright]
+
+				Colormap = cgrad(colorschemes[ColourOption[ColourOption_No]], size(colorschemes[ColourOption[ColourOption_No]]), categorical=true)
+
+
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : PLOT_∑INFILT
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, infiltOutput, N_Infilt, NiZ, option, param, Path, Tinfilt)
+			println("  ==  START: PLOT_∑INFILT  == \n")
 			
-	# 			for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
-	# 				# << PLOT 1 >>
-	# 					Title = " iZ= $(IdSelect[iZ])"
-	# 					# Plot_∑infilt_Obs
+				for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
 
-	# 						Label ="Obs_$(string(option.infilt.DataSingleDoubleRing⍰))_Ring"
-	# 						X = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
-	# 						Y = ∑Infilt_Obs[iZ,1:N_Infilt[iZ]]
-	# 						Plot_∑infilt_Obs = Plots.plot(X, Y, seriestype=:scatter, label=Label, color= :red, shape= :square, markersize=4, marker = (Plots.stroke(1, :red))) 
+					# Starting to plot	
+						# CairoMakie.activate!(type="svg", pt_per_unit=1)
+						# Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
+						
+						CairoMakie.activate!(type="svg")
+						Fig =  Figure(fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
 
-	# 					# Plot_∑infilt_Sim
-	# 						Label = "Sim_3D"
-	# 						X = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
-	# 						Y = ∑Infilt_3D[iZ,1:N_Infilt[iZ]]
-	# 						Plots.plot!(X, Y, seriestype=:line, label=Label, color= :blue, shape= :square, markersize=4, marker = (Plots.stroke(1, :blue))) 
+					# << PLOT 1 >>
+						Title = " iZ= $(IdSelect[iZ])"
 
+						# Plot_∑infilt_Obs
+						Axis_Infilt = Axis(Fig[1, 1], xlabel= L"Time \ [minutes]", ylabel=L"\sum infiltration \ [mm]", title=Title, titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")
 
-	# 						Label = "Sim_1D"
-	# 						Y2 = ∑Infilt_1D[iZ,1:N_Infilt[iZ]]
-	# 						Plots.plot!(X, Y2, seriestype=:line, label=Label, color= :green, shape= :square, markersize=4,  marker = (Plots.stroke(1, :green))) 
+							Label ="Obs_$(string(option.infilt.DataSingleDoubleRing⍰))_Ring"
+							X = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
+							Y = ∑Infilt_Obs[iZ,1:N_Infilt[iZ]]
+							scatter!(Axis_Infilt, X, Y, color=:red, markersize=Markersize, marker = '●', label=Label)
 
-	# 					# TransSteady
-	# 						Label="T_TransSteady"
-	# 						X = zeros(Float64,1)
-	# 						Y = zeros(Float64,1)
-	# 						X[1] = Tinfilt[iZ,infiltOutput.iT_TransSteady_Data[iZ]] / 60.0
-	# 						Y[1] = ∑Infilt_Obs[iZ,infiltOutput.iT_TransSteady_Data[iZ]]
-	# 						Plots.plot!(X, Y, seriestype=:scatter, label=Label, color= :violet, shape= :circle, markersize=10, title=Title) 
+						# Plot_∑infilt_Sim
+							Label = "Sim_3D"
+							X = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
+							Y = ∑Infilt_3D[iZ,1:N_Infilt[iZ]]
+							lines!(Axis_Infilt, X, Y, color=:blue, linewidth=Linewidth, label=Label) 
 
-	# 						Plots.xlabel!(L"Time [minutes]")
-	# 						Plots.ylabel!(L"\sum infiltration \ [mm]")      
-							
-	# 					Path₂ = Path * "INFIL_" * string(option.infilt.Model⍰)  *  "_" * string(IdSelect[iZ]) *  ".svg"
+							Label = "Sim_1D"
+							Y2 = ∑Infilt_1D[iZ,1:N_Infilt[iZ]]
+							lines!(Axis_Infilt, X, Y2, color=:green, linewidth=Linewidth, label=Label)  
 
-	# 				Plots.savefig(Plot_∑infilt_Obs, Path₂)
-	# 				# println("    ~  $(Path₂) ~")
-	# 			end # for iZ=1:NiZ
-	# 		println("  ==  END: PLOT_∑INFILT  == \n")
-	# 		return nothing
-	# 		end # PLOT_∑INFILT
+						# TransSteady
+							Label="T_TransSteady"
+							X = zeros(Float64,1)
+							Y = zeros(Float64,1)
+							X[1] = Tinfilt[iZ,infiltOutput.iT_TransSteady_Data[iZ]] / 60.0
+							Y[1] = ∑Infilt_Obs[iZ,infiltOutput.iT_TransSteady_Data[iZ]]
+
+							scatter!(Axis_Infilt, X, Y, color=:violet, markersize=30, marker =:star6, label=Label)
+
+							Legend(Fig[1,2], Axis_Infilt, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
+
+					Path₂ = Path * "INFIL_" * string(option.infilt.Model⍰)  *  "_" * string(IdSelect[iZ]) *  ".svg"
+
+					# General
+						resize_to_layout!(Fig)
+						trim!(Fig.layout)
+						colgap!(Fig.layout, 10)
+						rowgap!(Fig.layout, 10)
+
+						save(Path₂, Fig)
+						display(Fig)
+						println("    ~  $(Path₂) ~")
+				end # for iZ=1:NiZ
+			println("  ==  END: PLOT_∑INFILT  == \n")
+			return nothing
+			end # PLOT_∑INFILT
 
 
 	# 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1117,8 +1175,8 @@ module lab
 	# 		return nothing
 	# 		end  # function: PLOT_∑INFILT_θΨ
 
-	# end # module infilt
-	# # ............................................................
+	end # module infilt
+	# ............................................................
 
 end  # module plot
 

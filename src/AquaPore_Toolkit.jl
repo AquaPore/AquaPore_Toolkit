@@ -198,8 +198,9 @@ module AquaPore_Toolkit
 				hydro, optim, optimAllSoils = reading.HYDRO_PARAM(option.hydro, hydro, NiZ, path.inputGuiSoilwater.GUI_HydroParam)
 
 			# CHECKING THE DATA
-				checking.CHECKING(option, option.hydro, optim)
-
+				if option.run.HydroLabθΨ⍰ ≠ "No"
+					checking.CHECKING(option, option.hydro, optim)
+				end
 
 			# CORRECT θ(Ψ) FOR ROCK FRAGMENT
 			if option.run.RockCorection && !(option.data.SimulationKosugiθΨK)
@@ -305,7 +306,7 @@ module AquaPore_Toolkit
 				hydroInfilt, optim_Infilt, optimAllSoils = reading.HYDRO_PARAM(option.psd, hydroInfilt, NiZ, path.inputGuiSoilwater.GUI_HydroParam)
 
 			# CHECKING THE DATA
-				checking.CHECKING(option, option.infilt, optim)
+				# checking.CHECKING(option, option.infilt, optim)
 
 			# TRANSFERING Φ -> hydro
 				for iZ =1:NiZ 
@@ -452,9 +453,7 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 	
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="NewFormat")
 	
-
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SFF")
-
 
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="TestSmapHydro20220728")
 
@@ -462,10 +461,12 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 
 	#  @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="Hypix", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Convert")
 
-	AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="UnsodaPumice")
+	# AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="UnsodaPumice")
 
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Pumice")
 
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
+
+	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Infiltration")
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)

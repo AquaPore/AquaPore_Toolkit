@@ -7,28 +7,28 @@ module options
 
 	# What available data we have?
 	@option mutable struct DATA
-		Infiltration::Bool
-		Kθ::Bool
-		Pedological⍰::String
-		Psd::Bool
-		RockWetability::Bool
-		SimulationKosugiθΨK::Bool
-		θΨ::Bool
-		Φ⍰::String
+      Infiltration        :: Bool
+      Kθ                  :: Bool
+      Pedological⍰        :: String
+      Psd                 :: Bool
+      RockWetability      :: Bool
+      SimulationKosugiθΨK :: Bool
+      θΨ                  :: Bool
+      Φ⍰                  :: String
 	end # struct DATA
 
 	# What model wanting to run
 	@option mutable struct RUN
-      ChangeHydroModel::Bool
-      HydroLabθΨ⍰::String
-      Hypix::Bool
-      Infiltration::Bool
-      IntergranularMixingPsd ::Bool
-		KsModel::Bool
-      RockCorection::Bool
-		Smap::Bool
-		Smap2Hypix::Bool
-      Temporary::Bool
+      ChangeHydroModel       :: Bool
+      HydroLabθΨ⍰            :: String
+      Hypix                  :: Bool
+      Infiltration           :: Bool
+      IntergranularMixingPsd :: Bool
+      KsModel                :: Bool
+      RockCorection          :: Bool
+      Smap                   :: Bool
+      Smap2Hypix             :: Bool
+      Temporary              :: Bool
 	end
 
 	@option mutable struct OTHER
@@ -38,66 +38,71 @@ module options
 		Nothings
 	end
 	@option mutable struct HYDRO
-      HydroModel⍰          ::String
-      HydroModel_List      ::Vector{String}
-      KosugiModel_θΨ⍰      ::String
-      KosugiModel_KΨ⍰      ::String
-      KosugiModel_σ_2_Tb   ::Bool
-      θrOpt⍰               ::String
-      σ_2_Ψm⍰              ::String
-      ΨmacMat_2_σMac_ΨmMac ::Bool
-      Plot_θΨ              ::Bool
+      HydroModel⍰          :: String
+      HydroModel_List      :: Vector{String}
+      KosugiModel_θΨ⍰      :: String
+      KosugiModel_KΨ⍰      :: String
+      KosugiModel_σ_2_Tb   :: Bool
+      θrOpt⍰               :: String
+      σ_2_Ψm⍰              :: String
+      ΨmacMat_2_σMac_ΨmMac :: Bool
+      Plot_θΨ              :: Bool
 	end
 
 	@option mutable struct KSMODEL
-      Class                 ::Bool
-      KₛModel⍰              ::String
-		Of_KₛModel⍰           ::String
-      OptIndivSoil          ::Bool
-      Plot_KsModel          ::Bool
+      Class        :: Bool
+      KₛModel⍰     :: String
+      Of_KₛModel⍰  :: String
+      OptIndivSoil :: Bool
+      Plot_KsModel :: Bool
 	end
 
 	@option mutable struct PSD
-		Model⍰::String
-		OptimizePsd⍰::String
-		Psd_2_θr⍰::String
-		∑Psd_2_ξ1::Bool
-		HydroModel⍰::String
-		θrOpt⍰::String
-		σ_2_Ψm⍰::String
-		Plot_Psd_θΨ::Bool
-		Plot_θr::Bool
-		Plot_IMP_Model::Bool
-		Table_Psd_θΨ_θ::Bool
+      Model⍰               :: String
+      OptimizePsd⍰         :: String
+      Psd_2_θr⍰            :: String
+      ∑Psd_2_ξ1            :: Bool
+      HydroModel⍰          :: String
+      θrOpt⍰               :: String
+      σ_2_Ψm⍰              :: String
+      ΨmacMat_2_σMac_ΨmMac :: Bool
+      Plot_Psd_θΨ          :: Bool
+      Plot_θr              :: Bool
+      Plot_IMP_Model       :: Bool
+      Table_Psd_θΨ_θ       :: Bool
 	end
 	@option mutable struct ROCKFRAGMENT
-		CorectStoneRockWetability::Bool
-		RockInjectedIncluded⍰::String
+      CorectStoneRockWetability :: Bool
+      RockInjectedIncluded⍰     :: String
 	end
 	@option mutable struct INFILT
-		DataSingleDoubleRing⍰::String  
-		OptimizeRun⍰::String  
-		Model⍰::String
-		BestUniv_Continous::Bool                	  
-		SorptivitySplitModel⍰::String  
-		SorptivityModel⍰::String     
-		HydroModel⍰::String             
-		θrOpt⍰::String            
-		σ_2_Ψm⍰::String                   	 
-		Plot_∑Infiltration::Bool           
-		Plot_θΨ::Bool                
+      BestUniv_Continous    :: Bool
+      DataSingleDoubleRing⍰ :: String
+      HydroModel⍰           :: String
+      KosugiModel_KΨ⍰       :: String
+      KosugiModel_θΨ⍰       :: String
+      KosugiModel_σ_2_Tb    :: Bool
+      Model⍰                :: String
+      OptimizeRun⍰          :: String
+      Plot_θΨ               :: Bool
+      Plot_∑Infiltration    :: Bool
+      SorptivityModel⍰      :: String
+      SorptivitySplitModel⍰ :: String
+      ΨmacMat_2_σMac_ΨmMac  :: Bool
+      θrOpt⍰                :: String
+      σ_2_Ψm⍰               :: String
 	end
 
 		@option mutable struct OPTION
-			data::DATA
-			hydro::HYDRO
-			infilt::INFILT
-			general::OTHER
-			psd::PSD
-			rockFragment::ROCKFRAGMENT
-			run::RUN
-			smap::SMAP
-			ksModel::KSMODEL
+         data         :: DATA
+         hydro        :: HYDRO
+         infilt       :: INFILT
+         general      :: OTHER
+         psd          :: PSD
+         rockFragment :: ROCKFRAGMENT
+         run          :: RUN
+         smap         :: SMAP
+         ksModel      :: KSMODEL
 		end # struct OPTION
 	
 	#__________________________________________________________________

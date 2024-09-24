@@ -5,11 +5,10 @@ module kunsat
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KUNSAT_θΨSe
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KUNSAT_θΨSe(optionₘ, Ψ₁, iZ::Int64, hydroParam)
-			Ψ₁ = max(Ψ₁, 0.0)
-
+		function KUNSAT_θΨSe(optionₘ, Ψ₁, iZ::Int64, hydroParam; θ₁=-1.0, Se₁=-1.0)
+			
 			if  optionₘ.HydroModel⍰ == "Kosugi"
-				return kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], τa=hydroParam.τa[iZ], τb=hydroParam.τb[iZ], τc=hydroParam.τc[iZ],  τₚ=hydroParam.τₚ[iZ], τaMac=hydroParam.τaMac[iZ], τbMac=hydroParam.τbMac[iZ], τcMac=hydroParam.τcMac[iZ], σ_Min=hydroParam.σ_Min[iZ], σ_Max=hydroParam.σ_Max[iZ], KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰, KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac, KosugiModel_σ_2_Tb=optionₘ.KosugiModel_σ_2_Tb)
+				return kunsat.kg.KUNSAT_θΨSe(Ψ₁=Ψ₁, θ₁=θ₁, Se₁=Se₁, θs=hydroParam.θs[iZ], θr=hydroParam.θr[iZ], Ψm=hydroParam.Ψm[iZ], σ=hydroParam.σ[iZ], θsMacMat=hydroParam.θsMacMat[iZ], ΨmMac=hydroParam.ΨmMac[iZ], ΨmacMat=hydroParam.ΨmacMat[iZ], σMac=hydroParam.σMac[iZ], Ks=hydroParam.Ks[iZ], τa=hydroParam.τa[iZ], τb=hydroParam.τb[iZ], τc=hydroParam.τc[iZ], τₚ=hydroParam.τₚ[iZ], τaMac=hydroParam.τaMac[iZ], τbMac=hydroParam.τbMac[iZ], τcMac=hydroParam.τcMac[iZ], σ_Min=hydroParam.σ_Min[iZ], σ_Max=hydroParam.σ_Max[iZ], KosugiModel_KΨ⍰=optionₘ.KosugiModel_KΨ⍰, KosugiModel_θΨ⍰=optionₘ.KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac=optionₘ.ΨmacMat_2_σMac_ΨmMac, KosugiModel_σ_2_Tb=optionₘ.KosugiModel_σ_2_Tb)
 
 			elseif  optionₘ.HydroModel⍰ == "Vangenuchten" ||  optionₘ.HydroModel⍰ == "VangenuchtenJules"
 				return kunsat.vg.KUNSAT_θΨSe(optionₘ, Ψ₁, iZ::Int64, hydroParam)
@@ -166,34 +165,37 @@ module kunsat
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KUNSAT_θΨSe
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function KUNSAT_θΨSe(;Ψ₁=-1.0, θ₁=-1.0, Se₁ =-1.0, θs, θsMacMat, θr, Ψm, σ, ΨmMac=100.0, ΨmacMat, σMac=1.0, Ks, τa, τb, τc, τₚ, τaMac, τbMac, τcMac, σ_Min::Float64, σ_Max::Float64, KosugiModel_KΨ⍰="Traditional", KosugiModel_θΨ⍰="Traditional", KosugiModel_σ_2_Tb=false, Pσ_Mac=2.0, ΨmacMat_2_σMac_ΨmMac=true)
+			function KUNSAT_θΨSe(;Ψ₁=-1.0, θ₁=-1.0, Se₁=-1.0, θs, θsMacMat, θr, Ψm, σ, ΨmMac=100.0, ΨmacMat, σMac=1.0, Ks, τa, τb, τc, τₚ, τaMac, τbMac, τcMac, σ_Min::Float64, σ_Max::Float64, KosugiModel_KΨ⍰="Traditional", KosugiModel_θΨ⍰="Traditional", KosugiModel_σ_2_Tb=false, Pσ_Mac=2.0, ΨmacMat_2_σMac_ΨmMac=true)
 
 				# Physically constraining the hydraulic parameters
-				if ΨmacMat_2_σMac_ΨmMac == true
-					ΨmMac = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat)
-					σMac = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat)
-				end
-				
-				if Ψ₁==-1.0 && θ₁==-1.0 && Se₁==-1.0
-					error("KUNSAT_θΨSe function: Cannot 3 of them: Ψ₁==-1.0 && θ₁=-1.0 && Se₁=-1.0 ")
-				end
+					if ΨmacMat_2_σMac_ΨmMac == true
+						ΨmMac = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat)
+						σMac = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat)
+					end
+					
+					if signbit(Ψ₁) && signbit(θ₁) && signbit(Se₁)
+						error("KUNSAT_θΨSe function: Cannot 3 of them: Ψ₁==-1.0 && θ₁=-1.0 && Se₁=-1.0 ")
+					end
 
-				# For more flexibility on the different inputs
-					if θ₁ ≠ -1.0 && Se₁ == -1.0
+				# For more flexibility on the different inputs, <signbit> = true if negative
+				# Computing Se if required
+					if !signbit(θ₁) && signbit(Se₁)
 						Se₁ = wrc.θ_2_Se(θ₁=θ₁, θs=θs, θr=θr)
 
-					elseif Se₁ == -1.0 && Ψ₁ ≠ -1.0				
+					elseif signbit(Se₁) && !signbit(Ψ₁)				
 						Se₁ = wrc.kg.Ψ_2_Se(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac)
-					else
-						error("KUNSAT_θΨSe function: needs: Se₁ or θ data")
 					end 
 
-					if Ψ₁ == -1.0 && θ₁ ≠ -1.0
+				# Computing Ψ₁ if required
+					if signbit(Ψ₁) && !signbit(Se₁)
+						Ψ₁ = wrc.kg.Se_2_Ψ(;Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac) 
+						
+					elseif signbit(Ψ₁) && !signbit(θ₁)
 						Ψ₁ = wrc.kg.θ_2_Ψ(;θ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac) 
 
-					elseif Ψ₁ == -1.0 && Se₁ ≠ -1.0
-						Ψ₁ = wrc.kg.Se_2_Ψ(;Se₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰, ΨmacMat_2_σMac_ΨmMac) 
 					end
+
+				Ψ₁ = max(Ψ₁, 0.0)
 
 				if  KosugiModel_KΨ⍰ == "Traditional" # =====	
 					KsMat = Ks * min(max((θsMacMat - θr) / (θs - θr), 0.0), 1.0)			

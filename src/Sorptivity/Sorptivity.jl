@@ -81,7 +81,9 @@ module sorptivity
 		#  	FUNCTION : DIFFUSIVITY
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function DIFFUSIVITY_θ(θ, iZ, hydroInfilt, optionₘ)
-				Kunsat = kunsat.θ_2_KUNSAT(optionₘ, θ, iZ, hydroInfilt)
+				# Kunsat = kunsat.θ_2_KUNSAT(optionₘ, θ, iZ, hydroInfilt)
+
+				Kunsat = kunsat.KUNSAT_θΨSe(optionₘ, -1.0, iZ, hydroInfilt; θ₁=θ)
 
 				# Ψ₁ = wrc.θ_2_Ψ(optionₘ, θ, iZ, hydroInfilt)
 

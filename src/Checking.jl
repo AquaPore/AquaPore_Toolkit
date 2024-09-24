@@ -8,7 +8,6 @@ module checking
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       function CHECKING(option, optionₘ, optim)
 
-		
 
 		 # ------------ Cannot run simultaneously HyIx and soilwater---------------------
 		 	if option.run.Hypix && (option.run.ChangeHydroModel || option.run.HydroLabθΨ⍰≠"No" || option.run.Infiltration || option.run.IntergranularMixingPsd ||  option.run.Smap2Hypix || option.run.Temporary)

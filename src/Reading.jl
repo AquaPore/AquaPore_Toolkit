@@ -477,6 +477,7 @@ module reading
 			optim = OPTIM(Param_Name, ParamOpt_Min[SampleTrue], ParamOpt_Max[SampleTrue], ParamOpt[SampleTrue], NparamOpt,🎏_Opt, ParamOpt_LogTransform[SampleTrue], InitialGuess[SampleTrue])
 
 			if 🎏_Opt == true
+				println("")
 				printstyled("	=== === Optimizing parameters for every soil sample === === \n"; color=:green)
 				println("		Model=" , optionₘ.HydroModel⍰)
 				println("		NparamOpt          = " , NparamOpt)
@@ -502,6 +503,7 @@ module reading
 			optimAllSoils = OPTIM(Param_Name, ParamOpt_Min[AllSoilsTrue], ParamOpt_Max[AllSoilsTrue], ParamOpt[AllSoilsTrue], NparamOpt,🎏_Opt, ParamOpt_LogTransform[AllSoilsTrue], InitialGuess[AllSoilsTrue])
 		
 			if 🎏_Opt == true
+				println(" ")
 				printstyled("	=== === Optimizing parameters for all soil sample === === \n"; color=:green)
 				println("		NparamOpt          = " , NparamOpt)
 				println("		InitialGuess       = " , optimAllSoils.InitialGuess)				
