@@ -117,11 +117,49 @@ module bestFunc
 				∑Infilt_1D[iZ,iT] = ∑Infilt_3D[iZ,iT] - A * T[iZ,iT] * Sorptivity ^ 2.0
 			end # iT
 
-			return ∑Infilt_1D
+		return ∑Infilt_1D
 		end  # function: CONVERT_3D_2_1D
 	#.................................................................
 		
-		
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : INFILTRATIONtime_2_∑INFILT
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function INFILTRATIONtime_2_∑INFILT(hydroInfilt, infiltParam, iZ, option, Se_Ini; Infilt_10mm=10.0)
+
+			# Initializing
+				θini = wrc.Se_2_θ(Se₁=Se_Ini, θs=hydroInfilt.θs[iZ], θr=hydroInfilt.θr[iZ])
+
+				Kr_θini = kunsat.KUNSAT_θΨSe(option.infilt, -1.0, iZ, hydroInfilt; Se₁=Se_Ini) / hydroInfilt.Ks[iZ]
+
+				Sorptivity = sorptivity.SORPTIVITY(θini, iZ, hydroInfilt, option, option.infilt)
+
+				A = bestFunc.A(θini, hydroInfilt.θs[iZ], iZ, infiltParam)
+
+				B = bestFunc.B(iZ, Kr_θini, infiltParam)
+
+				T_TransSteady = bestFunc.TIME_TRANS_STEADY(B, hydroInfilt.Ks[iZ], Sorptivity)
+
+			# Iteration
+         Time2Infiltrate = 0.0
+         ∑Infilt_1D₂     = 0.0
+
+				while ∑Infilt_1D₂ < Infilt_10mm
+					Time2Infiltrate += 1.0 # Seconds
+
+					if Time2Infiltrate ≤ T_TransSteady
+						∑Infilt_1D₂ = bestFunc.INFILTRATION_1D_TRANSIT(B, hydroInfilt.Ks[iZ], Sorptivity, Time2Infiltrate)
+					else
+						∑Infilt_1D₂ = bestFunc.INFILTRATION_1D_STEADY(B, iZ, hydroInfilt.Ks[iZ], Sorptivity, Time2Infiltrate, infiltParam, option, T_TransSteady)
+					end # T <= T_TransSteady
+				end # iT
+
+				println("iZ=$iZ Se= $Se_Ini Time = $(Time2Infiltrate/60.0) minutes to reach Infilt_10mm= $Infilt_10mm")
+	return Time2Infiltrate
+	end  # function: name
+	# ------------------------------------------------------------------
+	
+
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : CONVERT_1D_2_3D
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,7 +182,7 @@ module bestFunc
 	#		FUNCTION : TIME_TRANS_STEADY 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function TIME_TRANS_STEADY(B, Ks, Sorptivity)
-			return ( Sorptivity / (Ks * 2.0 * (1.0 - B)) ) ^ 2.0
+			return (Sorptivity / (Ks * 2.0 * (1.0 - B)) ) ^ 2.0
 		end # function: TIME_TRANS_STEADY
 	#.................................................................
 

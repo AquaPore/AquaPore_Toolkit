@@ -19,7 +19,7 @@ module infiltStart
 	function START_INFILTRATION(;∑Infilt_Obs, ∑Psd, hydro=[], hydroInfilt, infiltParam, N_Infilt, NiZ, option, param, Tinfilt)
 
 		# INITIALIZE
-		∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, hydroInfilt, infiltOutput, SeIni_Vector, T = infiltInitialize.INFILT_INITIALIZE(∑Infilt_Obs, ∑Psd, hydroInfilt, infiltParam, N_Infilt, NiZ, option, param, Tinfilt)
+		∑Infilt_1D,  ∑Infilt_3D, hydroInfilt, infiltOutput, T = infiltInitialize.INFILT_INITIALIZE(∑Infilt_Obs, ∑Psd, hydroInfilt, infiltParam, N_Infilt, NiZ, option, param, Tinfilt)
 
 		for iZ=1:NiZ
 			println( "iZ= $iZ")
@@ -107,7 +107,6 @@ module infiltStart
 
 				elseif option.infilt.Model⍰ == "QuasiExact"
 					∑Infilt_3D = quasiExact.HYDRO_2_INFILTRATION3D(∑Infilt_3D, hydroInfilt, infiltParam, iZ, N_Infilt, option, T)
-
 				end # option.infilt.Model⍰
 
 			# Statistics
@@ -118,7 +117,6 @@ module infiltStart
 				infiltOutput.Nse_Steady[iZ] = 1.0 - stats.NSE_MINIMIZE( log10.(∑Infilt_Obs[iZ,iT_TransSteady+1:N_Infilt[iZ]]), log10.(∑Infilt_3D[iZ,iT_TransSteady+1:N_Infilt[iZ]]); Power=2.0)
 
 				infiltOutput.Nse[iZ] = 0.5 * infiltOutput.Nse_Trans[iZ] + 0.5 * infiltOutput.Nse_Steady[iZ]
-
 		end # for iZ=1:NiZ
 
 
@@ -128,11 +126,13 @@ module infiltStart
          Nse        = Statistics.mean(infiltOutput.Nse[1:NiZ])
 
 			println("    ~ $(option.infilt.SorptivityModel⍰) ~")
-			println("    ~ Nse= $Nse Nse_Trans= $Nse_Trans,  Nse_Steady= $Nse_Steady ~")
+			println("    ~ Infiltration model Nse= $Nse Nse_Trans= $Nse_Trans,  Nse_Steady= $Nse_Steady ~")
 
 
-		# CONVERTING INFILTRATION DIMENSIONS
-			 
+		# DERIVING INFILTRATION CURVES FOR DIFFERENT INITIAL Se & TIME TO INFILTRATE
+		∑Infilt_1D_SeIni, Infilt_SeIni, Time_2_Infilt = INFILTRATION_SEini(hydroInfilt, infiltOutput, infiltParam, N_Infilt, NiZ, option, T)
+		
+		# CONVERTING INFILTRATION DIMENSIONS	 
 			for iZ=1:NiZ
 				if option.infilt.Model⍰ == "Best_Univ" && option.infilt.DataSingleDoubleRing⍰ == "Single"
 					∑Infilt_1D = bestFunc.CONVERT_3D_2_1D(∑Infilt_3D, ∑Infilt_1D, hydroInfilt, infiltParam, iZ, N_Infilt, option, T)
@@ -145,12 +145,10 @@ module infiltStart
 
 				else
 					error("Not yet implemented option.infilt.Model⍰ == $(option.infilt.Model⍰)   && option.infilt.DataSingleDoubleRing⍰ == $(option.infilt.DataSingleDoubleRing⍰)")
-
 				end
-
 			end # for iZ=1:NiZ
 
-	return infiltOutput, hydroInfilt, ∑Infilt_3D, ∑Infilt_1D
+	return ∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, hydroInfilt, Infilt_SeIni, infiltOutput, Time_2_Infilt
 	end # FUNCTION: START_INFILTRATION
 
 
@@ -181,5 +179,56 @@ module infiltStart
 			end # Option.infilt.Model
 
 		end # FUNCTION: OF_INFILT_2_HYDRO_Best
+	#.................................................................
+
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : INFILTRATION_SEINI
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		function INFILTRATION_SEini(hydroInfilt, infiltOutput₁, infiltParam₁, N_Infilt, NiZ, option, T₁; Infilt_SeIni = [0.0, 0.2, 0.4, 0.6, 0.99])
+
+			# Initializing 
+            N_Infilt_Max     = maximum(N_Infilt[1:NiZ])
+            ∑Infilt_1D_SeIni = zeros(Float64, (NiZ, N_Infilt_Max, length(Infilt_SeIni)))
+            Time_2_Infilt    = zeros(Float64, (NiZ, length(Infilt_SeIni)))
+            ∑Infilt_3D₁      = zeros(Float64, (NiZ, N_Infilt_Max))
+            ∑Infilt_1D₁      = zeros(Float64, (NiZ, N_Infilt_Max))
+
+			# INFILTRATION 1D FOR DIFFERENT INITIAL SE
+			for iZ=1:NiZ
+				for (iSeIni, iiSeIni) in enumerate(Infilt_SeIni)
+
+					# Computing initial θini
+						infiltParam₁.θini[iZ] = wrc.Se_2_θ(Se₁=iiSeIni, θs=hydroInfilt.θs[iZ], θr=hydroInfilt.θr[iZ])
+
+					# Computing sorptivity
+						infiltOutput₁.Sorptivity[iZ] = sorptivity.SORPTIVITY(infiltParam₁.θini[iZ], iZ, hydroInfilt, option, option.infilt) 
+
+					if option.infilt.Model⍰ == "Best_Univ"
+						∑Infilt_3D₁, ~ = bestFunc.BEST_UNIVERSAL_START(∑Infilt_3D₁, hydroInfilt, infiltOutput₁, infiltParam₁, iZ, N_Infilt, option, T₁)
+
+						# Converting to 1D
+						∑Infilt_1D₁ = bestFunc.CONVERT_3D_2_1D(∑Infilt_3D₁, ∑Infilt_1D₁, hydroInfilt, infiltParam₁, iZ, N_Infilt, option, T₁)
+
+					elseif option.infilt.Model⍰ == "QuasiExact"
+						∑Infilt_3D₁ = quasiExact.HYDRO_2_INFILTRATION3D(∑Infilt_3D₁, hydroInfilt, infiltParam₁, iZ, N_Infilt, option, T₁)
+
+						# Converting to 1D
+						∑Infilt_1D₁ = quasiExact.CONVERT_3D_2_1D(∑Infilt_3D₁, ∑Infilt_1D₁, hydroInfilt, infiltParam₁, iZ, N_Infilt, option, T₁)
+					end # option.infilt.Model⍰
+
+				# Time to achieve 10mm of 1D ∑infiltration
+					Time_2_Infilt[iZ, iSeIni] = bestFunc.INFILTRATIONtime_2_∑INFILT(hydroInfilt, infiltParam₁, iZ, option, iiSeIni; Infilt_10mm=10.0)
+
+				# Saving
+					∑Infilt_1D_SeIni[iZ, :, iSeIni] = ∑Infilt_1D₁[iZ , :]
+
+				end # for iiSeIni_Vector in SeIni_Vector
+			end # for iZ=1:NiZ
+			
+		return ∑Infilt_1D_SeIni, Infilt_SeIni, Time_2_Infilt
+		end  # function: INFILTRATION_SEINI
+	# ------------------------------------------------------------------
+
 end # MODULE: infilt
 	

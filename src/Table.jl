@@ -329,7 +329,7 @@ module table
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : HYDRO_INFILT
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function HYDRO_INFILT(hydroInfilt, IdSelect, NiZ::Int64, Path)
+			function HYDRO_INFILT(hydroInfilt, IdSelect, NiZ, Path)
 				println("    ~  $Path ~")
 
 				Matrix, FieldName_String = tool.readWrite.STRUCT_2_FIELDNAME(NiZ, hydroInfilt)
@@ -337,13 +337,9 @@ module table
 				# Matrix = hcat(Matrix, KunsatModel_Infilt)
 				
 				pushfirst!(FieldName_String, string("Id")) # Write the "Id" at the very begenning
-				push!(FieldName_String, string("Kunsat_θΨ"))
+				# push!(FieldName_String, string("Kunsat_θΨ"))
 
 				Matrix =  round.(Matrix, digits=10)
-				# open(Path, "w") do io
-				# 	DelimitedFiles.writedlm(io,[FieldName_String] , ",",) # Header
-				# 	DelimitedFiles.writedlm(io, [string.(IdSelect) Matrix], ",")
-				# end
 				CSV.write(Path, Tables.table( [string.(IdSelect) Matrix]), writeheader=true, header=FieldName_String, bom=true)
 			return nothing
 			end  # function: HYDRO_INFILT
@@ -360,10 +356,21 @@ module table
 				pushfirst!(FieldName_String, string("Id")) # Write the "Id" at the very begenning
 
 				Matrix =  round.(Matrix, digits=5)
-				# open(Path, "w") do io
-				# 	DelimitedFiles.writedlm(io,[FieldName_String] , ",",) # Header
-				# 	DelimitedFiles.writedlm(io, [string.(IdSelect) Matrix], ",")
-				# end
+				CSV.write(Path, Tables.table( [string.(IdSelect) Matrix]), writeheader=true, header=FieldName_String, bom=true)
+			return nothing
+			end  # function: HYDRO_INFILT
+
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#		FUNCTION : infilt
+		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			function INFILT_SEINI(IdSelect, NiZ, Time_2_Infilt, Infilt_SeIni, Path)
+				println("    ~  $Path ~")
+
+				FieldName_String = "SeIni=" .* string.(Infilt_SeIni)
+				
+				pushfirst!(FieldName_String, string("Id/Seconds")) # Write the "Id" at the very begenning
+
+				Matrix =  round.(Time_2_Infilt, digits=1)
 				CSV.write(Path, Tables.table( [string.(IdSelect) Matrix]), writeheader=true, header=FieldName_String, bom=true)
 			return nothing
 			end  # function: HYDRO_INFILT
@@ -371,7 +378,6 @@ module table
 	end  # module: infilt
 
 	# .........................................................................................
-
 
 
 	# =============================================================

@@ -10,9 +10,6 @@ module infiltInitialize
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	function INFILT_INITIALIZE(∑Infilt_Obs, ∑Psd, hydroInfilt, infiltParam, N_Infilt, NiZ, option, param, Tinfilt)
 
-		# Computing ∑Infilt_1D at different SeIni
-		SeIni_Vector = [0.0, 0.25, 0.5, 0.75]
-
 		# CORRECTION FOR θr & θs
 			for iZ=1:NiZ
 				# θr computation
@@ -56,9 +53,8 @@ module infiltInitialize
 		# Initializing Infiltration		
 			∑Infilt_3D = fill(0.0::Float64, (NiZ, N_Infilt_Max))
 			∑Infilt_1D = fill(0.0::Float64, (NiZ, N_Infilt_Max))
-			∑Infilt_1D_SeIni = fill(0.0::Float64, (NiZ, N_Infilt_Max, length(SeIni_Vector)))
 
-	return ∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, hydroInfilt, infiltOutput, SeIni_Vector, T
+	return ∑Infilt_1D, ∑Infilt_3D, hydroInfilt, infiltOutput, T
 	end  # function: INFILT_INITIALIZE
 
 

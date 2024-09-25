@@ -976,14 +976,14 @@ module lab
 	module infilt
 		import ...wrc, ...kunsat, ...cst, ...psdThetar, ...psdFunc, ...bestFunc, ...sorptivity
 		# using Plots, Plots.PlotMeasures, LaTeXStrings
-		using CairoMakie, ColorSchemes
+		using CairoMakie, ColorSchemes, Colors
 		export  PLOT_∑INFILT, PLOT_∑INFILT_θΨ
 
 						# ================================================================
 				# Plotting parameters
-				ColourOption_No    = 1
+				
 				Linewidth          = 2
-				height             = 300
+				height             = 200
 				labelsize          = 15
 				textcolor          = :blue
 				textsize           = 20
@@ -1016,15 +1016,14 @@ module lab
 
 				Markersize = 12
 
+				ColourOption_No    = 5
 				ColourOption = [:glasbey_hv_n256,:seaborn_bright,:seaborn_colorblind,:seaborn_dark,:seaborn_deep,:tab10,:tableau_10,:tol_bright]
-
-				Colormap = cgrad(colorschemes[ColourOption[ColourOption_No]], size(colorschemes[ColourOption[ColourOption_No]]), categorical=true)
-
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : PLOT_∑INFILT
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, infiltOutput, N_Infilt, NiZ, option, param, Path, Tinfilt)
+		function PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, Infilt_SeIni, infiltOutput, N_Infilt, NiZ, option, param, Path, Tinfilt)
+
 			println("  ==  START: PLOT_∑INFILT  == \n")
 			
 				for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
@@ -1037,15 +1036,18 @@ module lab
 						Fig =  Figure(fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
 
 					# << PLOT 1 >>
-						Title = " iZ= $(IdSelect[iZ])"
+						Title = "Cumulative infiltration iZ= $(IdSelect[iZ])"
 
 						# Plot_∑infilt_Obs
-						Axis_Infilt = Axis(Fig[1, 1], xlabel= L"Time \ [minutes]", ylabel=L"\sum infiltration \ [mm]", title=Title, titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")
+						Axis_Infilt = Axis(Fig[1, 1], xlabel= "Time [minutes]", ylabel="∑ infiltration [mm]", title=Title, titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")
 
 							Label ="Obs_$(string(option.infilt.DataSingleDoubleRing⍰))_Ring"
 							X = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
 							Y = ∑Infilt_Obs[iZ,1:N_Infilt[iZ]]
 							scatter!(Axis_Infilt, X, Y, color=:red, markersize=Markersize, marker = '●', label=Label)
+		
+							xlims!(Axis_Infilt, (0, maximum(X)))
+							ylims!(Axis_Infilt, (0, nothing))
 
 						# Plot_∑infilt_Sim
 							Label = "Sim_3D"
@@ -1055,30 +1057,51 @@ module lab
 
 							Label = "Sim_1D"
 							Y2 = ∑Infilt_1D[iZ,1:N_Infilt[iZ]]
-							lines!(Axis_Infilt, X, Y2, color=:green, linewidth=Linewidth, label=Label)  
+							lines!(Axis_Infilt, X, Y2, color=:green, linewidth=Linewidth, linestyle=(:dash, :dense), label=Label)  
 
 						# TransSteady
-							Label="T_TransSteady"
+							Label="Time_TransSteady"
 							X = zeros(Float64,1)
 							Y = zeros(Float64,1)
 							X[1] = Tinfilt[iZ,infiltOutput.iT_TransSteady_Data[iZ]] / 60.0
 							Y[1] = ∑Infilt_Obs[iZ,infiltOutput.iT_TransSteady_Data[iZ]]
 
-							scatter!(Axis_Infilt, X, Y, color=:violet, markersize=30, marker =:star6, label=Label)
-
+							scatter!(Axis_Infilt, X, Y, color=:turquoise3, markersize=30, marker =:vline, label=Label)
+							
 							Legend(Fig[1,2], Axis_Infilt, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
 
-					Path₂ = Path * "INFIL_" * string(option.infilt.Model⍰)  *  "_" * string(IdSelect[iZ]) *  ".svg"
 
+						# Plot_∑infilt_SeIni
+						Title = "Cumulative 1D infiltration at different initial effective soil moisture"
+
+						Axis_Infilt_SeIni = Axis(Fig[2, 1], xlabel= "Time [minutes]", ylabel=" ∑ infiltration [mm]", title=Title, titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")
+
+						Colormap = cgrad(ColourOption[ColourOption_No], length(Infilt_SeIni), categorical = true)
+	
+						for (iSeIni, iiSeIni) in enumerate(Infilt_SeIni)
+							X = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
+							Y = ∑Infilt_1D_SeIni[iZ,1:N_Infilt[iZ], iSeIni]
+
+							lines!(Axis_Infilt_SeIni, X, Y, linewidth=Linewidth, colormap=Colormap[iSeIni], label= "Sₑ=" * string(iiSeIni))
+						end
+
+						lines!(Axis_Infilt_SeIni, 0.0:1.0:maximum(X), x->10.0, linewidth=Linewidth, linestyle=(:dash, :normal), color=:navyblue)
+
+						xlims!(Axis_Infilt_SeIni, (0, maximum(X)))
+						ylims!(Axis_Infilt_SeIni, (0, nothing))
+						
+						Legend(Fig[2,2], Axis_Infilt_SeIni, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
+							
 					# General
 						resize_to_layout!(Fig)
 						trim!(Fig.layout)
-						colgap!(Fig.layout, 10)
-						rowgap!(Fig.layout, 10)
-
+						colgap!(Fig.layout, 15)
+						rowgap!(Fig.layout, 15)
+						
+						Path₂ = Path * "INFIL_" * string(option.infilt.Model⍰)  *  "_" * string(IdSelect[iZ]) *  ".svg"
+						println("    ~  $(Path₂) ~")
 						save(Path₂, Fig)
 						display(Fig)
-						println("    ~  $(Path₂) ~")
 				end # for iZ=1:NiZ
 			println("  ==  END: PLOT_∑INFILT  == \n")
 			return nothing

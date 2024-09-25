@@ -315,9 +315,9 @@ module AquaPore_Toolkit
 
 			# RUNNING INFILTRATION MODEL
 			if @isdefined hydro
-				infiltOutput, hydroInfilt, ∑Infilt_3D, ∑Infilt_1D = infiltStart.START_INFILTRATION(∑Infilt_Obs=∑Infilt_Obs, ∑Psd=∑Psd, hydro=hydro, hydroInfilt=hydroInfilt, infiltParam=infiltParam, N_Infilt=N_Infilt, NiZ=NiZ, option=option, param=param,Tinfilt=Tinfilt)
+				∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, hydroInfilt, Infilt_SeIni, infiltOutput, Time_2_Infilt = infiltStart.START_INFILTRATION(∑Infilt_Obs=∑Infilt_Obs, ∑Psd=∑Psd, hydro=hydro, hydroInfilt=hydroInfilt, infiltParam=infiltParam, N_Infilt=N_Infilt, NiZ=NiZ, option=option, param=param,Tinfilt=Tinfilt)
 			else
-				infiltOutput, hydroInfilt, ∑Infilt_3D, ∑Infilt_1D = infiltStart.START_INFILTRATION(∑Infilt_Obs=∑Infilt_Obs, ∑Psd=∑Psd, hydroInfilt=hydroInfilt, infiltParam=infiltParam, N_Infilt=N_Infilt, NiZ=NiZ, option=option, param=param, Tinfilt=Tinfilt)
+				∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, hydroInfilt, Infilt_SeIni, infiltOutput, Time_2_Infilt = infiltStart.START_INFILTRATION(∑Infilt_Obs=∑Infilt_Obs, ∑Psd=∑Psd, hydroInfilt=hydroInfilt, infiltParam=infiltParam, N_Infilt=N_Infilt, NiZ=NiZ, option=option, param=param, Tinfilt=Tinfilt)
 			end
 		printstyled("\n ----- END: RUNNING Infiltration ----------------------------------------------- \n"; color=:yellow)
 		end # option.run.Infiltration
@@ -378,6 +378,9 @@ module AquaPore_Toolkit
 				table.infilt.HYDRO_INFILT(hydroInfilt, IdSelect, NiZ, path.tableSoilwater.Table_HydroInfilt)
 
 				table.infilt.INFILT(IdSelect, NiZ, infiltOutput, path.tableSoilwater.Table_Infilt)
+
+				table.infilt.INFILT_SEINI(IdSelect, NiZ, Time_2_Infilt, Infilt_SeIni, path.tableSoilwater.Table_Infilt_SeIni)
+				# Time_2_Infilt
 			end # option.run.Infiltration
 
 
@@ -419,7 +422,7 @@ module AquaPore_Toolkit
 
 				if option.run.Infiltration # <>=<>=<>=<>=<>
 					if option.infilt.Plot_∑Infiltration  
-						plot.infilt.PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, infiltOutput, N_Infilt, NiZ, option, param, path.plotSoilwater.Plot_∑infilt_Opt, Tinfilt)
+						plot.infilt.PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, Infilt_SeIni, infiltOutput, N_Infilt, NiZ, option, param, path.plotSoilwater.Plot_∑infilt_Opt, Tinfilt)
 					end
 					if option.infilt.Plot_θΨ
 						if option.run.HydroLabθΨ⍰ ≠ "No"

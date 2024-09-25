@@ -53,19 +53,20 @@ module paths
 	end # struct INPUT_TABLE_SMAP	
 
 	@option mutable struct TABLE_SOILWATER
-		Path_Soilwater_Table::String
-		Table_HydroInfilt::String
-		Table_Infilt::String
-		Table_KsModel_Ks::String
-		Table_KsModel::String
-		Table_KsModel_τ::String
-		Table_KΨ::String
-		Table_Psd_θΨ_θ::String
-		Table_Psd::String
-		Table_θΨ_Psd::String
-		Table_θΨK::String
-		TableComplete_KΨ::String
-		TableComplete_θΨ::String
+      Path_Soilwater_Table :: String
+      TableComplete_KΨ     :: String
+      TableComplete_θΨ     :: String
+      Table_HydroInfilt    :: String
+      Table_Infilt         :: String
+      Table_Infilt_SeIni   :: String
+      Table_KsModel        :: String
+      Table_KsModel_Ks     :: String
+      Table_KsModel_τ      :: String
+      Table_KΨ             :: String
+      Table_Psd            :: String
+      Table_Psd_θΨ_θ       :: String
+      Table_θΨK            :: String
+      Table_θΨ_Psd         :: String
 	end # struct INPUT_SOILWATER
 
 	@option mutable struct PLOT_SOILWATER	
@@ -177,6 +178,7 @@ module paths
 			path.tableSoilwater.Path_Soilwater_Table = Path_Soilwater_Table
 			path.tableSoilwater.Table_HydroInfilt    = Path_Soilwater_Table * path.option.ModelName * "_" *string(opt.infilt.Model⍰) * "_" *  path.option.ModelName  *  "_" * path.tableSoilwater.Table_HydroInfilt
 			path.tableSoilwater.Table_Infilt         = Path_Soilwater_Table * path.option.ModelName * "_" *string(opt.infilt.Model⍰) *  "_" *  path.option.ModelName  *  "_" *  path.tableSoilwater.Table_Infilt
+			path.tableSoilwater.Table_Infilt_SeIni         = Path_Soilwater_Table * path.option.ModelName * "_" *string(opt.infilt.Model⍰) *  "_" *  path.option.ModelName  *  "_" *  path.tableSoilwater.Table_Infilt_SeIni
 			path.tableSoilwater.Table_KsModel_Ks        = Path_Soilwater_Table * "_"  *  path.option.ModelName * "_" *  path.option.Select  * "_" * path.tableSoilwater.Table_KsModel_Ks
 			path.tableSoilwater.Table_KsModel        = Path_Soilwater_Table * "_"  *  path.option.ModelName * "_" *  opt.ksModel.KₛModel⍰ * "_" * path.tableSoilwater.Table_KsModel
 			path.tableSoilwater.Table_KsModel_τ        = Path_Soilwater_Table * "_"  *  path.option.ModelName * "_" *  opt.ksModel.KₛModel⍰  * "_" * path.tableSoilwater.Table_KsModel_τ
