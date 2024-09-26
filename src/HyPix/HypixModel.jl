@@ -155,7 +155,7 @@ module hypixModel
 				end # if: optionHypix
 
 			# SORPTIVITY TO COMPUTE INFILTRATION RATE
-				Sorptivity = sorptivity.SORPTIVITY(θ[iT-1, 1], 1, hydro, optionHypix, optionHypix; Rtol = 10^-3.0, SorptivityModelScaled=false)
+				Sorptivity = sorptivity.SORPTIVITY(θ[iT-1, 1], 1, hydro, optionHypix, optionHypix; Rtol = 10^-3.0)
 
 			# SOLVING THE EXPLICIT RICHARDS
 			🎏_NoConverge, 🎏_ReRun, Hpond, iCount_ReRun, iNonConverge, iTer, IterCount, Q, ΔRunoff, ΔT, θ, Ψ = richard.RICHARD_ITERATION(∂K∂Ψ, ∂R∂Ψ, ∂R∂Ψ△, ∂R∂Ψ▽, discret, 🎏_NoConverge, Hpond, hydro, iCount_ReRun, iNonConverge, iT, IterCount, K_Aver_Vect, K_Aver₀_Vect, Nz, optionHypix, paramHypix, Pkₐᵥₑᵣ, Q, Residual, Sorptivity, ΔLnΨmax, ΔPrThroughfall, ΔRunoff, ΔSink, ΔT, θ, Ψ_Max, Ψ_Min, Ψ, Ψbest)

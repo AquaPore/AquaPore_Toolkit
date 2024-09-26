@@ -76,7 +76,6 @@ module options
       RockInjectedIncluded⍰     :: String
 	end
 	@option mutable struct INFILT
-      BestUniv_Continous    :: Bool
       DataSingleDoubleRing⍰ :: String
       HydroModel⍰           :: String
       KosugiModel_KΨ⍰       :: String
@@ -87,7 +86,6 @@ module options
       Plot_θΨ               :: Bool
       Plot_∑Infiltration    :: Bool
       SorptivityModel⍰      :: String
-      SorptivitySplitModel⍰ :: String
       ΨmacMat_2_σMac_ΨmMac  :: Bool
       θrOpt⍰                :: String
       σ_2_Ψm⍰               :: String

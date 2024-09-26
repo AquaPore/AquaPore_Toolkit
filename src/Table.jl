@@ -329,18 +329,21 @@ module table
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : HYDRO_INFILT
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function HYDRO_INFILT(hydroInfilt, IdSelect, NiZ, Path)
+			function HYDRO_INFILT(hydroInfilt, IdSelect, NiZ::Int64, Path, Soilname)
 				println("    ~  $Path ~")
 
 				Matrix, FieldName_String = tool.readWrite.STRUCT_2_FIELDNAME(NiZ, hydroInfilt)
 
-				# Matrix = hcat(Matrix, KunsatModel_Infilt)
+				# Matrix = hcat(Matrix, KunsatModel_Infilt)\
+
+				pushfirst!(FieldName_String, "Soilname") # Write the "Soilname" at the very begenning
+				# push!(FieldName_String, string("Kunsat_θΨ"))
 				
 				pushfirst!(FieldName_String, string("Id")) # Write the "Id" at the very begenning
 				# push!(FieldName_String, string("Kunsat_θΨ"))
 
 				Matrix =  round.(Matrix, digits=10)
-				CSV.write(Path, Tables.table( [string.(IdSelect) Matrix]), writeheader=true, header=FieldName_String, bom=true)
+				CSV.write(Path, Tables.table( [string.(IdSelect) Soilname Matrix]), writeheader=true, header=FieldName_String, bom=true)
 			return nothing
 			end  # function: HYDRO_INFILT
 
@@ -348,30 +351,34 @@ module table
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : infilt
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function INFILT(IdSelect, NiZ, infiltOutput, Path)
+			function INFILT(IdSelect, infiltOutput, NiZ::Int64, Path, Soilname)
 				println("    ~  $Path ~")
 
 				Matrix, FieldName_String = tool.readWrite.STRUCT_2_FIELDNAME(NiZ::Int64, infiltOutput)
+
+				pushfirst!(FieldName_String, "Soilname") # Write the "Soilname" at the very begenning				
 				
 				pushfirst!(FieldName_String, string("Id")) # Write the "Id" at the very begenning
 
 				Matrix =  round.(Matrix, digits=5)
-				CSV.write(Path, Tables.table( [string.(IdSelect) Matrix]), writeheader=true, header=FieldName_String, bom=true)
+				CSV.write(Path, Tables.table( [string.(IdSelect) Soilname Matrix]), writeheader=true, header=FieldName_String, bom=true)
 			return nothing
 			end  # function: HYDRO_INFILT
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : infilt
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function INFILT_SEINI(IdSelect, NiZ, Time_2_Infilt, Infilt_SeIni, Path)
+			function INFILT_SEINI(IdSelect, Infilt_SeIni, NiZ::Int64, Path, Soilname, Time_2_Infilt)
 				println("    ~  $Path ~")
 
 				FieldName_String = "SeIni=" .* string.(Infilt_SeIni)
-				
+
+				pushfirst!(FieldName_String, "Soilname") # Write the "Soilname" at the very begenning					
+
 				pushfirst!(FieldName_String, string("Id/Seconds")) # Write the "Id" at the very begenning
 
 				Matrix =  round.(Time_2_Infilt, digits=1)
-				CSV.write(Path, Tables.table( [string.(IdSelect) Matrix]), writeheader=true, header=FieldName_String, bom=true)
+				CSV.write(Path, Tables.table( [string.(IdSelect) Soilname Matrix]), writeheader=true, header=FieldName_String, bom=true)
 			return nothing
 			end  # function: HYDRO_INFILT
 		

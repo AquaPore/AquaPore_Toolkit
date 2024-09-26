@@ -375,11 +375,11 @@ module AquaPore_Toolkit
 			end  # if: option.run.KsModel
 
 			if option.run.Infiltration # <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
-				table.infilt.HYDRO_INFILT(hydroInfilt, IdSelect, NiZ, path.tableSoilwater.Table_HydroInfilt)
+				table.infilt.HYDRO_INFILT(hydroInfilt, IdSelect, NiZ, path.tableSoilwater.Table_HydroInfilt, Soilname)
 
-				table.infilt.INFILT(IdSelect, NiZ, infiltOutput, path.tableSoilwater.Table_Infilt)
+				table.infilt.INFILT(IdSelect, infiltOutput, NiZ, path.tableSoilwater.Table_Infilt, Soilname)
 
-				table.infilt.INFILT_SEINI(IdSelect, NiZ, Time_2_Infilt, Infilt_SeIni, path.tableSoilwater.Table_Infilt_SeIni)
+				table.infilt.INFILT_SEINI(IdSelect, Infilt_SeIni, NiZ, path.tableSoilwater.Table_Infilt_SeIni, Soilname, Time_2_Infilt)
 				# Time_2_Infilt
 			end # option.run.Infiltration
 
@@ -422,7 +422,7 @@ module AquaPore_Toolkit
 
 				if option.run.Infiltration # <>=<>=<>=<>=<>
 					if option.infilt.Plot_∑Infiltration  
-						plot.infilt.PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, Infilt_SeIni, infiltOutput, N_Infilt, NiZ, option, param, path.plotSoilwater.Plot_∑infilt_Opt, Tinfilt)
+						plot.infilt.PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, Infilt_SeIni, infiltOutput, N_Infilt, NiZ, option, param, path.plotSoilwater.Plot_∑infilt_Opt, Soilname, Tinfilt)
 					end
 					if option.infilt.Plot_θΨ
 						if option.run.HydroLabθΨ⍰ ≠ "No"
@@ -443,7 +443,6 @@ module AquaPore_Toolkit
 		#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 
 		end #iSim
-
 		
 		printstyled("				==== ==== ==== Path = $(path.option.OutputNumber) ==== ==== ===="; color=:blue)
 
@@ -470,6 +469,6 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
 
-	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Infiltration")
+	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="InfiltNz")
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)

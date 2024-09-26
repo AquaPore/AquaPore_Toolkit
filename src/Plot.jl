@@ -1022,13 +1022,13 @@ module lab
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : PLOT_∑INFILT
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, Infilt_SeIni, infiltOutput, N_Infilt, NiZ, option, param, Path, Tinfilt)
+		function PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, Infilt_SeIni, infiltOutput, N_Infilt, NiZ, option, param, Path, Soilname, Tinfilt)
 
 			println("  ==  START: PLOT_∑INFILT  == \n")
 			
 				for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
 
-					# Starting to plot	
+					# Starting to plot	 
 						# CairoMakie.activate!(type="svg", pt_per_unit=1)
 						# Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
 						
@@ -1036,7 +1036,7 @@ module lab
 						Fig =  Figure(fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
 
 					# << PLOT 1 >>
-						Title = "Cumulative infiltration iZ= $(IdSelect[iZ])"
+						Title = "Cumulative infiltration Id= $(IdSelect[iZ]) ; Soilname=$(Soilname[iZ])"
 
 						# Plot_∑infilt_Obs
 						Axis_Infilt = Axis(Fig[1, 1], xlabel= "Time [minutes]", ylabel="∑ infiltration [mm]", title=Title, titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")
@@ -1061,12 +1061,12 @@ module lab
 
 						# TransSteady
 							Label="Time_TransSteady"
-							X = zeros(Float64,1)
-							Y = zeros(Float64,1)
-							X[1] = Tinfilt[iZ,infiltOutput.iT_TransSteady_Data[iZ]] / 60.0
-							Y[1] = ∑Infilt_Obs[iZ,infiltOutput.iT_TransSteady_Data[iZ]]
+							X3 = zeros(Float64,1)
+							Y3 = zeros(Float64,1)
+							X3[1] = Tinfilt[iZ,infiltOutput.iT_TransSteady_Data[iZ]] / 60.0
+							Y3[1] = ∑Infilt_Obs[iZ,infiltOutput.iT_TransSteady_Data[iZ]]
 
-							scatter!(Axis_Infilt, X, Y, color=:turquoise3, markersize=30, marker =:vline, label=Label)
+							scatter!(Axis_Infilt, X3, Y3, color=:turquoise3, markersize=30, marker =:vline, label=Label)
 							
 							Legend(Fig[1,2], Axis_Infilt, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
 
@@ -1079,10 +1079,10 @@ module lab
 						Colormap = cgrad(ColourOption[ColourOption_No], length(Infilt_SeIni), categorical = true)
 	
 						for (iSeIni, iiSeIni) in enumerate(Infilt_SeIni)
-							X = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
-							Y = ∑Infilt_1D_SeIni[iZ,1:N_Infilt[iZ], iSeIni]
+							X4 = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
+							Y4 = ∑Infilt_1D_SeIni[iZ,1:N_Infilt[iZ], iSeIni]
 
-							lines!(Axis_Infilt_SeIni, X, Y, linewidth=Linewidth, colormap=Colormap[iSeIni], label= "Sₑ=" * string(iiSeIni))
+							lines!(Axis_Infilt_SeIni, X4, Y4, linewidth=Linewidth, colormap=Colormap[iSeIni], label= "Sₑ=" * string(iiSeIni))
 						end
 
 						lines!(Axis_Infilt_SeIni, 0.0:1.0:maximum(X), x->10.0, linewidth=Linewidth, linestyle=(:dash, :normal), color=:navyblue)

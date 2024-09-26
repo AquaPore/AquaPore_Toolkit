@@ -34,13 +34,13 @@ module infiltInitialize
 		# TIME FLUX CORRECTION
 			N_Infilt_Max = maximum(N_Infilt[1:NiZ])
 
-			T = fill(0.0::Float64, (NiZ, N_Infilt_Max))
+			Time = fill(0.0::Float64, (NiZ, N_Infilt_Max))
 			for iZ=1:NiZ
-				# T[iZ,1] = ( (Tinfilt[iZ,1] ^0.5 + (0.0)^0.5) / 2.0 ) ^ 2.0
-				T[iZ,1] = Tinfilt[iZ,1]
+				# Time[iZ,1] = ( (Tinfilt[iZ,1] ^0.5 + (0.0)^0.5) / 2.0 ) ^ 2.0
+				Time[iZ,1] = Tinfilt[iZ,1]
 
 				for iInfilt=2:N_Infilt[iZ]
-					T[iZ,iInfilt] = ( (Tinfilt[iZ,iInfilt] ^ 0.5 + Tinfilt[iZ,iInfilt-1] ^ 0.5) / 2.0 ) ^ 2.0
+					Time[iZ,iInfilt] = ( (Tinfilt[iZ,iInfilt] ^ 0.5 + Tinfilt[iZ,iInfilt-1] ^ 0.5) / 2.0 ) ^ 2.0
 				end	
 			end #  iZ=1:NiZ
 
@@ -48,13 +48,13 @@ module infiltInitialize
 			infiltOutput = infiltStruct.INFILTSTRUCT(NiZ)
 
 		# DETERMENING WHEN STEADY STATE OCCURES
-			infiltOutput = timeTransSteady.∑INFIlT_2_TIMETRANSSTEADY(∑Infilt_Obs, infiltOutput, N_Infilt, NiZ, param, T) 
+			infiltOutput = timeTransSteady.∑INFIlT_2_TIMETRANSSTEADY(∑Infilt_Obs, infiltOutput, N_Infilt, NiZ, param, Time) 
 
 		# Initializing Infiltration		
 			∑Infilt_3D = fill(0.0::Float64, (NiZ, N_Infilt_Max))
 			∑Infilt_1D = fill(0.0::Float64, (NiZ, N_Infilt_Max))
 
-	return ∑Infilt_1D, ∑Infilt_3D, hydroInfilt, infiltOutput, T
+	return ∑Infilt_1D, ∑Infilt_3D, hydroInfilt, infiltOutput, Time
 	end  # function: INFILT_INITIALIZE
 
 

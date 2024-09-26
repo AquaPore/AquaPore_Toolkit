@@ -6,7 +6,7 @@ module timeTransSteady
 	#		FUNCTION : ∑INFIlT_2_TIMETRANSSTEADY
 	#		Determening from the data when the transition between transit and steady occures
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~		
-	function  ∑INFIlT_2_TIMETRANSSTEADY(∑Infilt_Obs, infiltOutput, N_Infilt, NiZ, param, T; N_LastInfiltPoint=4, CorrectLinear=true) 
+	function  ∑INFIlT_2_TIMETRANSSTEADY(∑Infilt_Obs, infiltOutput₀, N_Infilt, NiZ, param, Time₀; N_LastInfiltPoint=4, CorrectLinear=true) 
 		
 		# FOR EVERY SOIL
 		for iZ=1:NiZ
@@ -23,7 +23,7 @@ module timeTransSteady
 				iStart = N_Infilt[iZ] - N_LastInfiltPoint + 1
 				iEnd = N_Infilt[iZ]
 
-				Intercept, Slope = stats.LINEAR_REGRESSION(T[iZ,iStart:iEnd], ∑Infilt_Obs[iZ,iStart:iEnd])
+				Intercept, Slope = stats.LINEAR_REGRESSION(Time₀[iZ,iStart:iEnd], ∑Infilt_Obs[iZ,iStart:iEnd])
 					# error("*** Most probaby a problem with SELECT_ID of infiltration data ***")
 		
 			# Starting from the last soils
@@ -32,17 +32,17 @@ module timeTransSteady
 					# iEnd = N_Infilt[iZ] - N_LastInfiltPoint
 
 					# Determine the linear regression
-						∑Infilt_Model = T[iZ,iModel] * Slope + Intercept
+						∑Infilt_Model = Time₀[iZ,iModel] * Slope + Intercept
 
 					#Determine if enough points for the linear regression since it must monotically decrease
 						if ∑Infilt_Model > ∑Infilt_Obs[iZ,iModel] && CorrectLinear == true
 								# Recompute the slope and intercept
-							Intercept, Slope = stats.LINEAR_REGRESSION(T[iZ,iModel:iEnd], ∑Infilt_Obs[iZ,iModel:iEnd])
-							∑Infilt_Model = T[iZ,iModel] * Slope + Intercept
+							Intercept, Slope = stats.LINEAR_REGRESSION(Time₀[iZ,iModel:iEnd], ∑Infilt_Obs[iZ,iModel:iEnd])
+							∑Infilt_Model = Time₀[iZ,iModel] * Slope + Intercept
 						end
 
 					# Compute the error of slope of not fitting the linear steady equation
-						ΔSlope_Err = abs(∑Infilt_Model - ∑Infilt_Obs[iZ,iModel]) / (T[iZ,iModel+1]-T[iZ,iModel])
+						ΔSlope_Err = abs(∑Infilt_Model - ∑Infilt_Obs[iZ,iModel]) / (Time₀[iZ,iModel+1]-Time₀[iZ,iModel])
 						ΔSlope_Err = rad2deg(atan(abs(ΔSlope_Err)))
 					
 					if (ΔSlope_Err >= param.infilt.ΔSlope_Err_SteadyState || iModel<=3) && 🎏_Break == false
@@ -51,9 +51,9 @@ module timeTransSteady
 
 						iModel = max(iModel - 1, 3)
 
-						infiltOutput.iT_TransSteady_Data[iZ] = iModel
+						infiltOutput₀.iT_TransSteady_Data[iZ] = iModel
 						
-						infiltOutput.T_TransSteady_Data[iZ] = T[iZ,iModel]
+						infiltOutput₀.T_TransSteady_Data[iZ] = Time₀[iZ,iModel]
 
 						break # To speed up
 					end # 	if i-1 >= 1
@@ -62,7 +62,7 @@ module timeTransSteady
 
 		end # for iZ=1
 
-		return infiltOutput
+		return infiltOutput₀
 
 	end # function: INFIlTOBS_2_iTIME_TRANS_STEADy
 

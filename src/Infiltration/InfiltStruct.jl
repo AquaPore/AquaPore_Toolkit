@@ -29,7 +29,7 @@ module infiltStruct
          Nse_Steady          = zeros(Float64, NiZ)
          Nse                 = zeros(Float64, NiZ)
 			
-			return infiltOutput = INFILT(Sorptivity, iT_TransSteady_Data, T_TransSteady_Data, Nse_Trans, Nse_Steady, Nse)
+			return infiltOutput₀ = INFILT(Sorptivity, iT_TransSteady_Data, T_TransSteady_Data, Nse_Trans, Nse_Steady, Nse)
 
 		end  # function: INFILTSTRUCT
 

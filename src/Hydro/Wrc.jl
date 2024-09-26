@@ -212,8 +212,7 @@ module wrc
 				if KosugiModel_θΨ⍰ == "Traditional" || KosugiModel_θΨ⍰ == "Mualem"
 					θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
 
-					θ_Mac = 0.5 * max(θs - θsMacMat, 0.0) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))
-					
+					θ_Mac = 0.5 * max(θs - θsMacMat, 0.0) * erfc((log(Ψ₁ / ΨmMac)) / (σMac * √2.0))	
 					return θ_Mac + θ_Mat
 
 				
@@ -221,7 +220,6 @@ module wrc
 						θ_Mat = 0.5 * (θsMacMat - θr) * erfc((log( Ψ₁ / Ψm)) / (σ * √2.0)) + θr
 
 						θ_Mac = 0.5 * max(θs - θsMacMat, 0.0) * erfc((Pσ_Mac / √2.0 ) * (log(Ψ₁) / log(√ΨmacMat) - 1.0))
-
 						return θ_Mac + θ_Mat
 				
 
@@ -287,6 +285,12 @@ module wrc
 		#		FUNCTION : ∂θ∂Ψ
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function ∂θ∂Ψ(;Ψ₁, θs, θsMacMat, θr, Ψm, σ, ΨmMac, ΨmacMat, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
+
+				# Physically constraining the hydraulic parameters
+				if ΨmacMat_2_σMac_ΨmMac == true
+					ΨmMac = hydroRelation.FUNC_ΨmacMat_2_ΨmMac(;ΨmacMat)
+					σMac  = hydroRelation.FUNC_ΨmacMat_2_σMac(;ΨmacMat)
+				end
 
 				if Ψ₁ > eps(100.0)
 
@@ -389,14 +393,14 @@ module wrc
 				θ₂[1] = θ₁
 				Func_∂Ψ∂θ_Numerical = θ₂ -> ForwardDiff.gradient(∂Ψ∂θ_Numerical, θ₂)
 
-				∂Ψ∂θ₀ = Func_∂Ψ∂θ_Numerical(θ₂)[1]
+			return ∂Ψ∂θ₀ = Func_∂Ψ∂θ_Numerical(θ₂)[1]
 
-				if isnan(∂Ψ∂θ₀)
-					println( "======== wrc.kg.∂Ψ∂θ = NaN ======== ")
-					return 1.0
-				else
-					return ∂Ψ∂θ₀
-				end
+				# if isnan(∂Ψ∂θ₀)
+				# 	println( "======== wrc.kg.∂Ψ∂θ = NaN ======== ")
+				# 	return 1.0
+				# else
+				# 	return ∂Ψ∂θ₀
+				# end
 			end # function ∂Ψ∂θ
 		#-------------------------------------------------------------------
 
