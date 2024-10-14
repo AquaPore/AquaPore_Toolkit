@@ -10,7 +10,6 @@ module timeTransSteady
 		
 		# FOR EVERY SOIL
 		for iZ=1:NiZ
-
 			🎏_Break = false
 
 			# Want at least 3 remaining points
@@ -24,12 +23,10 @@ module timeTransSteady
 				iEnd = N_Infilt[iZ]
 
 				Intercept, Slope = stats.LINEAR_REGRESSION(Time₀[iZ,iStart:iEnd], ∑Infilt_Obs[iZ,iStart:iEnd])
-					# error("*** Most probaby a problem with SELECT_ID of infiltration data ***")
 		
 			# Starting from the last soils
 				for i =1:N_Infilt[iZ] - N_LastInfiltPoint - 1
 					iModel = N_Infilt[iZ] - N_LastInfiltPoint - i
-					# iEnd = N_Infilt[iZ] - N_LastInfiltPoint
 
 					# Determine the linear regression
 						∑Infilt_Model = Time₀[iZ,iModel] * Slope + Intercept
@@ -45,13 +42,13 @@ module timeTransSteady
 						ΔSlope_Err = abs(∑Infilt_Model - ∑Infilt_Obs[iZ,iModel]) / (Time₀[iZ,iModel+1]-Time₀[iZ,iModel])
 						ΔSlope_Err = rad2deg(atan(abs(ΔSlope_Err)))
 					
-					if (ΔSlope_Err >= param.infilt.ΔSlope_Err_SteadyState || iModel<=3) && 🎏_Break == false
+					if (ΔSlope_Err >= param.infilt.ΔSlope_Err_SteadyState || iModel<=3) && 🎏_Break==false
 
 						🎏_Break = true
 
 						iModel = max(iModel - 1, 3)
 
-						infiltOutput₀.iT_TransSteady_Data[iZ] = iModel
+						infiltOutput₀.iT_TransSteady_Data[iZ] = iModel # TODO needs to understand why get 0
 						
 						infiltOutput₀.T_TransSteady_Data[iZ] = Time₀[iZ,iModel]
 
@@ -59,11 +56,9 @@ module timeTransSteady
 					end # 	if i-1 >= 1
 					
 				end # for i = N_Infilt[iZ] - N_LastInfiltPoint:-1:1
-
 		end # for iZ=1
 
-		return infiltOutput₀
-
+	return infiltOutput₀
 	end # function: INFIlTOBS_2_iTIME_TRANS_STEADy
 
 end  # macro timeTransSteady

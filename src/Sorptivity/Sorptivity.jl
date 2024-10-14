@@ -30,17 +30,6 @@ module sorptivity
 				end # SORPTIVITY_θ² ~~~~~~~~~~~~~~~~~
 
 				# Sorptivity_θ² = QuadGK.quadgk(θ -> SORPTIVITY_θ²(hydroInfilt₀, iZ, θ, θini, optionₘ), θini, θ⬙, rtol=Rtol)[1]
-
-				# @show iZ
-				# println("")
-				# @show hydroInfilt₀.θs[iZ] 
-				# @show hydroInfilt₀.θr[iZ]
-				# @show hydroInfilt₀.Ks[iZ]
-				# @show hydroInfilt₀.σ[iZ] 
-				# @show hydroInfilt₀.Ψm[iZ]
-				# @show hydroInfilt₀.θsMacMat[iZ]
-				# @show hydroInfilt₀.ΨmMac[iZ] 
-				@show hydroInfilt₀.σMac[iZ] 
 		
 				Sorptivity_θ² = QuadGK.quadgk(θ -> SORPTIVITY_θ²(hydroInfilt₀, iZ, θ, θini, optionₘ), θini, θ⬙)[1]
 

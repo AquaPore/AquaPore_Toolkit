@@ -18,14 +18,6 @@ module table
 
 			FieldName_String = ["Id", path.option.Select]
 
-			# Output = Tables.table( [IdSelect[1:NiZ] Select[1:NiZ]] )
-			
-			# CSV.write(Path, Output, header=FieldName_String, delim=',')
-
-			# open(Path, "w") do io
-			# 	DelimitedFiles.writedlm(io,[FieldName_String] , ",",) # Header
-			# 	DelimitedFiles.writedlm(io, [string.(IdSelect[1:NiZ]) Select[1:NiZ]], ",")
-			# end
 			CSV.write(Path, Tables.table([string.(IdSelect[1:NiZ]) Select[1:NiZ]]), writeheader=true, header=FieldName_String, bom=true)
 		return nothing
 		end  # function:  TABLE_ID
