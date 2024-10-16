@@ -1022,7 +1022,7 @@ module lab
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : PLOT_∑INFILT
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, Infilt_SeIni, infiltOutput, N_Infilt, NiZ, option, param, Path, Soilname, Tinfilt)
+		function PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, IdSelect, Infilt_SeIni, infiltOutput, infiltParam, N_Infilt, NiZ, option, param, Path, Soilname, Tinfilt)
 
 			println("  ==  START: PLOT_∑INFILT  == \n")
 			
@@ -1030,15 +1030,14 @@ module lab
 					println("=== iZ=$iZ ===")
 
 					# Starting to plot	 
-						# CairoMakie.activate!(type="svg", pt_per_unit=1)
-						# Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
-						
-						CairoMakie.activate!(type="svg")
-						Fig =  Figure(fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
+						CairoMakie.activate!(type="svg", pt_per_unit=1)
+						Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
 
 					# << PLOT 1 >>
-						Title = "Cumulative infiltration Id= $(IdSelect[iZ]) ; Soilname=$(Soilname[iZ])"
-						println(Title)
+
+						θini_θs = infiltParam.θini[iZ] / hydroInfilt.θs[iZ] 
+						Title = "∑infiltration Id=$(IdSelect[iZ]) ; Soilname=$(Soilname[iZ]) ; θᵢₙᵢ/θₛ=$(round(θini_θs, digits=2))"
+		
 
 						# Plot_∑infilt_Obs
 						Axis_Infilt = Axis(Fig[1, 1], xlabel= "Time [minutes]", ylabel="∑ infiltration [mm]", title=Title, titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")

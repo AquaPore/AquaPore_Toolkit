@@ -422,7 +422,7 @@ module AquaPore_Toolkit
 
 				if option.run.Infiltration # <>=<>=<>=<>=<>
 					if option.infilt.Plot_∑Infiltration  
-						plot.infilt.PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, IdSelect, Infilt_SeIni, infiltOutput, N_Infilt, NiZ, option, param, path.plotSoilwater.Plot_∑infilt_Opt, Soilname, Tinfilt)
+						plot.infilt.PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, IdSelect, Infilt_SeIni, infiltOutput, infiltParam, N_Infilt, NiZ, option, param, path.plotSoilwater.Plot_∑infilt_Opt, Soilname, Tinfilt)
 					end
 					if option.infilt.Plot_θΨ
 						if option.run.HydroLabθΨ⍰ ≠ "No"
