@@ -8,7 +8,7 @@ module bestFunc
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : BEST
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function BEST_UNIVERSAL_START(∑Infilt_3D₀, hydroInfilt₀, infiltParam₀, iZ, N_Infilt, option, Time₀; θini=infiltParam₀.θini[iZ])
+		function BEST_UNIVERSAL_START(∑Infilt_1D₀, ∑Infilt_3D₀, hydroInfilt₀, infiltParam₀, iZ, N_Infilt, option, Time₀; θini=infiltParam₀.θini[iZ])
 
 			# Initializing
 			Se_Ini = wrc.θ_2_Se(θ₁=θini, θs=hydroInfilt₀.θs[iZ], θr=hydroInfilt₀.θr[iZ])
@@ -25,10 +25,15 @@ module bestFunc
 			T_TransSteady = bestFunc.TIME_TRANS_STEADY(B, hydroInfilt₀.Ks[iZ], Sorptivity)
 
 			for iT = 1:N_Infilt[iZ]
-				∑Infilt_3D₀[iZ, iT] = BEST_UNIVERSAL(iZ, A, B, Sorptivity, Time₀[iZ,iT], T_TransSteady, hydroInfilt₀, infiltParam₀, option)
+				if option.infilt.DataSingleDoubleRing⍰ == "Single"
+					∑Infilt_3D₀[iZ, iT] = BEST_UNIVERSAL(iZ, A, B, Sorptivity, Time₀[iZ,iT], T_TransSteady, hydroInfilt₀, infiltParam₀, option)
+
+				elseif option.infilt.DataSingleDoubleRing⍰ == "Double" 
+					∑Infilt_1D₀[iZ, iT] = BEST_UNIVERSAL(iZ, A, B, Sorptivity, Time₀[iZ,iT], T_TransSteady, hydroInfilt₀, infiltParam₀, option) 
+				end
 			end  # for iT=1:N_Infilt[iZ] 
 
-		return ∑Infilt_3D₀, T_TransSteady
+		return ∑Infilt_1D₀, ∑Infilt_3D₀, T_TransSteady
 		end # function: BEST_UNIVERSAL_START
 
 	# <>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>=<>
@@ -52,7 +57,6 @@ module bestFunc
 				else
 					return ∑Infilt_1D₀ = bestFunc.INFILTRATION_1D_STEADY(B, iZ, hydroInfilt₀.Ks[iZ], Sorptivity, Time₀, infiltParam₀, option, T_TransSteady)
 				end # Time₀ <= T_TransSteady
-
 			end # option.∑Infilt_3D₀.Dimension	
 		end  # function: BEST_UNIVERSAL
 	#.................................................................
@@ -80,9 +84,7 @@ module bestFunc
 	#		FUNCTION : INFILTRATION_3D_STEADY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function INFILTRATION_3D_STEADY(A, B, iZ, Ks, Sorptivity, Time₀, infiltParam₀, option, T_TransSteady)
-
 			return bestFunc.INFILTRATION_3D_TRANSIT(A, B, Ks, Sorptivity, T_TransSteady) + (A * (Sorptivity ^ 2.0) + Ks) * (Time₀ - T_TransSteady)
-
 		end  # function: INFILTRATION_3D_STEADY
 	#.................................................................
 
@@ -91,9 +93,7 @@ module bestFunc
 	#		FUNCTION : INFILTRATION_1D_STEADY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function INFILTRATION_1D_STEADY(B, iZ, Ks, Sorptivity, Time₀, infiltParam₀, option, T_TransSteady)
-
 			return bestFunc.INFILTRATION_1D_TRANSIT(B, Ks, Sorptivity, T_TransSteady) + Ks * (Time₀ - T_TransSteady)
-				
 		end  # function: INFILTRATION_1D_STEADY
 	#.................................................................
 

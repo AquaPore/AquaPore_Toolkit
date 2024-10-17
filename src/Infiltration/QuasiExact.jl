@@ -66,7 +66,6 @@ module quasiExact
 
 			Se_Ini = wrc.θ_2_Se(θ₁=infiltParam₀.θini[iZ], θs=hydroInfilt₀.θs[iZ], θr=hydroInfilt₀.θr[iZ])
 
-			# K_θini = kunsat.Se_2_KUNSAT(option.infilt, Se_Ini, iZ, hydroInfilt₀)
 			K_θini = kunsat.KUNSAT_θΨSe(option.infilt, -1.0, iZ, hydroInfilt₀; θ₁=-1.0, Se₁=Se_Ini)
 
 			ΔK = hydroInfilt₀.Ks[iZ] - K_θini
@@ -75,9 +74,9 @@ module quasiExact
 		
 			# At t=1
             ∑Infilt_3D₀[1] = 0.0
-            Infilt_η[1]   = 0.0
-            Infilt_η_Min  = 10^-8
-            Infilt_η_Max  = Infilt_η_Max_Start #Since Time₀[1] = 0
+            Infilt_η[1]    = 0.0
+            Infilt_η_Min   = 10^-8
+            Infilt_η_Max   = Infilt_η_Max_Start #Since Time₀[1] = 0
 
 			# ~~~~~~~~~~~~~~~~~~~~
 			function OF_QUASIEXACTη(Infilt_η, infiltParam₀, iZ, Time_η)
@@ -170,6 +169,4 @@ module quasiExact
 	return Wof = (W * Of_Trans / Float64(iT_TransSteady-1)) + ((1.0 - W) * Of_Stead / Float64(N_Infilt[iZ] - iT_TransSteady + 1)) + Of_Penalty
 	end # function: OF_INFILT_2_HYDRO
 	
-
-
 end # module quasiExact

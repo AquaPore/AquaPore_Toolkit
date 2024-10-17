@@ -33,7 +33,7 @@ module infiltStart
 					infiltParam.θini[iZ] = max(hydroInfilt.θr[iZ] + eps(), infiltParam.θini[iZ])
 
 				if option.infilt.Model⍰ == "Best_Univ"
-					∑Infilt_3D, T_TransStead =  bestFunc.BEST_UNIVERSAL_START(∑Infilt_3D, hydroInfilt, infiltParam, iZ, N_Infilt, option, Time)
+					∑Infilt_1D, ∑Infilt_3D, T_TransStead =  bestFunc.BEST_UNIVERSAL_START(∑Infilt_1D, ∑Infilt_3D, hydroInfilt, infiltParam, iZ, N_Infilt, option, Time)
 
 				elseif option.infilt.Model⍰ == "QuasiExact"
 					∑Infilt_3D = quasiExact.HYDRO_2_INFILTRATION3D(∑Infilt_3D, hydroInfilt, infiltParam, iZ, N_Infilt, option, Time)
@@ -50,7 +50,7 @@ module infiltStart
 				
 				SearchRange =[(log10(hydroInfilt.Ks_Min), log10(hydroInfilt.Ks_Max))]
 
-				Optimization = BlackBoxOptim.bboptimize(P -> OF_INFILT_2_HYDRO(∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; Ks=10.0^P[1])[1]; SearchRange=SearchRange, NumDimensions=1, TraceMode=:silent)
+				Optimization = BlackBoxOptim.bboptimize(P -> OF_INFILT_2_HYDRO(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; Ks=10.0^P[1])[1]; SearchRange=SearchRange, NumDimensions=1, TraceMode=:silent)
 
 				hydroInfilt.Ks[iZ] = 10.0 ^ BlackBoxOptim.best_candidate(Optimization)[1]
 
@@ -59,7 +59,7 @@ module infiltStart
 				if option.infilt.σ_2_Ψm⍰ == "Constrained"
 					SearchRange =[ (hydroInfilt.σ_Min[iZ], hydroInfilt.σ_Max[iZ]), (0.0, 1.0), (log10(hydroInfilt.Ks_Min[iZ]), log10(hydroInfilt.Ks_Max[iZ]))]
 
-					Optimization = BlackBoxOptim.bboptimize(P -> OF_INFILT_2_HYDRO(∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; σ=P[1], Ψm=P[2], Ks=10.0^P[3])[1]; SearchRange=SearchRange, NumDimensions=3, TraceMode=:silent)
+					Optimization = BlackBoxOptim.bboptimize(P -> OF_INFILT_2_HYDRO(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; σ=P[1], Ψm=P[2], Ks=10.0^P[3])[1]; SearchRange=SearchRange, NumDimensions=3, TraceMode=:silent)
 
 					hydroInfilt.σ[iZ]  = BlackBoxOptim.best_candidate(Optimization)[1]
 					hydroInfilt.Ψm[iZ] = BlackBoxOptim.best_candidate(Optimization)[2]
@@ -71,7 +71,7 @@ module infiltStart
 				elseif option.infilt.σ_2_Ψm⍰ == "No"
 					SearchRange =[ (hydroInfilt.σ_Min[iZ], hydroInfilt.σ_Max[iZ]), (log10(hydroInfilt.Ψm_Min[iZ]), log10(hydroInfilt.Ψm_Max[iZ])), (log10(hydroInfilt.Ks_Min[iZ]), log10(hydroInfilt.Ks_Max[iZ]))]
 
-					Optimization = BlackBoxOptim.bboptimize(P -> OF_INFILT_2_HYDRO(∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; σ=P[1], Ψm=10.0^P[2], Ks=10.0^P[3])[1]; SearchRange=SearchRange, NumDimensions=3, TraceMode=:silent)
+					Optimization = BlackBoxOptim.bboptimize(P -> OF_INFILT_2_HYDRO(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; σ=P[1], Ψm=10.0^P[2], Ks=10.0^P[3])[1]; SearchRange=SearchRange, NumDimensions=3, TraceMode=:silent)
 
 					hydroInfilt.σ[iZ]  = BlackBoxOptim.best_candidate(Optimization)[1]
 					hydroInfilt.Ψm[iZ] = 10.0 ^ BlackBoxOptim.best_candidate(Optimization)[2]
@@ -80,7 +80,7 @@ module infiltStart
 				elseif option.infilt.σ_2_Ψm⍰ == "UniqueRelationship"
 					SearchRange =[ (hydroInfilt.θr_Min[iZ], hydroInfilt.θr_Max[iZ]), (hydroInfilt.σ_Min[iZ], hydroInfilt.σ_Max[iZ]), (log10(hydroInfilt.Ks_Min[iZ]), log10(hydroInfilt.Ks_Max[iZ]))]
 
-					Optimization = BlackBoxOptim.bboptimize(P -> OF_INFILT_2_HYDRO(∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; θr=P[1], σ=P[2], Ks=10.0^P[3])[1]; SearchRange=SearchRange, NumDimensions=3, TraceMode=:silent)
+					Optimization = BlackBoxOptim.bboptimize(P -> OF_INFILT_2_HYDRO(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; θr=P[1], σ=P[2], Ks=10.0^P[3])[1]; SearchRange=SearchRange, NumDimensions=3, TraceMode=:silent)
 
                hydroInfilt.θr[iZ] = BlackBoxOptim.best_candidate(Optimization)[1]
                hydroInfilt.σ[iZ]  = BlackBoxOptim.best_candidate(Optimization)[2]
@@ -103,7 +103,7 @@ module infiltStart
 				infiltOutput.Sorptivity[iZ] = sorptivity.SORPTIVITY(infiltParam.θini[iZ], iZ, hydroInfilt, option, option.infilt) 
 
 				if option.infilt.Model⍰ == "Best_Univ"
-					∑Infilt_3D, T_TransStead = bestFunc.BEST_UNIVERSAL_START(∑Infilt_3D, hydroInfilt, infiltParam, iZ, N_Infilt, option, Time)
+					∑Infilt_1D, ∑Infilt_3D, T_TransStead = bestFunc.BEST_UNIVERSAL_START(∑Infilt_1D, ∑Infilt_3D, hydroInfilt, infiltParam, iZ, N_Infilt, option, Time)
 
 				elseif option.infilt.Model⍰ == "QuasiExact"
 					∑Infilt_3D = quasiExact.HYDRO_2_INFILTRATION3D(∑Infilt_3D, hydroInfilt, infiltParam, iZ, N_Infilt, option, Time)
@@ -159,7 +159,7 @@ module infiltStart
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OF_INFILT_2_HYDRO
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OF_INFILT_2_HYDRO(∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; σ=hydroInfilt.σ[iZ], Ψm=hydroInfilt.Ψm[iZ], θr=hydroInfilt.θr[iZ], θs=hydroInfilt.θs[iZ], Ks=hydroInfilt.Ks[iZ])
+		function OF_INFILT_2_HYDRO(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, param, Time; σ=hydroInfilt.σ[iZ], Ψm=hydroInfilt.Ψm[iZ], θr=hydroInfilt.θr[iZ], θs=hydroInfilt.θs[iZ], Ks=hydroInfilt.Ks[iZ])
 
          hydroInfilt.θs[iZ]       = θs
          hydroInfilt.θr[iZ]       = θr
@@ -173,7 +173,7 @@ module infiltStart
 			hydroInfilt = hydroRelation.FUNCTION_σ_2_Ψm_SOFTWARE(hydroInfilt, iZ, option.infilt, param.hydro)
 
 			if option.infilt.Model⍰ == "Best_Univ"
-				return Nse = ofBest.OF_BEST(∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, Time; W=0.5)
+				return Nse = ofBest.OF_BEST(∑Infilt_1D, ∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, Time; W=0.5)
 
 			elseif option.infilt.Model⍰ == "QuasiExact"
 				return Nse =quasiExact.OF_QUASIEXACT(∑Infilt_Obs, hydroInfilt, infiltOutput, infiltParam, iZ, N_Infilt, option, Time)
@@ -210,11 +210,13 @@ module infiltStart
 						# infiltOutput₁.Sorptivity[iZ] = sorptivity.SORPTIVITY(infiltParam₁.θini[iZ], iZ, hydroInfilt₁, option, option.infilt) 
 
 					if option.infilt.Model⍰ == "Best_Univ"
-						∑Infilt_3D₁, ~ = bestFunc.BEST_UNIVERSAL_START(∑Infilt_3D₁, hydroInfilt₁, infiltParam₁, iZ, N_Infilt, option, T₁)
+						∑Infilt_1D₁, ∑Infilt_3D₁, ~ = bestFunc.BEST_UNIVERSAL_START(∑Infilt_1D₁, ∑Infilt_3D₁, hydroInfilt₁, infiltParam₁, iZ, N_Infilt, option, T₁)
 
-						# Converting to 1D
-						∑Infilt_1D₁ = bestFunc.CONVERT_3D_2_1D(∑Infilt_3D₁, ∑Infilt_1D₁, hydroInfilt₁, infiltParam₁, iZ, N_Infilt, option, T₁)
-
+						if option.infilt.DataSingleDoubleRing⍰ == "Single"
+							# Converting to 1D
+							∑Infilt_1D₁ = bestFunc.CONVERT_3D_2_1D(∑Infilt_3D₁, ∑Infilt_1D₁, hydroInfilt₁, infiltParam₁, iZ, N_Infilt, option, T₁)	
+						end
+						
 					elseif option.infilt.Model⍰ == "QuasiExact"
 						∑Infilt_3D₁ = quasiExact.HYDRO_2_INFILTRATION3D(∑Infilt_3D₁, hydroInfilt₁, infiltParam₁, iZ, N_Infilt, option, T₁)
 
