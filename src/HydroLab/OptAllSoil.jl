@@ -37,7 +37,6 @@ export OPTIMIZE_ALLSOILS
 			return Count_NoImprovement > Count_NoImprovement_Max
 			end # ===========
 
-
 			if WHEN_TO_STOP(oc)
 				printstyled("\n ========= Count_NoImprovement_Max achieved  ======", color=:red)
 				BlackBoxOptim.shutdown!(oc)

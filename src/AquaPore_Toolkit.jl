@@ -155,7 +155,6 @@ module AquaPore_Toolkit
 				
 			# IF WE WANT TO DERIVE Ks FROM θ(Ψ)
 				if option.hydro.HydroModel⍰ == "Kosugi" && (option.run.KsModel || !(option.data.Kθ && "Ks" ∈ optim.ParamOpt))
-					
 					ksmodelτ, optimKsmodel = reading.KSΨMODEL_PARAM(NiZ, option, param, path.inputGuiSoilwater.GUI_KsModel) 
 				end
 
@@ -252,8 +251,9 @@ module AquaPore_Toolkit
 			KₛModel = fill(NaN::Float64, NiZ)
 
 			if option.hydro.HydroModel⍰ == "Kosugi" && (option.run.KsModel || !(option.data.Kθ && "Ks" ∈ optim.ParamOpt))
+
 				printstyled("\n ----- START RUNNING Ks Model from θ(Ψ)  ----------------------------------------------- \n"; color=:red)
-					printstyled("		Running KsModel= ", option.ksModel.KₛModel⍰, "\n" ; color=:green)
+				printstyled("		Running KsModel= ", option.ksModel.KₛModel⍰, "\n" ; color=:green)
 
 				hydro, KₛModel, N_Class = startKsModel.START_KSΨMODEL(hydro, KₛModel, ksmodelτ, NiZ, optim, optimKsmodel, option, param, path; IsTopsoil=IsTopsoil, RockFragment=RockFragment, Ks_Impermeable=Ks_Impermeable, ∑Psd=∑Psd)
 
@@ -467,8 +467,8 @@ printstyled("\n\n ===== START SOIL WATER TOOLBOX =====, \n"; color=:green)
 
 	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="Pumice")
 
-	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="SmapHydro")
+	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="KsGroup")
 
-	@time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="InfiltNz")
+	# @time AquaPore_Toolkit.AQUAPORE_TOOLBOX(;Soilwater_OR_Hypix⍰="SoilWater", SiteName_Hypix="LYSIMETERS", SiteName_Soilwater="InfiltNz")
 
 printstyled("\n ==== END SOIL WATER TOOLBOX ====, \n"; color=:red)

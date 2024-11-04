@@ -50,6 +50,8 @@ function PLOT_HEATMAP_2(SiteName, θZₐᵥₑᵣ, Option_Data)
    HEATMAP(Df, Df_θZₐᵥₑᵣ, Header_θZₐᵥₑᵣ, Nit, Option_Data, PathOutput, SiteName; Height= 500, Width = Width)
 end
 
+# ---------------------------------------------------------------------------------------------------------------
+
 function HEATMAP(Df, Df_θZₐᵥₑᵣ, Header_θZₐᵥₑᵣ, Nit, Option_Data, PathOutput, SiteName; Height=400, Width=1000)
 
    N_θZₐᵥₑᵣ = length(Df_θZₐᵥₑᵣ)

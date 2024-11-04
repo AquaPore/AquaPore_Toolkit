@@ -336,6 +336,8 @@ module lab
 				# Leg1 = Colorbar(Fig, Fig_Ks, label = "Theta", ticklabelsize = 14, labelpadding = 5, width = 10)
 
 			# PLOTTING K₁₀ₖₚₐ
+			🎏_K₁₀ₖₚₐ = false
+			if 🎏_K₁₀ₖₚₐ 
 				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, xlabel=L"$K10kpa _{sim}$ $[mm$ $h^{-1}]$", ylabel=L"$K10kpa _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xminorticksvisible=true, xminorticks=IntervalsBetween(9), yminorticksvisible=true, yminorticks=IntervalsBetween(9))
 
 				KΨ_Obs₁₀ₖₚₐ = KΨ_Obs₁₀ₖₚₐ .* cst.MmS_2_MmH
@@ -359,22 +361,23 @@ module lab
 				Line = range(0.0, stop=Ks_Max, length=10) 
 				Fig_Ks = lines!(Fig[1,2], Line, Line, color=:grey, linestyle=:dash, linewidth=5)
 					
-			# Colour bas
-				Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical=true, labelsize=LabelSize, width=30, ticksize=TickSize, ticklabelsize=TickLabelSize, labelpadding=5) # :thermal, :ice, :viridis, :plasma
+				# Colour bas
+					Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical=true, labelsize=LabelSize, width=30, ticksize=TickSize, ticklabelsize=TickLabelSize, labelpadding=5) # :thermal, :ice, :viridis, :plasma
 				
-			# Letters
-				for (ax, label) in zip([Axis_Ks, Axis_KΨ], ["(A)", "(B)"])
-					text!(
-						ax, 0, 1,
-						text = label, 
-						font = :bold,
-						align = (:left, :top),
-						offset = (4, -2),
-						space = :relative,
-						fontsize = TitleSize,
-						colour=:brown
-					)
-				end
+				# Letters
+					for (ax, label) in zip([Axis_Ks, Axis_KΨ], ["(A)", "(B)"])
+						text!(
+							ax, 0, 1,
+							text = label, 
+							font = :bold,
+							align = (:left, :top),
+							offset = (4, -2),
+							space = :relative,
+							fontsize = TitleSize,
+							color=:brown
+						)
+					end
+			end # 🎏_ K₁₀ₖₚₐ
 
 			# Final adjustments
 				Label(Fig[1, 1:2, Top()], Title, valign=:bottom, font=:bold, padding = (0, 0, 20, 0), fontsize=TitleSize)
@@ -399,7 +402,7 @@ module lab
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : KSMODEL_TCLAY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL_FUNCTIONS(Path, option, ksmodelτ, ipClass; τₚ=ksmodelτ.τₚ[ipClass], τclay₀=ksmodelτ.τclay₀[ipClass],τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass],τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass])
+		function KSMODEL_FUNCTIONS(Path, option, ksmodelτ, ipClass; τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τclay₀=ksmodelτ.τclay₀[ipClass],τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass],τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass])
 		
 			# DERIVING THE DATA TO PLOT
 				σ = 0.75:0.001:3.0
@@ -433,7 +436,7 @@ module lab
 						Clayₙ = max(Clay - X_Clay₁, 0.0) / (1.0 - X_Clay₁)
 
 						ΔθsMacθrₙ =  max(ΘsMacMatΘr[iΘsΘr] - τclayΔθsr , 0.0) 
-						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τₚ - 1.0) 
+						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
 
 						Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5) 
 
@@ -444,8 +447,8 @@ module lab
 			# PLOTTING
 				#P arameters
 				# Dimensions of figure
-					Height = 800 # Height of plot
-					Width  = 1000  # Width of plot
+					Height = 200 # Height of plot
+					Width  = 600 # Width of plot
 
 				# Size of X and Y label
 					XlabelSize = 45
@@ -464,7 +467,7 @@ module lab
 					ColourMap = :plasma # :thermal :plasma, :ice, :viridis, :plasma
 
 			# Activating the figure
-				CairoMakie.activate!(type = "svg")
+				CairoMakie.activate!(type = "svg", pt_per_unit=1)
 				Fig = Figure(font="Sans", fontsize=NumberSize)
 
 			# PLOTTING KsModel1	
@@ -476,6 +479,7 @@ module lab
 				for iΘsΘr=1:NΘsΘr
 					Fig_Model1 = lines!(Axis_KsModel1, σ[1:Nσ], Func_Ks1[iΘsΘr, 1:Nσ], linewidth=5, colormap =Colormap[iΘsΘr], label =string(ΘsMacMatΘr[iΘsΘr]))
 				end
+
 
 			# PLOTTING KsModel2	
 				Axis_KsModel3 = Axis(Fig[2,1], title="", width=Width, height=Height, xlabel=L"$σ [-]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, xminorticks=IntervalsBetween(10), yminorticksvisible=true, yminorticks=IntervalsBetween(10), yscale=Makie.pseudolog10)

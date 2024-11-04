@@ -304,7 +304,8 @@ module optIndivSoil
 				if  optionₘ.HydroModel⍰ == "Kosugi"
 					hydro.θsMacMat[iZ] = min(hydro.θsMacMat_ƞ[iZ] * (hydro.θs[iZ] - hydro.θr[iZ]) + hydro.θr[iZ], hydro.θs[iZ])
 
-					if hydro.θsMacMat_ƞ[iZ] > 0.94
+					# Snapping if 
+					if hydro.θsMacMat_ƞ[iZ] > hydro.θsMacMat_ƞ_Max[iZ] - 0.03
 						hydro.θsMacMat_ƞ[iZ] = 1.0
 						hydro.θsMacMat[iZ]   = hydro.θs[iZ]
 						# hydro.ΨmacMat[iZ]    = hydro.ΨmacMat_Min[iZ]

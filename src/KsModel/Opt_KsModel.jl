@@ -56,18 +56,21 @@ module optKsModel
 					# K(Ψ) simulated
 						Kθ_Sim = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ_Obs[iΨ]; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, RockFragment=RockFragment, IsTopsoil=IsTopsoil)
 
-						Kθ_Log_Sim[iΨ] = log(Kθ_Sim)
+						Kθ_Log_Sim[iΨ] = log10(Kθ_Sim)
 
 					# K(Ψ) oberved
 						Kθ_Obs = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Obs[iΨ], iZ, hydro)
-						Kθ_Log_Obs[iΨ] = log(Kθ_Obs)
+						Kθ_Log_Obs[iΨ] = log10(Kθ_Obs)
 				end # for iΨ =1:N_ΨObs
 
 				if option.ksModel.Of_KₛModel⍰ == "Wilmot"
 					Of_Kθ = Of_Kθ + (1.0 - abs(stats.NSE_WILMOT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])))
-				else
+				elseif option.ksModel.Of_KₛModel⍰ == "Ccc"
 					Of_Kθ = Of_Kθ + stats.RMSE_CONCORDANCE_CORELATION_COEFICIENT(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])
+				elseif option.ksModel.Of_KₛModel⍰ == "Rmse"
+					Of_Kθ = Of_Kθ + stats.RMSE(Kθ_Log_Obs[1:N_ΨObs], Kθ_Log_Sim[1:N_ΨObs])
 				end
+
 			end # if ClassBool_Select[iZ]
 			end # for iZ=1:NiZ		
 		return Of_Kθ 

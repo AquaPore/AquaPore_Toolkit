@@ -529,7 +529,7 @@ module reading
          🎏_Opt       :: Bool
 		end
 
-		function KSΨMODEL_PARAM(NiZ, option, param, Path) 
+		function KSΨMODEL_PARAM(NiZ, option, param, Path;  OptColumn=:OPT1) 
 			# Read data
 				Data = CSV.File(Path, header=true)
 
@@ -569,12 +569,13 @@ module reading
 					ParamValue = ParamValue[iSelectModel]
 
 			# Reading which parameters to be optimized [1 or 0]
-				Opt = convert(Vector{Int64}, Tables.getcolumn(Data, :OPT))
+				Opt = convert(Vector{Int64}, Tables.getcolumn(Data, OptColumn))
 					# Selecing rows of the model of interest
 					Opt = Opt[iSelectModel]
 
 			# Number of parameters to be optimised
 				N_Opt = sum(Opt)
+
 				# Determine if we need to optimize
 					if N_Opt ≥ 1
 						🎏_Opt = true

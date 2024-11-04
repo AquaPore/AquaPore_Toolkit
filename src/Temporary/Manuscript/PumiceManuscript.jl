@@ -731,8 +731,6 @@ module pumiceManuscript
 
 			Texture = ["Sandy soils", "Silty soils", "Clay soils"] 
 
-	
-
 			ΨmacMat = collect(range(30.0, stop=200.0, length=3))
 			N_ΨmacMat = length(ΨmacMat)
 
