@@ -56,11 +56,11 @@ module optKsModel
 					# K(Ψ) simulated
 						Kθ_Sim = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ_Obs[iΨ]; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, RockFragment=RockFragment, IsTopsoil=IsTopsoil)
 
-						Kθ_Log_Sim[iΨ] = log10(Kθ_Sim)
+						Kθ_Log_Sim[iΨ] = log10(cst.MmS_2_MmH .* Kθ_Sim)
 
 					# K(Ψ) oberved
 						Kθ_Obs = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Obs[iΨ], iZ, hydro)
-						Kθ_Log_Obs[iΨ] = log10(Kθ_Obs)
+						Kθ_Log_Obs[iΨ] = log10(cst.MmS_2_MmH .*  Kθ_Obs)
 				end # for iΨ =1:N_ΨObs
 
 				if option.ksModel.Of_KₛModel⍰ == "Wilmot"

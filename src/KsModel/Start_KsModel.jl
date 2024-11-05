@@ -6,7 +6,7 @@ include("θψ_2_KsModel.jl")
 include("Opt_KsModel.jl")
 
 module startKsModel
-	import ..kunsat, ..optKsModel, ..plot, ..stats, ..θψ_2_KsψModel
+	import ..kunsat, ..optKsModel, ..plot, ..stats, ..θψ_2_KsψModel, ..cst
 	import Statistics
 	export START_KSΨMODEL
 
@@ -188,18 +188,18 @@ module startKsModel
 	
 			# STATISTICS
 				# For observed and simulated Ks
-               Nse_τ₀    = stats.NSE(log10.(hydro.Ks[ClassBool]) , log10.(KₛModel[ClassBool]))
-               Rmse_τ₀   = stats.RMSE(log10.(hydro.Ks[ClassBool]) , log10.(KₛModel[ClassBool]))
-               σ_τ₀      = Statistics.std(log10.(hydro.Ks[ClassBool]) .- log10.(KₛModel[ClassBool]))
-               Wilmot_τ₀ = stats.NSE_WILMOT(log10.(hydro.Ks[ClassBool]) , log10.(KₛModel[ClassBool]))
-               Ccc_τ₀    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log.(hydro.Ks[ClassBool]), log.(KₛModel[ClassBool]))
+               Nse_τ₀    = stats.NSE(log10.(cst.MmS_2_MmH * hydro.Ks[ClassBool]) , log10.(cst.MmS_2_MmH * KₛModel[ClassBool]))
+               Rmse_τ₀   = stats.RMSE(log10.( hydro.Ks[ClassBool]) , log10.( KₛModel[ClassBool]))
+               σ_τ₀      = Statistics.std((hydro.Ks[ClassBool]) .-(KₛModel[ClassBool]))
+               Wilmot_τ₀ = stats.NSE_WILMOT(log10.(cst.MmS_2_MmH * hydro.Ks[ClassBool]) , log10.(cst.MmS_2_MmH * KₛModel[ClassBool]))
+               Ccc_τ₀    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log10.(cst.MmS_2_MmH * hydro.Ks[ClassBool]), log10.(cst.MmS_2_MmH * KₛModel[ClassBool]))
 
 				# For observed and simulated K(Ψ₁₀ₖₚₐ)
-               Nse_KΨ₁₀ₖₚₐ    = stats.NSE(log10.(KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log10.(KΨ_Sim₁₀ₖₚₐ[ClassBool]))
-               Rmse_KΨ₁₀ₖₚₐ   = stats.RMSE(log10.(KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log10.(KΨ_Sim₁₀ₖₚₐ[ClassBool]))
+               Nse_KΨ₁₀ₖₚₐ    = stats.NSE(log10.(cst.MmS_2_MmH * KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log10.(cst.MmS_2_MmH * KΨ_Sim₁₀ₖₚₐ[ClassBool]))
+               Rmse_KΨ₁₀ₖₚₐ   = stats.RMSE(log10.(cst.MmS_2_MmH * KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log10.(cst.MmS_2_MmH * KΨ_Sim₁₀ₖₚₐ[ClassBool]))
                σ_KΨ₁₀ₖₚₐ      = Statistics.std(log10.(KΨ_Sim₁₀ₖₚₐ[ClassBool]).-log10.(KΨ_Obs₁₀ₖₚₐ[ClassBool]))
-               Wilmot_KΨ₁₀ₖₚₐ = stats.NSE_WILMOT(log10.(KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log10.(KΨ_Sim₁₀ₖₚₐ[ClassBool]))
-               Ccc_KΨ₁₀ₖₚₐ    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log.(KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log.(KΨ_Sim₁₀ₖₚₐ[ClassBool]))
+               Wilmot_KΨ₁₀ₖₚₐ = stats.NSE_WILMOT(log10.(cst.MmS_2_MmH * KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log10.(cst.MmS_2_MmH * KΨ_Sim₁₀ₖₚₐ[ClassBool]))
+               Ccc_KΨ₁₀ₖₚₐ    = stats.stats.NSE_CONCORDANCE_CORELATION_COEFICIENT(log10.(cst.MmS_2_MmH * KΨ_Obs₁₀ₖₚₐ[ClassBool]) , log10.(cst.MmS_2_MmH * KΨ_Sim₁₀ₖₚₐ[ClassBool]))
 
 				if ipClass == 0
 					println("\n       === Statistics all data === \n")
