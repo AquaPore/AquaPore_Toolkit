@@ -155,7 +155,7 @@ module AquaPore_Toolkit
 				
 			# IF WE WANT TO DERIVE Ks FROM θ(Ψ)
 				if option.hydro.HydroModel⍰ == "Kosugi" && (option.run.KsModel || !(option.data.Kθ && "Ks" ∈ optim.ParamOpt))
-					ksmodelτ, optimKsmodel = reading.KSΨMODEL_PARAM(NiZ, option, param, path.inputGuiSoilwater.GUI_KsModel) 
+					ksmodelτ, optimKsmodel = reading.KSΨMODEL_PARAM(IdSelect_True, NiZ, option, param, path.inputGuiSoilwater.GUI_KsModel, path.inputSoilwater.KsModelClass)
 				end
 
 

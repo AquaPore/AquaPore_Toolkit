@@ -517,6 +517,32 @@ module reading
 	return hydro, optim, optimAllSoils
 	end  # function: GUI_HydroParam
 
+
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#		FUNCTION : KS_CLASS
+	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	function KS_CLASS(IdSelect_True, NiZ, Path)
+
+		if isfile(Path)
+			# Read data
+				println("    ~  $(Path) ~")
+				Data = CSV.read(Path, DataFrame, header=true)
+
+				DataFrames.sort!(Data, [:Id])
+
+				KsClass = convert(Vector{Int64}, Data.KsClass)
+
+				# Selecting the ones of interest
+				return KsClass = KsClass[IdSelect_True]
+
+		# If not available than the file would be created
+		else
+			return KsClass = ones(Float64, NiZ)
+		end
+	end  # function: KS_CLASS
+	# ------------------------------------------------------------------
+
+
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION :  KSΨMODEL_PARAM
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -527,27 +553,31 @@ module reading
          ParamOpt     :: Array{String}
          NparamOpt    :: Vector{Int64}
          🎏_Opt       :: Bool
+         KsClass      :: Vector{Int64}
+         N_KsClass    :: Int64
 		end
 
-		function KSΨMODEL_PARAM(NiZ, option, param, Path;  OptColumn=:OPT1) 
-			# Read data
-				Data = CSV.File(Path, header=true)
+		function KSΨMODEL_PARAM(IdSelect_True, NiZ, option, param, Path_GUI, Path_KsModelClass;  OptColumn=:OPTION_1)
+			# Reading the KsClass which splits the data from 1...3
+            KsClass   = KS_CLASS(IdSelect_True, NiZ, Path_KsModelClass)
+				N_KsClass = maximum(KsClass)
 
 			# Reading MODEL data
-				 KₛModel⍰ = convert(Vector{String}, Tables.getcolumn(Data, :MODEL))
-				 Ndata = length(KₛModel⍰)
+				Data = CSV.File(Path_GUI, header=true)
+				KₛModel⍰ = convert(Vector{String}, Tables.getcolumn(Data, :MODEL))
+				Ndata = length(KₛModel⍰)
 
 			# Determening which rows correspond to the selected MODEL
-			iSelectModel = [] 
-			for i=1:Ndata
-				if  KₛModel⍰[i] == string(option.ksModel.KₛModel⍰)
-					append!(iSelectModel, i)
-				end
-			end # for i=1:Ndata
+				iSelectModel = [] 
+				for i=1:Ndata
+					if  KₛModel⍰[i] == string(option.ksModel.KₛModel⍰)
+						append!(iSelectModel, i)
+					end
+				end # for i=1:Ndata
 
-			if isempty(iSelectModel)
-				error("$(option.ksModel.KₛModel⍰) does not exist in GUI_KsModel.csv")
-			end
+				if isempty(iSelectModel)
+					error("$(option.ksModel.KₛModel⍰) does not exist in GUI_KsModel.csv")
+				end
 			# Reading names of the parameters
 				Param_Name = convert(Vector{String}, Tables.getcolumn(Data, :ParamName))
 					# Selecing rows of the model of interest
@@ -583,99 +613,87 @@ module reading
 						🎏_Opt = false
 					end
 
-			#CLASSES ========================
-			# Number of classes of subdividing the data    
-			   if option.ksModel.Class
-					N_Class = length(param.ksModel.σₛₚₗᵢₜ) - 1
-					println("						Spliting the data in $N_Class classes")
-
-				elseif option.ksModel.OptIndivSoil
-					N_Class = NiZ
-
-				else
-					N_Class = 1
+			# === CLASSES ========================				
+				if option.ksModel.OptIndivSoil
+					N_KsClass = NiZ
 				end
 
-				ParamOpt     = fill(""::String, (N_Class, N_Opt))
-            ParamOpt_Min = fill(0.0::Float64, (N_Class, N_Opt))
-            ParamOpt_Max = fill(0.0::Float64, (N_Class, N_Opt))
-            NparamOpt    = fill(0::Int64, N_Class)
+				printstyled("\n	=== === ==== Spliting the data into $N_KsClass classes  === === ====\n"; color=:red)
+
+				ParamOpt     = fill(""::String, (N_KsClass, N_Opt))
+            ParamOpt_Min = fill(0.0::Float64, (N_KsClass, N_Opt))
+            ParamOpt_Max = fill(0.0::Float64, (N_KsClass, N_Opt))
+            NparamOpt    = fill(0::Int64, N_KsClass)
 
 				# Declaring structure
 				if option.ksModel.OptIndivSoil
 					ksmodelτ = ksModel.STRUCT_KSMODEL(Nτ_Layer=NiZ)
 				else
-					ksmodelτ = ksModel.STRUCT_KSMODEL(Nτ_Layer=N_Class)
+					ksmodelτ = ksModel.STRUCT_KSMODEL(Nτ_Layer=N_KsClass)
 				end
 			
 			# Looping for every parameter of the selected model
 			i = 1
 			 for ipParamName in Param_Name
-				if !(option.ksModel.Class) && !(occursin("_", ipParamName))
-						Param_Name[i] = ipParamName
-						iClass = 1
-						🎏skip = false
+				i_ = findall("_", ipParamName)[1][1]
+				Sufix = ipParamName[i_:end]
 
-				elseif option.ksModel.Class && occursin( "_", ipParamName)					
-					i_ = findall("_", ipParamName)[1][1]
-					Sufix = ipParamName[i_:end]
+				# Cleaning the parameter name
+				ipParamName = replace(ipParamName, Sufix => "" )
 
-					# Cleaning the parameter name
-					ipParamName = replace(ipParamName, Sufix => "" )
+				# Abstracting the class number
+				iClass = parse(Int64,Sufix[2:end])
 
-					# Abstracting the class NUMBER
-					iClass = parse(Int64,Sufix[2:end])
-
-					if iClass > N_Class
-						🎏skip = true
-					else
-						🎏skip = false
-					end	
-				else
+				if iClass > N_KsClass
 					🎏skip = true
-				end
+				else
+					🎏skip = false
+				end	
+			# else
+				# 	🎏skip = true
+				# end
 
-				if !(🎏skip)
+			if !(🎏skip)
 				# Getting the Vector values of the τ parameters
-					ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName))
-					ParamValue_Vector[iClass] = Float64(ParamValue[i])
-					# Storing the value
-						setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
-						# Repeating the value of the parameters
-						if option.ksModel.OptIndivSoil
-							for iZ=1:NiZ 
-								ParamValue_Vector[iZ] = Float64(ParamValue[i])
-								# Storing the value
-								setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
-							end
+				ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName))
+				ParamValue_Vector[iClass] = Float64(ParamValue[i])
+				# Storing the value
+					setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
+					# Repeating the value of the parameters
+					if option.ksModel.OptIndivSoil
+						for iZ=1:NiZ 
+							ParamValue_Vector[iZ] = Float64(ParamValue[i])
+							# Storing the value
+							setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
 						end
+					end
 
-				# Putting the minimum value in the parameter
-					ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Min"))
-					ParamValue_Vector[iClass] = Float64(Param_Min[i])
-						# Storing the value
-						setfield!(ksmodelτ, Symbol(ipParamName * "_Min"), ParamValue_Vector)
+			# Putting the minimum value in the parameter
+				ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Min"))
+				ParamValue_Vector[iClass] = Float64(Param_Min[i])
+					# Storing the value
+					setfield!(ksmodelτ, Symbol(ipParamName * "_Min"), ParamValue_Vector)
 
-				# Putting the maximum value in the parameter
-					ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Max"))
-					ParamValue_Vector[iClass] = Float64(Param_Max[i])
-						# Storing the value
-						setfield!(ksmodelτ, Symbol(ipParamName * "_Max"), ParamValue_Vector)
+			# Putting the maximum value in the parameter
+				ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Max"))
+				ParamValue_Vector[iClass] = Float64(Param_Max[i])
+					# Storing the value
+					setfield!(ksmodelτ, Symbol(ipParamName * "_Max"), ParamValue_Vector)
 
-				# PARAM TO OPTIMIZE  
-					if Opt[i] == 1
-						NparamOpt[iClass] += 1
+			# PARAM TO OPTIMIZE  
+				if Opt[i] == 1
+					NparamOpt[iClass] += 1
 
-						ParamOpt[iClass, NparamOpt[iClass]]     = Param_Name[i]
-						ParamOpt_Min[iClass, NparamOpt[iClass]] = Param_Min[i]
-						ParamOpt_Max[iClass, NparamOpt[iClass]] = Param_Max[i]
+					ParamOpt[iClass, NparamOpt[iClass]]     = Param_Name[i]
+					ParamOpt_Min[iClass, NparamOpt[iClass]] = Param_Min[i]
+					ParamOpt_Max[iClass, NparamOpt[iClass]] = Param_Max[i]
 
-						# Checking error
-							if ParamOpt_Min[iClass, NparamOpt[iClass]] > ParamOpt_Max[iClass, NparamOpt[iClass]]
-								error("SoilWater LabOpt ERROR: $(ParamOpt[iClass, NparamOpt[iClass]]) $(ParamOpt_Min[iClass, NparamOpt[iClass]] ) < $(ParamValue[i]) < $( ParamOpt_Max[iClass, NparamOpt[iClass]]) !")
-							end
-					end # if 🎏_Opt
-				end # !(🎏skip)
+					# Checking error
+						if ParamOpt_Min[iClass, NparamOpt[iClass]] > ParamOpt_Max[iClass, NparamOpt[iClass]]
+							error("SoilWater LabOpt ERROR: $(ParamOpt[iClass, NparamOpt[iClass]]) $(ParamOpt_Min[iClass, NparamOpt[iClass]] ) < $(ParamValue[i]) < $( ParamOpt_Max[iClass, NparamOpt[iClass]]) !")
+						end
+				end # if 🎏_Opt
+			end # !(🎏skip)
 			i += 1
 			end # for loop
 
@@ -692,86 +710,92 @@ module reading
 				end  # if: option.ksModel.OptIndivSoil
 
 			# Putting values into the mutable structure
-				optimKsmodel = OPTIMKS(Param_Name, ParamOpt_Min, ParamOpt_Max, ParamOpt, NparamOpt, 🎏_Opt)
+				optimKsmodel = OPTIMKS(Param_Name, ParamOpt_Min, ParamOpt_Max, ParamOpt, NparamOpt, 🎏_Opt, KsClass, N_KsClass)
 
-			if 🎏_Opt
-				println("\n	=== === Optimizing the following τ parameters === ===")
-				println("		KsModel=" , option.ksModel.KₛModel⍰)
-				# println("		ksmodelτ=", Param_Name)
-				println("		NparamOpt_τ=" , optimKsmodel.NparamOpt)
-				println("		ParamOpt_τ= " ,  optimKsmodel.ParamOpt)
-				println("		Min_Value_τ= " , optimKsmodel.ParamOpt_Min)
-				println("		Max_Value_τ = " , optimKsmodel.ParamOpt_Max)
-				println("	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === === \n")
-			end
+			if !option.ksModel.OptIndivSoil
+				for iClass=1:N_KsClass
+					if 🎏_Opt
+						printstyled("\n	=== === Class = $iClass Optimizing the following τ parameters  === === \n"; color=:green)
+						println("		KsModel = " , option.ksModel.KₛModel⍰)
+						println("		NparamOpt_τ = " , optimKsmodel.NparamOpt[iClass])
+
+						SelectParam = findall(x->x≠"", optimKsmodel.ParamOpt[iClass,:])
+						println("		ParamOpt_τ = ",  optimKsmodel.ParamOpt[iClass,SelectParam])
+						println("		Min_Value_τ = " , optimKsmodel.ParamOpt_Min[iClass,SelectParam])
+						println("		Max_Value_τ = " , optimKsmodel.ParamOpt_Max[iClass,SelectParam])
+						println("	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === === \n")
+					end # if 🎏_Opt
+				end # for iClass=1:N_KsClass
+			end # if !option.ksModel.OptIndivSoil
+
 	return ksmodelτ, optimKsmodel
 	end  # function: KSΨMODEL_PARAM
 	# ............................................................
 
 	
-	module nsdr
-	   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      #		FUNCTION : θψLAB_2D_2_1D
-      # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			function θψLAB_2D_2_1D(Path)
-				println("    ~  $(Path) ~")
+	# module nsdr
+	#    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   #    #		FUNCTION : θψLAB_2D_2_1D
+   #    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	# 		function θψLAB_2D_2_1D(Path)
+	# 			println("    ~  $(Path) ~")
 
-				# Read data
-					Data = DelimitedFiles.readdlm(Path, ',')
-				# Read header
-					Header = Data[1,1:end]
-				# Remove first READ_ROW_SELECT
-					Data = Data[2:end,begin:end]
-				# Sort data
-					Data = sortslices(Data, dims=1)
+	# 			# Read data
+	# 				Data = DelimitedFiles.readdlm(Path, ',')
+	# 			# Read header
+	# 				Header = Data[1,1:end]
+	# 			# Remove first READ_ROW_SELECT
+	# 				Data = Data[2:end,begin:end]
+	# 			# Sort data
+	# 				Data = sortslices(Data, dims=1)
 
-				# Read data of interest
-					Id₂, NiZ = tool.readWrite.READ_HEADER_FAST(Data, Header, "Id")
+	# 			# Read data of interest
+	# 				Id₂, NiZ = tool.readWrite.READ_HEADER_FAST(Data, Header, "Id")
 
-					Soilname₂, ~ = tool.readWrite.READ_HEADER_FAST(Data, Header, "Soilname")
+	# 				Soilname₂, ~ = tool.readWrite.READ_HEADER_FAST(Data, Header, "Soilname")
 
-					Ψdata = []
-					θData = []
-					for iHeader in Header
-						if occursin("wrc", iHeader)
-							θ₀, NiZ = tool.readWrite.READ_HEADER_FAST(Data, Header, iHeader)
+	# 				Ψdata = []
+	# 				θData = []
+	# 				for iHeader in Header
+	# 					if occursin("wrc", iHeader)
+	# 						θ₀, NiZ = tool.readWrite.READ_HEADER_FAST(Data, Header, iHeader)
 
-							iHeader = replace(iHeader, "wrc" => "")
-							iHeader = replace(iHeader, "kpa" => "")
-							iHeader = replace(iHeader, " " => "")
-							iHeader_Float=  parse(Float64, iHeader)
+	# 						iHeader = replace(iHeader, "wrc" => "")
+	# 						iHeader = replace(iHeader, "kpa" => "")
+	# 						iHeader = replace(iHeader, " " => "")
+	# 						iHeader_Float=  parse(Float64, iHeader)
 
-							iHeader_Float = iHeader_Float * cst.kPa_2_Mm
+	# 						iHeader_Float = iHeader_Float * cst.kPa_2_Mm
 
-							append!(Ψdata, iHeader_Float)
+	# 						append!(Ψdata, iHeader_Float)
 
-							try
-								θData = hcat(θData[1:NiZ, :], θ₀[1:NiZ])
-							catch
-								θData = θ₀[1:NiZ]
-							end
-						end # occursin("wrc", iHeader)
-					end # for iHeader in Header
+	# 						try
+	# 							θData = hcat(θData[1:NiZ, :], θ₀[1:NiZ])
+	# 						catch
+	# 							θData = θ₀[1:NiZ]
+	# 						end
+	# 					end # occursin("wrc", iHeader)
+	# 				end # for iHeader in Header
 
-					θ_θΨobs₂ = zeros(Float64, NiZ, length(Ψdata))
-					Ψ_θΨobs₂ = zeros(Float64, NiZ, length(Ψdata))
-					N_θΨobs₂ = zeros(Int64, NiZ)
+	# 				θ_θΨobs₂ = zeros(Float64, NiZ, length(Ψdata))
+	# 				Ψ_θΨobs₂ = zeros(Float64, NiZ, length(Ψdata))
+	# 				N_θΨobs₂ = zeros(Int64, NiZ)
 	
-					for iZ=1:NiZ
-						iΨ_Count = 1
-						for iΨ=1:length(Ψdata)
-							if !isnan(θData[iZ, iΨ])
-								Ψ_θΨobs₂[iZ, iΨ_Count] = Ψdata[iΨ]
-								θ_θΨobs₂[iZ, iΨ_Count] = θData[iZ, iΨ]
-								N_θΨobs₂[iZ] += 1
-								iΨ_Count += 1
-							end #  !isnan(θData[iZ, iΨ])
-						end # iΨ
-					end # iZ
+	# 				for iZ=1:NiZ
+	# 					iΨ_Count = 1
+	# 					for iΨ=1:length(Ψdata)
+	# 						if !isnan(θData[iZ, iΨ])
+	# 							Ψ_θΨobs₂[iZ, iΨ_Count] = Ψdata[iΨ]
+	# 							θ_θΨobs₂[iZ, iΨ_Count] = θData[iZ, iΨ]
+	# 							N_θΨobs₂[iZ] += 1
+	# 							iΨ_Count += 1
+	# 						end #  !isnan(θData[iZ, iΨ])
+	# 					end # iΨ
+	# 				end # iZ
 
-			return Id₂, N_θΨobs₂, Soilname₂, θ_θΨobs₂, Ψ_θΨobs₂
-		end  # function: θψLAB_2D_2_1D
+	# 		return Id₂, N_θΨobs₂, Soilname₂, θ_θΨobs₂, Ψ_θΨobs₂
+	# 	end  # function: θψLAB_2D_2_1D
 		
-	end
+	# end
 end  # module: reading
 # ............................................................		

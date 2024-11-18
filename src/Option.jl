@@ -50,7 +50,6 @@ module options
 	end
 
 	@option mutable struct KSMODEL
-      Class        :: Bool
       KₛModel⍰     :: String
       Of_KₛModel⍰  :: String
       OptIndivSoil :: Bool

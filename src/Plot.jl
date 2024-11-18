@@ -278,7 +278,7 @@ module lab
 		function KSMODEL(KₛModel, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, Ksₒᵦₛ, NameSim::String, Path::String, θrₒᵦₛ, θsₒᵦₛ, σₒᵦₛ, option)
 
 			# Title
-				Title = "K(Ψ)model" * option.ksModel.KₛModel⍰[end-1:end]
+				Title = "NO PUMICE SOILS: K(Ψ)model" * option.ksModel.KₛModel⍰[end-1:end]
 
 			# Dimension of figure
             Height = 1000 # Height of plot
@@ -298,7 +298,7 @@ module lab
              LabelSize     = 35
         
 			# Colour map
-				ColourMap = :plasma # :plasma, :ice, :viridis, :plasma
+				ColourMap = :plasma # :plasma, :plasma, :thermal
 
 			# Activating the figure
 				CairoMakie.activate!(type = "svg")
@@ -312,8 +312,6 @@ module lab
 
             Ks_Min = minimum([minimum(Ksₒᵦₛ), minimum(KₛModel)])
             Ks_Max = maximum([maximum(Ksₒᵦₛ), maximum(KₛModel)])
-
-				@show Ks_Min, Ks_Max
 
 				# Ks_Max = 0.099371778 # mm/s
 				
@@ -329,7 +327,7 @@ module lab
 
 				ΔΘsMacΘr = θsₒᵦₛ .-  θrₒᵦₛ
 
-				Fig_Ks = scatter!(Axis_Ks, Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=135.0*ΔΘsMacΘr, marker=:circle, colormap=ColourMap, strokecolor=:black, strokewidth=1)
+				Fig_Ks = scatter!(Axis_Ks, Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=120.0*ΔΘsMacΘr, marker=:rect, colormap=ColourMap, strokecolor=:black, strokewidth=1)
 				Line = range(0.0, stop=Ks_Max, length=10) 
 				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:grey, linestyle=:dash, linewidth=5)
 
@@ -360,24 +358,24 @@ module lab
 
 				Line = range(0.0, stop=Ks_Max, length=10) 
 				Fig_Ks = lines!(Fig[1,2], Line, Line, color=:grey, linestyle=:dash, linewidth=5)
+			end # 🎏_ K₁₀ₖₚₐ
 					
 				# Colour bas
-					Colorbar(Fig[1,3], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical=true, labelsize=LabelSize, width=30, ticksize=TickSize, ticklabelsize=TickLabelSize, labelpadding=5) # :thermal, :ice, :viridis, :plasma
+					Colorbar(Fig[1,2], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical=true, labelsize=LabelSize, width=30, ticksize=TickSize, ticklabelsize=TickLabelSize, labelpadding=5) # :thermal, :ice, :viridis, :plasma
 				
 				# Letters
-					for (ax, label) in zip([Axis_Ks, Axis_KΨ], ["(A)", "(B)"])
-						text!(
-							ax, 0, 1,
-							text = label, 
-							font = :bold,
-							align = (:left, :top),
-							offset = (4, -2),
-							space = :relative,
-							fontsize = TitleSize,
-							color=:brown
-						)
-					end
-			end # 🎏_ K₁₀ₖₚₐ
+					# for (ax, label) in zip([Axis_Ks, Axis_KΨ], ["(A)", "(B)"])
+					# 	text!(
+					# 		ax, 0, 1,
+					# 		text = label, 
+					# 		font = :bold,
+					# 		align = (:left, :top),
+					# 		offset = (4, -2),
+					# 		space = :relative,
+					# 		fontsize = TitleSize,
+					# 		color=:brown
+					# 	)
+					# end
 
 			# Final adjustments
 				Label(Fig[1, 1:2, Top()], Title, valign=:bottom, font=:bold, padding = (0, 0, 20, 0), fontsize=TitleSize)

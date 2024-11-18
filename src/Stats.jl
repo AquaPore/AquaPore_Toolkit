@@ -7,14 +7,16 @@ module stats
 	#		FUNCTION : RMSE
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function RMSE(Obs, Sim; Power=2.0)
-			N = length(Obs)
-			Err = 0.0
-			iCount = 1
+         N      = length(Obs)
+         Err    = 0.0
+         iCount = 1
 			
 			for i = 1:N
 				if !(isnan(Sim[i]) || isnan(Obs[i]))
 					Err += abs(Sim[i] - Obs[i]) ^ Power
 					iCount += 1
+				else
+				println(i)
 				end
 			end
 		return (Err / Float64(iCount)) ^ (1.0 / Power)
@@ -27,9 +29,7 @@ module stats
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function NSE(Obs, Sim; Power=2.0)
 			N = length(Obs)
-			Err = 0.0
 			iCount = 1
-
 			∑Obs = 0.0
 			iCount = 1
 			for i = 1:N
@@ -40,12 +40,13 @@ module stats
 			end
 			Obs_Mean = ∑Obs / Float64(iCount)
 			
+			Err = 0.0
 			Obs_Mean_Err = 0.0
 			for i = 1:N
 				if !(isnan(Sim[i]) || isnan(Obs[i]))
-					Err += abs(Sim[i] - Obs[i]) ^ Power
+					Err += (abs(Sim[i] - Obs[i])) ^ Power
 
-					Obs_Mean_Err += abs(Obs_Mean - Obs[i]) ^ Power
+					Obs_Mean_Err += (abs(Obs[i] - Obs_Mean)) ^ Power
 				end
 			end
 		return 1.0 - (Err / Obs_Mean_Err)

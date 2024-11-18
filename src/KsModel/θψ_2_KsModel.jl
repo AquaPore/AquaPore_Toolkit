@@ -13,8 +13,7 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ₁; 🎏_IsTopsoil=false, 🎏_RockFragment=false, RockFragment=[], IsTopsoil=[])
 
-			return KsΨmodel = KSMODEL_OPTIONS(∑Psd, 🎏_Clay, 🎏_RockFragment, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ₁; RockFragment=RockFragment)
-
+		return KsΨmodel = KSMODEL_OPTIONS(∑Psd, 🎏_Clay, 🎏_RockFragment, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ₁; RockFragment=RockFragment)
 		end  # function: KS_MODEL
 	#..................................................................
 
@@ -87,13 +86,12 @@ module θψ_2_KsψModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : TORTUOSITYMODELS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL_OPTIONS(∑Psd, 🎏_Clay::Bool, 🎏_RockFragment::Bool, hydro, ipClass, iZ::Int64, ksmodelτ, option, param, Ψ₁; RockFragment=[], θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τclay₀=ksmodelτ.τclay₀[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass],τclay₀Mac=ksmodelτ.τclay₀Mac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass], τclayₘₐₓMac=ksmodelτ.τclayₘₐₓMac[ipClass], τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass], τclayΔθsrMac=ksmodelτ.τclayΔθsrMac)
+		function KSMODEL_OPTIONS(∑Psd, 🎏_Clay::Bool, 🎏_RockFragment::Bool, hydro, ipClass, iZ::Int64, ksmodelτ, option, param, Ψ₁; RockFragment=[], θs=hydro.θs[iZ], θr=hydro.θr[iZ], Ψm=hydro.Ψm[iZ], σ=hydro.σ[iZ], θsMacMat=hydro.θsMacMat[iZ], ΨmMac=hydro.ΨmMac[iZ], σMac=hydro.σMac[iZ], τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass],τclay₀=ksmodelτ.τclay₀[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass], τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass], τ₁ₐMac=ksmodelτ.τ₁ₐMac[ipClass], τ₂ₐMac=ksmodelτ.τ₂ₐMac[ipClass],  τ₃ₐMac=ksmodelτ.τ₃ₐMac[ipClass])
 
 			# Only correct if RF > Rf_StartIncrease
 			if 🎏_RockFragment
 				θr, θs, θsMacMat = ROCKCORRECTION!(hydro, iZ, RockFragment[iZ], θr, θs, θsMacMat)
 			end #@isdefined RockFragment
-
 
 			# MODEL 0 ====
 			# Original model	
