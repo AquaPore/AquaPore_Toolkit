@@ -375,10 +375,10 @@ module reading
 				Opt_LogTransform= Opt_LogTransform[iSelectModel]
 
 		# Reading the values of the parameters if they are not optimized
-			ParamValue = convert(Vector{Float64}, Tables.getcolumn(Data, :VALUE))
+			Param_Value = convert(Vector{Float64}, Tables.getcolumn(Data, :VALUE))
 			
 				# Selecing data
-				ParamValue = ParamValue[iSelectModel]
+				Param_Value = Param_Value[iSelectModel]
 
 		# Reading which parameters to be optimized [1 or 0]
 			Opt = convert(Vector{Int64}, Tables.getcolumn(Data, :OPT))
@@ -409,7 +409,7 @@ module reading
 		# For every hydraulic parameter
 		for inParamValue in Param_Name
 			# Putting the value of the parameters in hydro. Repeating the value of the parameter for all soils data: NiZ
-			ParamValue_Vector = fill(Float64(ParamValue[i]), NiZ)
+			ParamValue_Vector = fill(Float64(Param_Value[i]), NiZ)
 			setfield!(hydro, Symbol(inParamValue), ParamValue_Vector)
 
 			# θsMacMat value depends on θs
@@ -427,7 +427,7 @@ module reading
 				ParamValue_Vector = fill(Float64(Param_Max[i]), NiZ)
 				setfield!(hydro, Symbol(inParamValue * "_Max"), ParamValue_Vector)
 	
-			# ParamValue to optimize. The complication is that there are different layers of hydraulic parameters which can be optimized.  
+			# Param_Value to optimize. The complication is that there are different layers of hydraulic parameters which can be optimized.  
 			if Opt[i] ≥ 1
 				# appending the values of the parameters
 				append!(ParamOpt, [Param_Name[i]])
@@ -438,7 +438,7 @@ module reading
 
 				append!(Sample_or_AllSoils, Opt[i])
 
-				append!(InitialGuess, ParamValue[i])
+				append!(InitialGuess, Param_Value[i])
 
 				# Appending name of param to perform logTransform if optimized
 				if Opt_LogTransform[i] == 1
@@ -448,7 +448,7 @@ module reading
 				end
 
 				if Param_Min[i] > Param_Max[i]
-					error("LabOpt ERROR: $(Param_Min[i]) < $(ParamValue[i]) < $(Param_Max[i]) !")
+					error("LabOpt ERROR: $(Param_Min[i]) < $(Param_Value[i]) < $(Param_Max[i]) !")
 				end
 			end # if 🎏_Opt
 
@@ -522,7 +522,6 @@ module reading
 	#		FUNCTION : KS_CLASS
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	function KS_CLASS(IdSelect_True, NiZ, Path)
-
 		if isfile(Path)
 			# Read data
 				println("    ~  $(Path) ~")
@@ -531,6 +530,8 @@ module reading
 				DataFrames.sort!(Data, [:Id])
 
 				KsClass = convert(Vector{Int64}, Data.KsClass)
+				# KsClass = convert(Vector{Int64}, Data.TopSoil)
+				# KsClass = convert(Vector{Int64}, Data.PedSize)
 
 				# Selecting the ones of interest
 				return KsClass = KsClass[IdSelect_True]
@@ -552,7 +553,6 @@ module reading
          ParamOpt_Max :: Array{Float64}
          ParamOpt     :: Array{String}
          NparamOpt    :: Vector{Int64}
-         🎏_Opt       :: Bool
          KsClass      :: Vector{Int64}
          N_KsClass    :: Int64
 		end
@@ -583,6 +583,11 @@ module reading
 					# Selecing rows of the model of interest
 					Param_Name = Param_Name[iSelectModel]
 
+			# Reading group of the parameters
+				Param_Group = convert(Vector{Int64}, Tables.getcolumn(Data, :GROUP))
+					# Selecing rows of the model of interest
+					Param_Group = Param_Group[iSelectModel]					
+
 			# Reading minimum value of the parameters
 				Param_Min = convert(Vector{Float64}, Tables.getcolumn(Data, :MIN))
 					# Selecing rows of the model of interest
@@ -594,31 +599,24 @@ module reading
 					Param_Max = Param_Max[iSelectModel]
 
 			# Reading values of the default values of the parameters
-				ParamValue = convert(Vector{Float64}, Tables.getcolumn(Data, :VALUE))
+				Param_Value = convert(Vector{Float64}, Tables.getcolumn(Data, :VALUE))
 					# Selecing rows of the model of interest
-					ParamValue = ParamValue[iSelectModel]
+					Param_Value = Param_Value[iSelectModel]
 
 			# Reading which parameters to be optimized [1 or 0]
 				Opt = convert(Vector{Int64}, Tables.getcolumn(Data, OptColumn))
 					# Selecing rows of the model of interest
 					Opt = Opt[iSelectModel]
 
-			# Number of parameters to be optimised
-				N_Opt = sum(Opt)
-
-				# Determine if we need to optimize
-					if N_Opt ≥ 1
-						🎏_Opt = true
-					else
-						🎏_Opt = false
-					end
-
-			# === CLASSES ========================				
+			# SPECTIAL CASES
 				if option.ksModel.OptIndivSoil
 					N_KsClass = NiZ
 				end
 
 				printstyled("\n	=== === ==== Spliting the data into $N_KsClass classes  === === ====\n"; color=:red)
+
+			# Maximum number of parameters to be optimised just to reserve memory
+				N_Opt = sum(Opt)
 
 				ParamOpt     = fill(""::String, (N_KsClass, N_Opt))
             ParamOpt_Min = fill(0.0::Float64, (N_KsClass, N_Opt))
@@ -626,95 +624,84 @@ module reading
             NparamOpt    = fill(0::Int64, N_KsClass)
 
 				# Declaring structure
-				if option.ksModel.OptIndivSoil
-					ksmodelτ = ksModel.STRUCT_KSMODEL(Nτ_Layer=NiZ)
-				else
-					ksmodelτ = ksModel.STRUCT_KSMODEL(Nτ_Layer=N_KsClass)
-				end
-			
-			# Looping for every parameter of the selected model
-			i = 1
-			 for ipParamName in Param_Name
-				i_ = findall("_", ipParamName)[1][1]
-				Sufix = ipParamName[i_:end]
-
-				# Cleaning the parameter name
-				ipParamName = replace(ipParamName, Sufix => "" )
-
-				# Abstracting the class number
-				iClass = parse(Int64,Sufix[2:end])
-
-				if iClass > N_KsClass
-					🎏skip = true
-				else
-					🎏skip = false
-				end	
-			# else
-				# 	🎏skip = true
-				# end
-
-			if !(🎏skip)
-				# Getting the Vector values of the τ parameters
-				ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName))
-				ParamValue_Vector[iClass] = Float64(ParamValue[i])
-				# Storing the value
-					setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
-					# Repeating the value of the parameters
 					if option.ksModel.OptIndivSoil
-						for iZ=1:NiZ 
-							ParamValue_Vector[iZ] = Float64(ParamValue[i])
-							# Storing the value
-							setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
-						end
+						ksmodelτ = ksModel.STRUCT_KSMODEL(N_KsClass=NiZ)
+					else
+						ksmodelτ = ksModel.STRUCT_KSMODEL(N_KsClass=N_KsClass)
 					end
 
-			# Putting the minimum value in the parameter
-				ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Min"))
-				ParamValue_Vector[iClass] = Float64(Param_Min[i])
-					# Storing the value
-					setfield!(ksmodelτ, Symbol(ipParamName * "_Min"), ParamValue_Vector)
+			# === CLASSES ========================	
+			for iClass =1:N_KsClass
+				println("========== $iClass ==============")
+				for i=1:length(Param_Value)
+					if Param_Group[i] == iClass
+						# Selecting the parameter name
+							ipParamName = Param_Name[i]
 
-			# Putting the maximum value in the parameter
-				ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Max"))
-				ParamValue_Vector[iClass] = Float64(Param_Max[i])
-					# Storing the value
-					setfield!(ksmodelτ, Symbol(ipParamName * "_Max"), ParamValue_Vector)
+						# GETTING THE VECTOR VALUES OF THE Τ PARAMETERS
+							ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName))
+							ParamValue_Vector[iClass] = Float64(Param_Value[i])
+							# Storing the value
+							setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
 
-			# PARAM TO OPTIMIZE  
-				if Opt[i] == 1
-					NparamOpt[iClass] += 1
+							if option.ksModel.OptIndivSoil
+							# Repeating the value of the parameters
+								for iZ=1:NiZ 
+									ParamValue_Vector[iZ] = Float64(Param_Value[i])
+									# Storing the value
+									setfield!(ksmodelτ, Symbol(ipParamName), ParamValue_Vector)
+								end
+							end
 
-					ParamOpt[iClass, NparamOpt[iClass]]     = Param_Name[i]
-					ParamOpt_Min[iClass, NparamOpt[iClass]] = Param_Min[i]
-					ParamOpt_Max[iClass, NparamOpt[iClass]] = Param_Max[i]
+						# GETTING MINIMUM VALUE OF THE PARAMETER
+							ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Min"))
+							ParamValue_Vector[iClass] = Float64(Param_Min[i])
+								# Storing the value
+								setfield!(ksmodelτ, Symbol(ipParamName * "_Min"), ParamValue_Vector)
 
-					# Checking error
-						if ParamOpt_Min[iClass, NparamOpt[iClass]] > ParamOpt_Max[iClass, NparamOpt[iClass]]
-							error("SoilWater LabOpt ERROR: $(ParamOpt[iClass, NparamOpt[iClass]]) $(ParamOpt_Min[iClass, NparamOpt[iClass]] ) < $(ParamValue[i]) < $( ParamOpt_Max[iClass, NparamOpt[iClass]]) !")
-						end
-				end # if 🎏_Opt
-			end # !(🎏skip)
-			i += 1
-			end # for loop
+						# GETTING MAXIMUM VALUE OF THE PARAMETER
+							ParamValue_Vector = getfield(ksmodelτ, Symbol(ipParamName * "_Max"))
+							ParamValue_Vector[iClass] = Float64(Param_Max[i])
+								# Storing the value
+								setfield!(ksmodelτ, Symbol(ipParamName * "_Max"), ParamValue_Vector)
 
-			# Special cases for when we option.ksModel.OptIndivSoil
-				if option.ksModel.OptIndivSoil
-					for iZ=1:NiZ 
-						NparamOpt[iZ] = NparamOpt[1]
-						for iOpt=1:N_Opt
-							ParamOpt[iZ,iOpt]     = ParamOpt[1,iOpt]
-							ParamOpt_Min[iZ,iOpt] = ParamOpt_Min[1,iOpt]
-							ParamOpt_Max[iZ,iOpt] = ParamOpt_Max[1,iOpt]
-						end # for iOpt=1:N_Opt
-					end # for iZ=1:NiZ 
-				end  # if: option.ksModel.OptIndivSoil
+						# PARAM TO OPTIMIZE  
+							if Opt[i] == 1
+								NparamOpt[iClass] += 1
+
+								ParamOpt[iClass, NparamOpt[iClass]]     = Param_Name[i]
+								ParamOpt_Min[iClass, NparamOpt[iClass]] = Param_Min[i]
+								ParamOpt_Max[iClass, NparamOpt[iClass]] = Param_Max[i]
+
+								# Checking error
+									if ParamOpt_Min[iClass, NparamOpt[iClass]] > ParamOpt_Max[iClass, NparamOpt[iClass]]
+										error("SoilWater KsOpt ERROR: $(ParamOpt[iClass, NparamOpt[iClass]]) $(ParamOpt_Min[iClass, NparamOpt[iClass]] ) < $(Param_Value[i]) < $( ParamOpt_Max[iClass, NparamOpt[iClass]]) !")
+									end
+
+								# SPECIAL CASES FOR WHEN WE OPTION.KSMODEL.OPTINDIVSOIL
+									if option.ksModel.OptIndivSoil
+										for iZ=1:NiZ 
+											NparamOpt[iZ] = NparamOpt[1]
+											for iOpt=1:N_Opt
+												ParamOpt[iZ,iOpt]     = ParamOpt[1,iOpt]
+												ParamOpt_Min[iZ,iOpt] = ParamOpt_Min[1,iOpt]
+												ParamOpt_Max[iZ,iOpt] = ParamOpt_Max[1,iOpt]
+											end # for iOpt=1:N_Opt
+										end # for iZ=1:NiZ 
+									end  # if: option.ksModel.OptIndivSoil
+							end # if Opt[i] == 1
+
+					end # Param_Group[i] == iClass
+				end # for i=1:length(Param_Value)					
+			end # for iClass =1:N_KsClass
+
 
 			# Putting values into the mutable structure
-				optimKsmodel = OPTIMKS(Param_Name, ParamOpt_Min, ParamOpt_Max, ParamOpt, NparamOpt, 🎏_Opt, KsClass, N_KsClass)
+				optimKsmodel = OPTIMKS(Param_Name, ParamOpt_Min, ParamOpt_Max, ParamOpt, NparamOpt, KsClass, N_KsClass)
 
-			if !option.ksModel.OptIndivSoil
+			# Writting to screes
 				for iClass=1:N_KsClass
-					if 🎏_Opt
+					if NparamOpt[iClass] ≥ 1
 						printstyled("\n	=== === Class = $iClass Optimizing the following τ parameters  === === \n"; color=:green)
 						println("		KsModel = " , option.ksModel.KₛModel⍰)
 						println("		NparamOpt_τ = " , optimKsmodel.NparamOpt[iClass])
@@ -724,12 +711,11 @@ module reading
 						println("		Min_Value_τ = " , optimKsmodel.ParamOpt_Min[iClass,SelectParam])
 						println("		Max_Value_τ = " , optimKsmodel.ParamOpt_Max[iClass,SelectParam])
 						println("	=== === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ === === \n")
-					end # if 🎏_Opt
+					end # if NparamOpt[iClass] ≥ 1
 				end # for iClass=1:N_KsClass
-			end # if !option.ksModel.OptIndivSoil
 
-	return ksmodelτ, optimKsmodel
-	end  # function: KSΨMODEL_PARAM
+		return ksmodelτ, optimKsmodel
+		end  # function: KSΨMODEL_PARAM
 	# ............................................................
 
 	

@@ -255,8 +255,7 @@ module θψ_2_KsψModel
 			if 🎏_Clay
 				Clay = ∑Psd[iZ,1]
 			
-			# Rough modelling % of clay [0-1]
-			# Correlation between clay particle and Ψ
+			# Rough modelling % of clay [0-1] Correlation between clay particle and Ψ
 			else
 				# Ψ_Clay =  160000.0 * ( ( (cst.Y  / 0.002) - (cst.Y / 0.5) ) / ((cst.Y  / 0.001) - (cst.Y  / 0.5)) ) ^ 2.0
 				Ψ_Clay = param.psd.imp.Ψ_Max * (((cst.Y / 0.002) - (cst.Y / 0.5) ) / ((cst.Y / 0.002) - (cst.Y / 0.5))) ^ param.psd.imp.λ 
@@ -274,7 +273,7 @@ module θψ_2_KsψModel
 
 			Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
 
-		return Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5) 
+		return Tclay = Tclay_Max - (Tclay_Max - 1.0) * (cos(Clayₙ * π * 0.5)) ^ 0.5 
 		end				
 	# ------------------------------------------------------------------
 

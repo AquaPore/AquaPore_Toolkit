@@ -275,10 +275,11 @@ module lab
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : KSMODEL
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function KSMODEL(KₛModel, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, Ksₒᵦₛ, NameSim::String, Path::String, θrₒᵦₛ, θsₒᵦₛ, σₒᵦₛ, option)
+		function KSMODEL(KₛModel, Ksₒᵦₛ, KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, NameSim::String, option, Path::String, θrₒᵦₛ, θsₒᵦₛ, σₒᵦₛ)
 
 			# Title
-				Title = "NO PUMICE SOILS: K(Ψ)model" * option.ksModel.KₛModel⍰[end-1:end]
+				# Title = "NO PUMICE SOILS: K(Ψ)model" * option.ksModel.KₛModel⍰[end-1:end]
+				Title = NameSim
 
 			# Dimension of figure
             Height = 1000 # Height of plot
@@ -315,8 +316,8 @@ module lab
 
 				# Ks_Max = 0.099371778 # mm/s
 				
-				xlims!(Axis_Ks, 0, Ks_Max)
-				ylims!(Axis_Ks, 0, Ks_Max)
+				xlims!(Axis_Ks, 0.0, Ks_Max)
+				ylims!(Axis_Ks, 0.0, Ks_Max)
 
 				# KsTicks = (range(0.0, stop=Ks_Max, length=10)) 
 				Axis_Ks.xticks = [0, 1, 10, 10^2, 10^3, 10^4] 
@@ -328,7 +329,7 @@ module lab
 				ΔΘsMacΘr = θsₒᵦₛ .-  θrₒᵦₛ
 
 				Fig_Ks = scatter!(Axis_Ks, Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=120.0*ΔΘsMacΘr, marker=:rect, colormap=ColourMap, strokecolor=:black, strokewidth=1)
-				Line = range(0.0, stop=Ks_Max, length=10) 
+				Line = range(0.0, stop=Ks_Max, length=100) 
 				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:grey, linestyle=:dash, linewidth=5)
 
 				# Leg1 = Colorbar(Fig, Fig_Ks, label = "Theta", ticklabelsize = 14, labelpadding = 5, width = 10)
