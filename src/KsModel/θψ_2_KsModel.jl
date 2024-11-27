@@ -274,6 +274,7 @@ module θψ_2_KsψModel
 			Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
 
 		return Tclay = Tclay_Max - (Tclay_Max - 1.0) * (cos(Clayₙ * π * 0.5)) ^ 0.5 
+		# return Tclay = Tclay_Max - (Tclay_Max - 1.0) * (cos(Clayₙ * π * 0.5))
 		end				
 	# ------------------------------------------------------------------
 

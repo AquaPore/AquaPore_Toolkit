@@ -39,6 +39,8 @@ module optKsModel
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function OF_KθMODEL(∑Psd, 🎏_Clay, ClassBool_Select, hydro, ipClass, ksmodelτ, NiZ, optim, optimKsmodel, option, param, X; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, IsTopsoil=IsTopsoil, RockFragment=RockFragment)
 
+			OfScaling = "log1p" # <"None">, <"log1p">, <"log10">, 
+
 			# Deriving the optimal τ parameters from X
 				ksmodelτ = X_2_τ(ipClass, ksmodelτ, optimKsmodel, X)
 				
@@ -56,16 +58,28 @@ module optKsModel
 						# K(Ψ) simulated
 							Kθ_Sim = θψ_2_KsψModel.KSΨMODEL_START(∑Psd, 🎏_Clay, hydro, ipClass, iZ, ksmodelτ, option, param, Ψ_Obs[iΨ]; 🎏_IsTopsoil=🎏_IsTopsoil, 🎏_RockFragment=🎏_RockFragment, RockFragment=RockFragment, IsTopsoil=IsTopsoil)
 
-							# Kθ_Log_Sim[iΨ] = log10(cst.MmS_2_MmH .* Kθ_Sim)
-							Kθ_Log_Sim[iΨ] = (cst.MmS_2_MmH .* Kθ_Sim)
-							# Kθ_Log_Sim[iΨ] = cst.MmS_2_MmH .* Kθ_Sim
+							if OfScaling == "None"
+								Kθ_Log_Sim[iΨ] = (cst.MmS_2_MmH .* Kθ_Sim)
 
+							elseif OfScaling == "log10"
+								Kθ_Log_Sim[iΨ] = log10(cst.MmS_2_MmH .* Kθ_Sim)
+
+							elseif OfScaling == "log1p"
+								Kθ_Log_Sim[iΨ] = log1p(cst.MmS_2_MmH .* Kθ_Sim)
+							end
 
 						# K(Ψ) oberved
 							Kθ_Obs = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Obs[iΨ], iZ, hydro)
-							# Kθ_Log_Obs[iΨ] = log10(cst.MmS_2_MmH .*  Kθ_Obs)
-							Kθ_Log_Obs[iΨ] = (cst.MmS_2_MmH .*  Kθ_Obs)
-							# Kθ_Log_Obs[iΨ] = cst.MmS_2_MmH .* Kθ_Obs
+
+							if OfScaling == "None"
+								Kθ_Log_Obs[iΨ] = (cst.MmS_2_MmH .*  Kθ_Obs)
+
+							elseif OfScaling == "log10"
+								Kθ_Log_Obs[iΨ] = log10(cst.MmS_2_MmH .*  Kθ_Obs)
+
+							elseif OfScaling == "log1p"
+								Kθ_Log_Obs[iΨ] = log1p(cst.MmS_2_MmH .* Kθ_Obs)
+							end
 					end # for iΨ =1:N_ΨObs
 
 					if option.ksModel.Of_KₛModel⍰ == "Wilmot"

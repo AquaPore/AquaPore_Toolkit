@@ -48,8 +48,8 @@ module tableSmap
 
             🎏_BrooksCorey       = true
             🎏_ClappHornberger   = true
-            🎏_VanGenuchten      = false
-            🎏_VanGenuchtenJules = false
+            🎏_VanGenuchten      = true
+            🎏_VanGenuchtenJules = true
             🎏_Kosugi            = true
             🎏_Kosugi_Table_θψ   = true
             🎏_Kosugi_Table_Kψ   = true
