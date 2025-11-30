@@ -1,7 +1,7 @@
 # =============================================================
 #		module: including
 # =============================================================
-# module including
+
 
 using Suppressor
 
@@ -19,7 +19,7 @@ using Suppressor
       include("Hydro/Wrc.jl")
       include("Hydro/Kunsat.jl")
       include("Stats.jl")
-      
+
       include("Psd/Psd_θr.jl")
       include("Psd/Psd_START.jl")
 
@@ -32,9 +32,9 @@ using Suppressor
       include("Distribution.jl")
 
       include("Sorptivity/Sorptivity.jl")
-      include("Infiltration/BestFunc.jl")            
+      include("Infiltration/BestFunc.jl")
       include("Infiltration/Infiltration_START.jl")
-      
+
       include("Plot.jl")
 
       include("Ksmodel/Start_KsModel.jl")
@@ -53,7 +53,7 @@ using Suppressor
       include("NoCore/Smap/TableSmap.jl")
       include("NoCore/Smap/Smap2Hypix.jl")
       include("NoCore/Smap/PlotSmap.jl")
-      
+
 
       # include("HyPix/HypixStart.jl")
       # include("Temporary/Ks_Smap.jl")

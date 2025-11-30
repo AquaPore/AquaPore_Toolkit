@@ -11,7 +11,7 @@ function PLOT_HEATMAP()
 
    for iSiteName in SiteName
       println("<==== ", iSiteName, " ====>")
-      PLOT_HEATMAP_2(iSiteName, θZₐᵥₑᵣ, Option_Data)    
+      PLOT_HEATMAP_2(iSiteName, θZₐᵥₑᵣ, Option_Data)
    end
 end
 
@@ -62,14 +62,14 @@ function HEATMAP(Df, Df_θZₐᵥₑᵣ, Header_θZₐᵥₑᵣ, Nit, Option_Dat
       Xticks = string.(Df[!,:MonthlyCombine])
    end
 
-   Title = "©HyPix,    SiteName = $SiteName" 
+   Title = "©HyPix,    SiteName = $SiteName"
    Fig = Figure(fontsize=20, backgroundcolor = RGBf(0.98, 0.98, 0.98), font="CMU Serif")
 
    Ax1 = Axis(Fig[1,1], title=Title, titlesize=40, xticks =(1:Nit, Xticks), ylabel= L"$\Delta Flux$ [mm]", height=Height, width=Width, xgridvisible = true, ygridvisible = false, yticks = LinearTicks(10))
       xlims!(Ax1, 1, Nit)
 
       hidexdecorations!(Ax1, grid=false, ticks=true, ticklabels=true)
-      
+
       if Option_Data == :YearMonth
          barplot!(Ax1, 1:Nit,Df[!,:ΔPrThroughfall_sum], color=:blue, strokecolor=:black, strokewidth=1.5,  label= L"$\Delta Pr$ [mm]")
 
@@ -85,7 +85,7 @@ function HEATMAP(Df, Df_θZₐᵥₑᵣ, Header_θZₐᵥₑᵣ, Nit, Option_Dat
       end
 
          Leg = Legend(Fig[1,2], Ax1, framevisible=true, orientation=:horizontal, tellheight=true, tellwidth=true, nbanks=3, labelsize=14)
-     
+
    Yticks = Header_θZₐᵥₑᵣ
    Ax2 = Axis(Fig[3, 1], xticks = (1:Nit, Xticks), yticks = (1:N_θZₐᵥₑᵣ, Yticks), height=Height, width=Width, ylabel= L"$Zcell$ [mm]")
       Ax2.xticklabelrotation = π / 3

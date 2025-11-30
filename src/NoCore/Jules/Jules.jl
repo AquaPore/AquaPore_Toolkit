@@ -36,31 +36,31 @@ module jules
          SoilName, ~ = tool.readWrite.READ_HEADER_FAST(Data, Header, "SoilName-Smap")
 
       # Dictionary
-      # SiteName_2_VCSNgridnumber::Dict{String, Int64} 
+      # SiteName_2_VCSNgridnumber::Dict{String, Int64}
          iSite = 1
          SiteName_2_VCSNgridnumber = Dict("a"=>9999) # Initializing
          SiteName_2_SiteNumber  = Dict("a"=>9999)
          SoilName_2_SiteName = Dict("a"=>"b")
          SiteName_2_θini = Dict("a"=>9999.0) # Initializing
-             
+
          for iSiteName in SiteName
 
             # Making a new pathHyPix if not exist
                Path_Output =  pathHyPix.Path_home * "//INPUT//Data_Hypix//JULES//" * iSiteName
-               mkpath(Path_Output) 
-               
+               mkpath(Path_Output)
+
             # dictionary which correspond SiteName to VCSNgridnumber
                SiteName_2_VCSNgridnumber[iSiteName] = VCSNgridnumber[iSite]
                SiteName_2_SiteNumber[iSiteName] = SiteNumber[iSite]
                SoilName_2_SiteName[SoilName[iSite]] = iSiteName
-          
+
             # Reading climate
                Path_Climate_Input = Path_Climate * "VCSN_obsSM_" * string(SiteName_2_VCSNgridnumber[iSiteName]) * ".csv"
 
                Path_Climate_Output = Path_Output * "//" * iSiteName * "_Daily_Climate_2.csv"
-               
+
                READ_WRIITE_CLIMATE(Path_Climate_Input, Path_Climate_Output)
-         
+
             # Reading obs θ
                Path_θ_Input = Path_θ * "sm_obs_" * string(SiteName_2_SiteNumber[iSiteName]) * ".nc"
 
@@ -71,13 +71,13 @@ module jules
                θᵢₙᵢ= READ_WRITE_θobs(iSiteName, Path_Date_Output, Path_θ_Input, Path_θ_Output)
 
                SiteName_2_θini[iSiteName] = θᵢₙᵢ
-      
+
 
                # Reading Jules simulated θ
                   # Path_θjules_Input = Path_θJules * "Sta_" * string(SiteName_2_SiteNumber[iSiteName]) * "/"
-   
+
                   # Path_θjules_Output =  Path_Output * "//" * iSiteName * "_Soilmoisture_Jules.csv"
-   
+
                   # READ_WRITE_θJULES(Path_θjules_Input, Path_θjules_Output, Options_θjules)
             iSite += 1
          end #  for iSiteName
@@ -85,7 +85,7 @@ module jules
    return SoilName_2_SiteName,  SiteName_2_θini
    end  # function: START_JULES
 
-   
+
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    #		FUNCTION : READ_CLIMATE
    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,13 +108,13 @@ module jules
             Hour  = fill(9::Int64, N)
             Minute = fill(0::Int64, N)
             Second = fill(0::Int64, N)
-            
+
             Header = ["Year";"Month";"Day";"Hour";"Minute";"Second";"PET(mm)";"Rain(mm)"]
 
             Output = Tables.table( [Year Month Day Hour Minute Second Pet Rain])
 
-            CSV.write(Path_Output, Output, header=Header)	
-            
+            CSV.write(Path_Output, Output, header=Header)
+
          return nothing
          end  # function: READ_CLIMATE
 
@@ -141,7 +141,7 @@ module jules
                end
             end
 
-            # Getting the inititilal starting date in the format 1 January 2008   
+            # Getting the inititilal starting date in the format 1 January 2008
                Data = NetCDF.open(Path_θ_Input)
 
                Data2 = NCDatasets.Dataset(Path_θ_Input)
@@ -150,8 +150,8 @@ module jules
 
                # Converting to Year Month Day
                   # Day
-                     First_Space = findfirst(" ", Date_Start_Obs)
-         
+                     First_Space = 	`first(" ", Date_Start_Obs)
+
                      Day = Date_Start_Obs[1:First_Space[1]]
                      Date_Start_Obs = replace(Date_Start_Obs, Day => "")
                      Day = parse(Int, Day)
@@ -180,8 +180,8 @@ module jules
                   Minutes = fill(0::Int64, N)
                   Seconds = fill(0::Int64, N)
 
-          # CHECKING IF WE HAVE θ IN THE GIVEN DATES        
-            # Determening when we start to have θobs with data 
+          # CHECKING IF WE HAVE θ IN THE GIVEN DATES
+            # Determening when we start to have θobs with data
                Add_Date = Date_Start_Obs
                iFirst_NoData = false
                iTrueStart = 1
@@ -204,7 +204,7 @@ module jules
                Day_Obs_Start   = Days[iTrueStart]
 
                Date_Start_Obs = Dates.Date(Year_Obs_Start, Month_Obs_Start, Day_Obs_Start)
-                  
+
             # Determening when we end of having data starting in reverse
                iTrueEnd = N
                iFirst_NoData = false
@@ -223,7 +223,7 @@ module jules
 
                Date_End_Obs = Dates.Date(Year_Obs_End, Month_Obs_End, Day_Obs_End)
 
-         # SIMULATING DATES      
+         # SIMULATING DATES
             # Initial guess
                Year_Sim_Start = 2008 #2008
                Month_Sim_Start = 7 #7
@@ -240,14 +240,14 @@ module jules
             # Checking if the dates are available or else we shift the dates by one year
                if (Date_Start_Sim < Date_Start_Obs)
                   error("$iSiteName Date_Start_Sim $Date_Start_Sim < Date_Start_Obs $Date_Start_Obs")
-               end 
-                     
+               end
+
                if (Date_End_Sim > Date_End_Obs)
                   Year_Shift = -(Dates.year(Date_End_Sim) - Dates.year(Date_End_Obs) + 1)
 
                   Year_Sim_Start += Year_Shift
                   Date_Start_Sim = Dates.Date(Year_Sim_Start, Month_Sim_Start, Day_Sim_Start)
-                  
+
                   Year_Sim_End += Year_Shift
                   Date_End_Sim = Dates.Date(Year_Sim_End, Month_Sim_End, Day_Sim_End)
 
@@ -258,10 +258,10 @@ module jules
                   # Lets check again
                   if (Date_Start_Sim < Date_Start_Obs)
                      error("$iSiteName Date_Start_Sim $Date_Start_Sim < Date_Start_Obs $Date_Start_Obs")
-                  end 
-               end 
+                  end
+               end
 
-         # CHECKING IF WE HAVE θ on Date_Start_Sim which is used as θᵢₙᵢ 
+         # CHECKING IF WE HAVE θ on Date_Start_Sim which is used as θᵢₙᵢ
             # Searching for θᵢₙᵢ
                θᵢₙᵢ = 0.0
                for iDay = 1:N
@@ -275,25 +275,25 @@ module jules
             # Testing
                if θᵢₙᵢ == 0.0
                   error("JulesM error for $iSiteName, date= $(Year_Sim_Start) \\ $(Month_Sim_Start) \\ $(Day_Sim_Start) cannot find θobs")
-               end 
+               end
 
                if θᵢₙᵢ < 0.0
                   error("JulesM error for $iSiteName, date= $(Year_Sim_Start) \\ $(Month_Sim_Start) \\ $(Day_Sim_Start) θobs is not available for that date")
-                  end 
+                  end
 
          # WRITING TO FILES
             # Writting θ
                Header = ["Year";"Month";"Day";"Hour";"Minute";"Second";"Z=200mm"]
 
                Output = Tables.table( [Years Months Days Hours Minutes Seconds θdata])
-         
+
                CSV.write(Path_θ_Output, Output, header=Header)
-            
+
             # Writting Start end dates
                Header = ["Year_Obs_Start";"Month_Obs_Start";"Day_Obs_Start";"Year_Obs_End";"Month_Obs_End";"Day_Obs_End";"Year_Sim_Start"; "Month_Sim_Start"; "Day_Sim_Start"; "Year_Sim_End"; "Month_Sim_End"; "Day_Sim_End"]
 
                Output = Tables.table([Year_Obs_Start Month_Obs_Start Day_Obs_Start Year_Obs_End Month_Obs_End Day_Obs_End Year_Sim_Start Month_Sim_Start Day_Sim_Start Year_Sim_End Month_Sim_End Day_Sim_End])
-         
+
                CSV.write(Path_Date_Output, Output, header=Header)
 
 
