@@ -25,7 +25,7 @@ module lab
 				N_Ψ  = length(Ψ_Sim)
 
 			for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
-				# Simulated 
+				# Simulated
                θ_Sim      = zeros(N_Ψ)
                Kunsat_Sim = zeros(N_Ψ)
                KsMat      = zeros(N_Ψ)
@@ -35,7 +35,7 @@ module lab
 						θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 						Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 					end # iΨ = 1:N_Se
-	
+
 					KsMac[iZ], KsMat[iZ] = kunsat.kg.FUNC_KsMac(;KosugiModel_σ_2_Tb=option.hydro.KosugiModel_σ_2_Tb, Ks=hydro.Ks[iZ], KosugiModel_KΨ⍰=option.hydro.KosugiModel_KΨ⍰, θr=hydro.θr[iZ], θs=hydro.θs[iZ], θsMacMat=hydro.θsMacMat[iZ], σ=hydro.σ[iZ], σ_Max=hydro.σ_Max[iZ], σ_Min=hydro.σ_Min[iZ], σMac=hydro.σMac[iZ], τa=hydro.τa[iZ], τaMac=hydro.τaMac[iZ], τb=hydro.τb[iZ], τbMac=hydro.τbMac[iZ], τc=hydro.τc[iZ], τcMac=hydro.τcMac[iZ], τₚ=hydro.τₚ[iZ], Ψm=hydro.Ψm[iZ], ΨmacMat=hydro.ΨmacMat[iZ], ΨmMac=hydro.ΨmMac[iZ])
 
 
@@ -87,7 +87,7 @@ module lab
 							Ψ_Log[iZ] = log1p(Ψ_Sim[iZ])
 						end
 
-				# Starting to plot	
+				# Starting to plot
 					CairoMakie.activate!(type="svg", pt_per_unit=1)
 					Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
 
@@ -110,7 +110,7 @@ module lab
 							text!(log1p(0.0), hydro.θsMacMat[iZ], text =L"θ_{sMacMat}", align=(:left,:top),  color=textcolor, fontsize=textsize)
 
 							Legend(Fig[1,2], Axis_θψ, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
-		
+
 
 					Axis_Kunsat = Axis(Fig[2, 1], xlabel= L"$ψ$ [kPa]", ylabel=L"$K(\psi)$ [mm h ⁻¹]", title=" " ,  titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign, titlefont = "CMU Serif", yscale=Makie.pseudolog10)
 
@@ -125,7 +125,7 @@ module lab
 						text!(log1p(hydro.ΨmacMat[iZ]), 0, text =L"ψ_{macMat}", align=(:left,:bottom), rotation = π/2,  color=textcolor, fontsize=textsize)
 
 						text!(log1p(0), cst.MmS_2_MmH*KsMat[iZ], text =L"K_{sMacMat}", align=(:left,:top), color=textcolor, fontsize=textsize)
-						
+
 						if option.data.Kθ
 							scatter!(Axis_Kunsat, log1p.(Ψ_KΨobs[iZ,1:N_KΨobs[iZ]]), K_KΨobs[iZ,1:N_KΨobs[iZ]].*cst.MmS_2_MmH, color=:firebrick, markersize=Markersize, marker='●',  label=L"K(\psi)_{obs}")
 						end
@@ -140,12 +140,12 @@ module lab
 						colgap!(Fig.layout, 10)
 						rowgap!(Fig.layout, 10)
 
-						Path = path.plotSoilwater.Plot_θΨK * "Lab_ThetaH_" * string(path.option.ModelName) * "_" * string(IdSelect[iZ]) * ".svg" 
+						Path = path.plotSoilwater.Plot_θΨK * "Lab_ThetaH_" * string(path.option.ModelName) * "_" * string(IdSelect[iZ]) * ".svg"
 						save(Path, Fig)
 						display(Fig)
 
 			end # iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
-			
+
 		return nothing
 	end  # function: HYDROPARAM
 	# ------------------------------------------------------------------
@@ -170,24 +170,24 @@ module lab
 
 		# 			Ψ_θΨobs_Max = maximum(Ψ_θΨobs[iZ,N_θΨobs[iZ]]) + 100000.0
 
-		# 			Ψ_Sim = expm1.(range(log1p(Ψ_θΨobs_Min), stop=log1p(Ψ_θΨobs_Max), length=N_Se)) 
+		# 			Ψ_Sim = expm1.(range(log1p(Ψ_θΨobs_Min), stop=log1p(Ψ_θΨobs_Max), length=N_Se))
 
 		# 			KsMat[iZ] =hydro.Ks[iZ] * min(max((hydro.θsMacMat[iZ] - hydro.θr[iZ]) / (hydro.θs[iZ] - hydro.θr[iZ]), 0.0), 1.0)
 
 		# 			θ_θΨobs_Max = hydro.Φ[iZ]
 
-		# 			# Simulated 
+		# 			# Simulated
 		# 				for iΨ = 1:N_Se
 		# 					θ_Sim[iΨ] = wrc.Ψ_2_θ(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 		# 					Kunsat_Sim[iΨ] = kunsat.KUNSAT_θΨSe(option.hydro, Ψ_Sim[iΨ], iZ, hydro)
 		# 				end # iΨ = 1:N_Se
 
 		# 			# _______________________ START: Plotting _______________________
-								
+
 		# 			Fig = Figure(size = (2500, 1000),  font="Sans", fontsize=16)
 
 		# 			Title = "iZ= $(IdSelect[iZ]) " * "θ(Ψ) Nse_θΨ=" * string(round(hydroOther.Nse_θΨ[iZ], digits=2)) * "; Nse_KΨ=" * string(round(hydroOther.Nse_KΨ[iZ], digits=2)) * "; Wilmot_θΨ=" *  string(round(hydroOther.NseWilmot_θΨ[iZ],digits=2)) * "; Wilmot_KΨ=" * string(round(hydroOther.NseWilmot_KΨ[iZ], digits=2))
-					
+
 		# 			#  == Plot_θ_Ψ  ==
 		# 				Axis1 = Axis(Fig[1,1], title=Title, titlesize=24, xlabel="ln(1 + Ψ) [kPa]", ylabel="θ [mm³ mm⁻³]", xlabelsize=10, backgroundcolor=:white)
 
@@ -203,7 +203,7 @@ module lab
 		# 				lines!(Fig[1,1], [Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), 0), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
 
 		# 				lines!(Fig[1,1], [Point(log1p(0.0), hydro.θsMacMat[iZ]), Point(log1p(cst.Mm_2_kPa * hydro.ΨmacMat[iZ]), hydro.θsMacMat[iZ])], color=:brown, linewidth=3)
-				
+
 		# 				Fig_TotalPorosity = scatter!(Fig[1,1], [log1p.(cst.Mm_2_kPa .* 0.0)], [hydro.Φ[iZ]], color=:green, markersize=25, marker ='●')
 
 		# 			# == Plot_K_Ψ  ==
@@ -242,22 +242,22 @@ module lab
 		# 			trim!(Fig.layout)
 		# 			Leg.orientation = :horizontal
 		# 			Leg.tellheight = true
-					
-		# 			Path = path.plotSoilwater.Plot_θΨK * "Lab_ThetaH_" * string(path.option.ModelName) * "_" * string(IdSelect[iZ]) * ".svg" 
+
+		# 			Path = path.plotSoilwater.Plot_θΨK * "Lab_ThetaH_" * string(path.option.ModelName) * "_" * string(IdSelect[iZ]) * ".svg"
 		# 			save(Path, Fig)
-	
+
 		# 			# Displaying figure in VScode
 		# 			if option.general.PlotVscode
 		# 				display(Fig)
 		# 			end
-				
+
 		# 		end # for iZ
-				
-			# # ------------------------END: Plotting---------------------------  
-			# println("  ==  END: Plotting HydroParam  == \n")		
+
+			# # ------------------------END: Plotting---------------------------
+			# println("  ==  END: Plotting HydroParam  == \n")
 			# return nothing
 			# end  # function: HYDROPARAM
-	
+
 	end  # module lab
 	# ............................................................
 
@@ -297,7 +297,7 @@ module lab
              TickLabelSize = 35
              TickSize      = 20
              LabelSize     = 35
-        
+
 			# Colour map
 				ColourMap = :plasma # :plasma, :plasma, :thermal
 
@@ -305,7 +305,7 @@ module lab
 				CairoMakie.activate!(type = "svg")
 				Fig = Figure(font="Sans", fontsize=NumberSize)
 
-			# PLOTTING KS	
+			# PLOTTING KS
 			Axis_Ks = Axis(Fig[1,1], width=Width, height=Height, aspect=1, xlabel=L"$Ks _{sim}$ $[mm$ $h^{-1}]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xscale=Makie.pseudolog10, yscale=Makie.pseudolog10, xminorticksvisible=true, xminorticks = IntervalsBetween(9), yminorticksvisible=true, yminorticks = IntervalsBetween(9))
 
             Ksₒᵦₛ   = Ksₒᵦₛ .* cst.MmS_2_MmH
@@ -315,28 +315,28 @@ module lab
             Ks_Max = maximum([maximum(Ksₒᵦₛ), maximum(KₛModel)])
 
 				# Ks_Max = 0.099371778 # mm/s
-				
+
 				xlims!(Axis_Ks, 0.0, Ks_Max)
 				ylims!(Axis_Ks, 0.0, Ks_Max)
 
-				# KsTicks = (range(0.0, stop=Ks_Max, length=10)) 
-				Axis_Ks.xticks = [0, 1, 10, 10^2, 10^3, 10^4] 
+				# KsTicks = (range(0.0, stop=Ks_Max, length=10))
+				Axis_Ks.xticks = [0, 1, 10, 10^2, 10^3, 10^4]
 				# (KsTicks, string.( floor.(KsTicks, digits=1)))
 				# Axis_Ks.yticks = (KsTicks, string.(floor.(KsTicks, digits=1)))
-				Axis_Ks.yticks =  [0, 1, 10, 10^2, 10^3, 10^4] 
+				Axis_Ks.yticks =  [0, 1, 10, 10^2, 10^3, 10^4]
 				# Axis_Ks.xticklabelrotation = π/3
 
 				ΔΘsMacΘr = θsₒᵦₛ .-  θrₒᵦₛ
 
 				Fig_Ks = scatter!(Axis_Ks, Ksₒᵦₛ, KₛModel, color=σₒᵦₛ, markersize=120.0*ΔΘsMacΘr, marker=:rect, colormap=ColourMap, strokecolor=:black, strokewidth=1)
-				Line = range(0.0, stop=Ks_Max, length=100) 
+				Line = range(0.0, stop=Ks_Max, length=100)
 				Fig_Ks = lines!(Fig[1,1], Line, Line, color=:grey, linestyle=:dash, linewidth=5)
 
 				# Leg1 = Colorbar(Fig, Fig_Ks, label = "Theta", ticklabelsize = 14, labelpadding = 5, width = 10)
 
 			# PLOTTING K₁₀ₖₚₐ
 			🎏_K₁₀ₖₚₐ = false
-			if 🎏_K₁₀ₖₚₐ 
+			if 🎏_K₁₀ₖₚₐ
 				Axis_KΨ = Axis(Fig[1,2], aspect = 1, width= Width, height=Height, xlabel=L"$K10kpa _{sim}$ $[mm$ $h^{-1}]$", ylabel=L"$K10kpa _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xminorticksvisible=true, xminorticks=IntervalsBetween(9), yminorticksvisible=true, yminorticks=IntervalsBetween(9))
 
 				KΨ_Obs₁₀ₖₚₐ = KΨ_Obs₁₀ₖₚₐ .* cst.MmS_2_MmH
@@ -350,25 +350,25 @@ module lab
 				xlims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
 				ylims!(Axis_KΨ, 0.0, KΨ_Sim₁₀ₖₚₐ_Max)
 
-				Axis_KΨ.xticks = [0, 0.5, 1, 1.5, 2] 
-				Axis_KΨ.yticks = [0, 0.5, 1, 1.5, 2] 
+				Axis_KΨ.xticks = [0, 0.5, 1, 1.5, 2]
+				Axis_KΨ.yticks = [0, 0.5, 1, 1.5, 2]
 
 				# Axis_KΨ.xticklabelrotation = π/3
 
 				Fig_KΨ = scatter!(Fig[1,2], KΨ_Obs₁₀ₖₚₐ, KΨ_Sim₁₀ₖₚₐ, color=σₒᵦₛ, markersize=135.0*ΔΘsMacΘr, marker=:circle, colormap=ColourMap, strokecolor=:black, strokewidth=1)
 
-				Line = range(0.0, stop=Ks_Max, length=10) 
+				Line = range(0.0, stop=Ks_Max, length=10)
 				Fig_Ks = lines!(Fig[1,2], Line, Line, color=:grey, linestyle=:dash, linewidth=5)
 			end # 🎏_ K₁₀ₖₚₐ
-					
+
 				# Colour bas
 					Colorbar(Fig[1,2], limits=(minimum(σₒᵦₛ), maximum(σₒᵦₛ)+0.001), colormap =ColourMap, label="σ[-]", vertical=true, labelsize=LabelSize, width=30, ticksize=TickSize, ticklabelsize=TickLabelSize, labelpadding=5) # :thermal, :ice, :viridis, :plasma
-				
+
 				# Letters
 					# for (ax, label) in zip([Axis_Ks, Axis_KΨ], ["(A)", "(B)"])
 					# 	text!(
 					# 		ax, 0, 1,
-					# 		text = label, 
+					# 		text = label,
 					# 		font = :bold,
 					# 		align = (:left, :top),
 					# 		offset = (4, -2),
@@ -386,7 +386,7 @@ module lab
 				colgap!(Fig.layout, 20)
 				rowgap!(Fig.layout, 20)
 
-			Pathₛ = Path * "_" * NameSim * ".svg" 
+			Pathₛ = Path * "_" * NameSim * ".svg"
 
 			save(Pathₛ, Fig)
 			# Displaying figure in VScode
@@ -402,7 +402,7 @@ module lab
 	#		FUNCTION : KSMODEL_TCLAY
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		function KSMODEL_FUNCTIONS(Path, option, ksmodelτ, ipClass; τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τclay₀=ksmodelτ.τclay₀[ipClass],τ₁ₐ=ksmodelτ.τ₁ₐ[ipClass], τ₂ₐ=ksmodelτ.τ₂ₐ[ipClass],τ₃ₐ=ksmodelτ.τ₃ₐ[ipClass], τclayΔθsr=ksmodelτ.τclayΔθsr[ipClass])
-		
+
 			# DERIVING THE DATA TO PLOT
 				σ = 0.75:0.001:3.0
 				Nσ  = length(σ)
@@ -434,10 +434,10 @@ module lab
 
 						Clayₙ = max(Clay - X_Clay₁, 0.0) / (1.0 - X_Clay₁)
 
-						ΔθsMacθrₙ =  max(ΘsMacMatΘr[iΘsΘr] - τclayΔθsr , 0.0) 
-						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
+						ΔθsMacθrₙ =  max(ΘsMacMatΘr[iΘsΘr] - τclayΔθsr , 0.0)
+						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0)
 
-						Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5) 
+						Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5)
 
 						Func_Ks3[iΘsΘr, iσ] = 60.0 * 60.0 * T1 * cst.KunsatModel * π * ((ΘsMacMatΘr[iΘsΘr]) ^ (Tclay / T3) * ((cst.Y / Ψm) ^ T2) * exp(((T2 * σ[iσ]) ^ 2.0) / 2.0)) ^ T3
 					end
@@ -461,7 +461,8 @@ module lab
 					TickLabelSize = 35
 					TickSize      = 20
 					LabelSize     = 30
-			
+
+					
 				# Colour map
 					ColourMap = :plasma # :thermal :plasma, :ice, :viridis, :plasma
 
@@ -469,10 +470,10 @@ module lab
 				CairoMakie.activate!(type = "svg", pt_per_unit=1)
 				Fig = Figure(font="Sans", fontsize=NumberSize)
 
-			# PLOTTING KsModel1	
+			# PLOTTING KsModel1
 				Axis_KsModel1 = Axis(Fig[1,1], title="", width=Width, height=Height, xlabel=L"$σ [-]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, xminorticks=IntervalsBetween(10), yminorticksvisible=true, yminorticks=IntervalsBetween(10), yscale=Makie.pseudolog10)
 
-				Axis_KsModel1.yticks =  [0, 10^0, 10^1, 10^2, 10^3, 10^4] 
+				Axis_KsModel1.yticks =  [0, 10^0, 10^1, 10^2, 10^3, 10^4]
 
 				Colormap = cgrad(colorschemes[ColourMap], NΘsΘr, categorical = true)
 				for iΘsΘr=1:NΘsΘr
@@ -480,23 +481,23 @@ module lab
 				end
 
 
-			# PLOTTING KsModel2	
+			# PLOTTING KsModel2
 				Axis_KsModel3 = Axis(Fig[2,1], title="", width=Width, height=Height, xlabel=L"$σ [-]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, xminorticks=IntervalsBetween(10), yminorticksvisible=true, yminorticks=IntervalsBetween(10), yscale=Makie.pseudolog10)
 
-				Axis_KsModel3.yticks =  [0, 10^0, 10^1, 10^2, 10^3, 10^4] 
+				Axis_KsModel3.yticks =  [0, 10^0, 10^1, 10^2, 10^3, 10^4]
 
 				Colormap = cgrad(colorschemes[:thermal], NΘsΘr, categorical = true)
 				for iΘsΘr=1:NΘsΘr
 					Fig_Model3 = lines!(Axis_KsModel3, σ[1:Nσ], Func_Ks3[iΘsΘr, 1:Nσ], linewidth=5, colormap =Colormap[iΘsΘr])
 				end
-				
+
 				Leg = Legend(Fig[1:2,2], Axis_KsModel1, "θₛ-θᵣ", framevisible=true, tellheight=true, tellwidth=true, labelsize=LabelSize, margin=(30, 30, 30, 30))
 
 				# Letters
 					for (ax, Label) in zip([Axis_KsModel1, Axis_KsModel3], ["(i)", "(ii)"])
 						text!(
 							ax, 3.0, 150,
-							text = Label, 
+							text = Label,
 							font = :bold,
 							align = (:right, :top),
 							# offset = (40, -2),
@@ -511,7 +512,7 @@ module lab
 				colgap!(Fig.layout, 20)
 				rowgap!(Fig.layout, 20)
 
-			Pathₛ = Path * "_" * "Func_KsModel" * ".svg" 
+			Pathₛ = Path * "_" * "Func_KsModel" * ".svg"
 
 			save(Pathₛ, Fig)
 			# Displaying figure in VScode
@@ -529,7 +530,7 @@ module lab
 		function KSMODEL_TCLAY(Path, option, ksmodelτ, ipClass; τclayₘₐₓ=ksmodelτ.τclayₘₐₓ[ipClass], τclay₀=ksmodelτ.τclay₀[ipClass], τclayΔθsr=ksmodelτ. τclayΔθsr[ipClass])
 			# DERIVING THE DATA TO PLOT
 				Tclay_Min = 1.0
-				
+
 				X_Clay₁ =  τclay₀ # τclay₀
 				Clay = 0.0:0.001:1.0
 				Nclay = length(Clay)
@@ -538,7 +539,7 @@ module lab
 				NΘsΘr = length(ΘsΘr)
 
 				Func_Tclay=fill(0.0, (NΘsΘr, Nclay))
- 				
+
 				for iΘsΘr=1:NΘsΘr
 					for iClay =1:Nclay
 
@@ -546,13 +547,13 @@ module lab
 
 						Clayₙ = max(Clay[iClay] - X_Clay₁, 0.0) / (1.0 - X_Clay₁)
 
-						ΔθsMacθrₙ =  max(ΘsΘr[iΘsΘr] - τclayΔθsr , 0.0) 
+						ΔθsMacθrₙ =  max(ΘsΘr[iΘsΘr] - τclayΔθsr , 0.0)
 
-						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0) 
+						Tclay_Max =  1.0 + ΔθsMacθrₙ * (τclayₘₐₓ - 1.0)
 
-						Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5) 
+						Tclay = Tclay_Max - (Tclay_Max - 1.0) * cos(Clayₙ * π * 0.5)
 
-						Func_Tclay[iΘsΘr, iClay] =	ΘsΘr[iΘsΘr] ^ Tclay	
+						Func_Tclay[iΘsΘr, iClay] =	ΘsΘr[iΘsΘr] ^ Tclay
 					end
 				end
 
@@ -574,7 +575,7 @@ module lab
 					TickLabelSize = 35
 					TickSize      = 20
 					LabelSize     = 35
-			
+
 				# Colour map
 					ColourMap = :viridis # :plasma, :ice, :viridis, :plasma
 
@@ -582,10 +583,10 @@ module lab
 				CairoMakie.activate!(type = "svg")
 				Fig = Figure(font="Sans", fontsize=NumberSize)
 
-			# PLOTTING Tclay	
+			# PLOTTING Tclay
 				Axis_Tclay = Axis(Fig[1,1], width=Width, height=Height, xlabel=L"$Clay$", ylabel=L"$ (θ_{s} - θ_{r}) ^{T_{clay}}$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false, xminorticksvisible=true, xminorticks=IntervalsBetween(10), yminorticksvisible=true, yminorticks=IntervalsBetween(10), yscale=log10, xlabelpadding=30)
 
-				Axis_Tclay.xticks = [0, 0.25, 0.5, 0.75, 1] 
+				Axis_Tclay.xticks = [0, 0.25, 0.5, 0.75, 1]
 				xlims!(Axis_Tclay, 0, Clay[Nclay])
 				ylims!(Axis_Tclay, 10^-6, ΘsΘr[NΘsΘr] )
 
@@ -603,7 +604,7 @@ module lab
 				colgap!(Fig.layout, 20)
 				rowgap!(Fig.layout, 20)
 
-			Pathₛ = Path * "_" * "Tclay" * ".svg" 
+			Pathₛ = Path * "_" * "Tclay" * ".svg"
 
 			save(Pathₛ, Fig)
 			# Displaying figure in VScode
@@ -628,7 +629,7 @@ module lab
 						if RockFragment₁ > Rf_StartIncrease
 							# X values
 								X = [Rf_StartIncrease, Rf_EndIncrease]
-		
+
 							# θs ----
 								θs_NoRf = θs * 1.0
 								Y_θs = [ (1.0 - Rf_StartIncrease) * θs_NoRf, θs_Amplify * θs_NoRf]
@@ -645,7 +646,7 @@ module lab
 							# θsMacMat ----
 								θsMacMat_NoRf =  θsMacMat * 1.0
 								Y_θsMacMat = [min((1.0 - Rf_StartIncrease) * θsMacMat_NoRf, θs), 0.7 * (θs - θr) + θr]
-								Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)	
+								Fit_θsMacMat = Polynomials.fit(X, Y_θsMacMat, 1)
 								θsMacMat = min(Fit_θsMacMat(RockFragment₁), θs)
 
 						else
@@ -661,7 +662,7 @@ module lab
 					T2_Max = 3.0; T3_Max = 4.0
 					T1     = 10.0 ^ (τ₁ₐ / (τ₁ₐ - 1.0))
 					T2     = T2_Max * (1.0 - τ₂ₐ)
-				
+
 					T3     = T3_Max * (1.0 - τ₃ₐ)
 					T1Mac  = T1
 					T2Mac  = T2_Max * (1.0 - τ₂ₐMac)
@@ -681,19 +682,19 @@ module lab
 
 					RockFragment = collect(0.0:0.001:0.9)
 					Nrf = length(RockFragment)
-							
+
 
 					KsModel = fill(0.0::Float64, Nsoil, Nrf)
-					for iSoil=1:Nsoil 
-						for iRf=1:Nrf 							
+					for iSoil=1:Nsoil
+						for iRf=1:Nrf
 							Ψm = ΨmMean * exp(σ[iSoil] * 3.0)
 
 							θr₀, θs₀, θsMacMat₀ =  ROCKCORRECTION!(hydro, 1, RockFragment[iRf], θr[iSoil], θs[iSoil], θsMacMat[iSoil])
 
-							KsModel[iSoil, iRf] =  60.0 * 60.0 * θψ_2_KsψModel.KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr₀, θs₀, θsMacMat₀, σ[iSoil], σMac, Ψ₁, Ψm, ΨmMac)	
-						end 
+							KsModel[iSoil, iRf] =  60.0 * 60.0 * θψ_2_KsψModel.KsΨMODEL_NOINTEGRAL(T1, T1Mac, T2, T2Mac, T3, T3Mac, θr₀, θs₀, θsMacMat₀, σ[iSoil], σMac, Ψ₁, Ψm, ΨmMac)
+						end
 					end
-					
+
 				# PLOTTING
 					# Dimensions of figure
 						Height = 800 # Height of plot
@@ -711,7 +712,7 @@ module lab
 						TickLabelSize = 35
 						TickSize      = 20
 						LabelSize     = 30
-				
+
 					# Colour map
 						ColourMap = :plasma # :thermal :plasma, :ice, :viridis, :plasma
 
@@ -719,17 +720,17 @@ module lab
 						CairoMakie.activate!(type = "svg")
 						Fig = Figure(font="Sans", fontsize=NumberSize)
 
-				# PLOTTING KsModel1	
+				# PLOTTING KsModel1
 					Axis_KsModel1 = Axis(Fig[1,1], title="", width=Width, height=Height, xlabel=L"$Rock Fragments$ $[%]$", ylabel=L"$Ks _{model}$ $[mm$ $h^{-1}]$", xlabelsize=XlabelSize, ylabelsize=YlabelSize, xgridvisible=false, ygridvisible=false,  yminorticksvisible=true, yminorticks=IntervalsBetween(10))
 
-					Axis_KsModel1.xticks =  [0, 0.2, 0.4, 0.6, 0.8, 1] 
-					Axis_KsModel1.yticks =  [0, 10, 20, 30, 40, 50, 60] 
+					Axis_KsModel1.xticks =  [0, 0.2, 0.4, 0.6, 0.8, 1]
+					Axis_KsModel1.yticks =  [0, 10, 20, 30, 40, 50, 60]
 
 					Colormap = cgrad(colorschemes[ColourMap], Nsoil, categorical = true)
 					for iSoil=1:Nsoil
 						Fig_Model1 = lines!(Axis_KsModel1, RockFragment, KsModel[iSoil, :], linewidth=5, colormap =Colormap[iSoil], label =string(σ[iSoil]))
 					end
-		
+
 				Leg = Legend(Fig[1:2,2], Axis_KsModel1, "σ", framevisible=true, tellheight=true, tellwidth=true, labelsize=LabelSize, margin=(30, 30, 30, 30))
 
 
@@ -739,21 +740,21 @@ module lab
 				colgap!(Fig.layout, 20)
 				rowgap!(Fig.layout, 20)
 
-			Pathₛ = Path * "_" * "Func_RockFragment" * ".svg" 
+			Pathₛ = Path * "_" * "Func_RockFragment" * ".svg"
 
 			save(Pathₛ, Fig)
 			# Displaying figure in VScode
 				if option.general.PlotVscode
 					display(Fig)
 				end
-			return nothing	
+			return nothing
 			end  # function: KSMODEL_RF
 		# ------------------------------------------------------------------
 
 
 	end  # module: ksmodel
 
-	
+
 	# ............................................................
 
 	# =============================================================
@@ -773,7 +774,7 @@ module lab
 	# 			# Sorting ascending order with clay fraction
 	# 				Array      = zeros(Float64, 3, length(∑Psd[1:NiZ, param.psd.Psd_2_θr_Size]))
 	# 				Array      = zeros(Float64, (3, NiZ))
-				
+
 	# 				Array[1,:] = ∑Psd[1:NiZ, param.psd.Psd_2_θr_Size] # Clay fraction
 	# 				Array[2,:] = hydroPsd.θr[1:NiZ]
 	# 				Array[3,:] = hydro.θr[1:NiZ]
@@ -781,14 +782,14 @@ module lab
 	# 				Clay       = Array[1,:] # Clay fraction
 	# 				θr_Psd     = Array[2,:]
 	# 				θr         = Array[3,:]
-				
+
 	# 			# Minimum and maximum value
-	# 				θr_Min = 0.01 
+	# 				θr_Min = 0.01
 
 	# 				θr_Max = maximum(hydroPsd.θr_Max) + 0.05
 	# 				Clay_Min = 0.1
 	# 				Clay_Max = maximum(∑Psd[1:NiZ, param.psd.Psd_2_θr_Size]) + 0.05
-				
+
 	# 			# PLOT 1 <>=<>=<>=<>=<>=<>
 	# 				# pgfplotsx()
 	# 				# Plot θr(Clay)
@@ -800,9 +801,9 @@ module lab
 	# 					X = Clay
 	# 					Y = θr_Psd
 	# 					Plots.plot!(X ,Y, seriestype=:line, label=L"\theta _{r psd}", color= :blue, lw=2)
-				
+
 	# 				# General attributes
-	# 					xlabel!(L"Clay \ [g \ g^{-1}]")                         
+	# 					xlabel!(L"Clay \ [g \ g^{-1}]")
 	# 					ylabel!(L"\theta _{r} [cm^{3} \ cm^{-3}]")
 	# 					Plots.plot!(xlims= (Clay_Min, Clay_Max), ylims= (θr_Min, θr_Max))
 
@@ -811,7 +812,7 @@ module lab
 	# 					X = θr
 	# 					Y = θr_Psd
 	# 					Plot_θr_Psd = Plots.plot(X ,Y, seriestype=:scatter, color=:violet, shape=:square, markersize=4, size=(800,400))
-						
+
 	# 				# 1:1 line
 	# 					X = range(θr_Min, stop=θr_Max, length=10)
 	# 					Y = X
@@ -826,7 +827,7 @@ module lab
 	# 			Plot = Plots.plot(Plot_θr, Plot_θr_Psd)
 	# 			Plots.savefig(Plot, Path)
 	# 			println("    ~  $(Path) ~")
-			
+
 	# 		println("  ==  END: Plotting PLOT_θr  == \n")
 	# 		return nothing
 	# 		end # function: PLOT_θr
@@ -836,7 +837,7 @@ module lab
 	# 	#		FUNCTION : PLOT_IMP_MODEL
 	# 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	# 		function PLOT_IMP_MODEL(∑Psd, hydro, IdSelect, NiZ, N_Psd, option, param, Path, Psd, Rpart)
-	# 			println("  ==  START: PLOT_IMP_MODEL  ==")	
+	# 			println("  ==  START: PLOT_IMP_MODEL  ==")
 
 	# 			for iZ = param.globalparam.N_iZ_Plot_Start: param.globalparam.N_iZ_Plot_End
 	# 				Rpart_Min = minimum(Rpart[iZ,1:N_Psd[iZ]])
@@ -856,7 +857,7 @@ module lab
 
 	# 					ξ[iRpart] = psdFunc.imp.INTERGRANULARMIXING(param, Rpart[iZ,iRpart], param.psd.imp.ξ1, ξ2)
 
-	# 					IntergranularMixing[iRpart] = (Rpart[iZ, iRpart] ^ -ξ[iRpart]) 
+	# 					IntergranularMixing[iRpart] = (Rpart[iZ, iRpart] ^ -ξ[iRpart])
 	# 				end # for iRpart = 1:N_Psd[iZ]
 
 	# 				# << PLOT 1 >>
@@ -899,7 +900,7 @@ module lab
 	# 				# println("    ~  $(Path₀) ~")
 	# 			end # for iZ
 	# 		println("  ==  END: PLOT_IMP_MODEL  == \n")
-	# 		return nothing	
+	# 		return nothing
 	# 		end # function: PLOT_IMP_MODEL
 
 
@@ -907,7 +908,7 @@ module lab
 	# 	#		FUNCTION : PLOT_IMP_ΘΨ
 	# 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	# 		function PLOT_PSD_θΨ(hydro, hydroPsd, IdSelect, NiZ, N_Psd, N_θΨobs, option, param, Path, θ_Rpart, θ_θΨobs, Ψ_Rpart, Ψ_θΨobs; N_Se= 100)
-			
+
 	# 			println("  ==  START: Plotting PLOT_PSD_θΨ  ==")
 
 	# 			θ_θΨobs_Psd = fill(0.0::Float64, (N_Se))
@@ -922,10 +923,10 @@ module lab
 
 	# 					θ_θΨobs_Max = hydroPsd.Φ[iZ] + 0.1
 
-	# 				# Simulated 
+	# 				# Simulated
 	# 					for iΨ = 1:N_Se
 	# 						θ_θΨobs_Psd[iΨ] = wrc.Ψ_2_θ(option.psd,Ψ_Sim[iΨ], iZ, hydroPsd)
-	# 					end # iΨ 
+	# 					end # iΨ
 
 	# 				# Plot_θ_Ψ: Psd model fitting for e.g. Kosugi model
 	# 					X = Ψ_Sim[1:N_Se] .* cst.Mm_2_Cm
@@ -940,7 +941,7 @@ module lab
 	# 					Plot_θ_Ψ_Psd = Plots.plot!(X ,Y, seriestype=:scatter, label=Label, color= :violet, shape= :circle, markersize=4)
 
 	# 				# Plot_θ_Ψ: Observed
-	# 				if option.run.HydroLabθΨ⍰ ≠ "No" 
+	# 				if option.run.HydroLabθΨ⍰ ≠ "No"
 	# 					X = Ψ_θΨobs[iZ,1:N_θΨobs[iZ]] .* cst.Mm_2_Cm
 	# 					Y = θ_θΨobs[iZ,1:N_θΨobs[iZ]]
 	# 					Label = "LabObs"
@@ -952,7 +953,7 @@ module lab
 	# 						Y = zeros(Float64,1)
 	# 						Y[1] = hydro.Φ[iZ]
 	# 						Label = "\$ \\phi \$"
-	# 						Plots.plot!(X, Y, seriestype=:scatter, label= Label, color= :green, shape= :square, markersize=4) 
+	# 						Plots.plot!(X, Y, seriestype=:scatter, label= Label, color= :green, shape= :square, markersize=4)
 	# 				end
 
 	# 				# Plot_θ_Ψ: General attributes
@@ -960,13 +961,13 @@ module lab
 	# 					ylabel!(L"\theta \ [cm^3 cm^{-3}]")
 	# 					Plots.plot!(xlims =(Ψ_θΨobs_Min*cst.Mm_2_Cm, Ψ_θΨobs_Max*cst.Mm_2_Cm), ylims =(0.0, θ_θΨobs_Max), xscale= :log10, size=(800,400))
 
-	# 				Path₀ = Path * "Psd_ThetaH_" * string(option.hydro.HydroModel⍰) * "_" *string(IdSelect[iZ]) * ".svg"     
+	# 				Path₀ = Path * "Psd_ThetaH_" * string(option.hydro.HydroModel⍰) * "_" *string(IdSelect[iZ]) * ".svg"
 	# 				Plot = Plots.plot(Plot_θ_Ψ_Psd)
 	# 				Plots.savefig(Plot, Path₀)
 	# 				# println("    ~  $(Path₀) ~")
 	# 			end # iZ
 	# 		println("  ==  END: Plotting PLOT_PSD_θΨ  == \n")
-	# 		return	nothing	
+	# 		return	nothing
 	# 		end # function PLOT_IMP_ΘΨ
 
 	# end  # module: psd
@@ -984,7 +985,7 @@ module lab
 
 						# ================================================================
 				# Plotting parameters
-				
+
 				Linewidth          = 2
 				height             = 200
 				labelsize          = 15
@@ -1028,19 +1029,19 @@ module lab
 		function PLOT_∑INFILT(∑Infilt_1D, ∑Infilt_1D_SeIni, ∑Infilt_3D, ∑Infilt_Obs, hydroInfilt, IdSelect, Infilt_SeIni, infiltOutput, infiltParam, N_Infilt, NiZ, option, param, Path, Soilname, Tinfilt)
 
 			println("  ==  START: PLOT_∑INFILT  == \n")
-			
+
 				for iZ = param.globalparam.N_iZ_Plot_Start:param.globalparam.N_iZ_Plot_End
 					println("=== iZ=$iZ ===")
 
-					# Starting to plot	 
+					# Starting to plot
 						CairoMakie.activate!(type="svg", pt_per_unit=1)
 						Fig =  Figure(figure_padding = 10; fonts = ( ; regular="CMU Serif"), backgroundcolor = :ivory)
 
 					# << PLOT 1 >>
 
-						θini_θs = infiltParam.θini[iZ] / hydroInfilt.θs[iZ] 
+						θini_θs = infiltParam.θini[iZ] / hydroInfilt.θs[iZ]
 						Title = "∑infiltration Id=$(IdSelect[iZ]) ; Soilname=$(Soilname[iZ]) ; θᵢₙᵢ/θₛ=$(round(θini_θs, digits=2))"
-		
+
 
 						# Plot_∑infilt_Obs
 						Axis_Infilt = Axis(Fig[1, 1], xlabel= "Time [minutes]", ylabel="∑ infiltration [mm]", title=Title, titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")
@@ -1049,7 +1050,7 @@ module lab
 							X = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
 							Y = ∑Infilt_Obs[iZ,1:N_Infilt[iZ]]
 							scatter!(Axis_Infilt, X, Y, color=:red, markersize=Markersize, marker = '●', label=Label)
-		
+
 							xlims!(Axis_Infilt, (0, maximum(X)))
 							ylims!(Axis_Infilt, (0, nothing))
 
@@ -1057,11 +1058,11 @@ module lab
 							Label = "Sim_3D"
 							X = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
 							Y = ∑Infilt_3D[iZ,1:N_Infilt[iZ]]
-							lines!(Axis_Infilt, X, Y, color=:blue, linewidth=Linewidth, label=Label) 
+							lines!(Axis_Infilt, X, Y, color=:blue, linewidth=Linewidth, label=Label)
 
 							Label = "Sim_1D"
 							Y2 = ∑Infilt_1D[iZ,1:N_Infilt[iZ]]
-							lines!(Axis_Infilt, X, Y2, color=:green, linewidth=Linewidth, linestyle=(:dash, :dense), label=Label)  
+							lines!(Axis_Infilt, X, Y2, color=:green, linewidth=Linewidth, linestyle=(:dash, :dense), label=Label)
 
 						# TransSteady
 							Label="Time_TransSteady"
@@ -1072,7 +1073,7 @@ module lab
 							Y3[1] = ∑Infilt_Obs[iZ,infiltOutput.iT_TransSteady_Data[iZ]]
 
 							scatter!(Axis_Infilt, X3, Y3, color=:turquoise3, markersize=30, marker =:vline, label=Label)
-							
+
 							Legend(Fig[1,2], Axis_Infilt, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
 
 
@@ -1082,7 +1083,7 @@ module lab
 						Axis_Infilt_SeIni = Axis(Fig[2, 1], xlabel= "Time [minutes]", ylabel=" ∑ infiltration [mm]", title=Title, titlecolor=titlecolor, xticklabelrotation=xticklabelrotation, ylabelsize=ylabelsize, xlabelsize=xlabelSize, xticksize=xticksize, yticksize=yticksize, width=width, height=height, titlesize=titlesize,  xgridvisible=xgridvisible, ygridvisible=ygridvisible, xminorticksvisible=xminorticksvisible, yminorticksvisible=yminorticksvisible, xtickwidth=xtickwidt, ytickwidth=ytickwidt, xtickalign=xtickalign, ytickalign=ytickalign, xticksmirrored=xticksmirrored, yticksmirrored=yticksmirrored, xtrimspine=xtrimspine,  ytrimspine=ytrimspine, xgridstyle=xgridstyle, ygridstyle=ygridstyle, yminorticks=IntervalsBetween(5), xlabelpadding=xlabelpadding, ylabelpadding=ylabelpadding, xminortickalign=xminortickalign, yminortickalign=yminortickalign,  titlefont = "CMU Serif")
 
 						Colormap = cgrad(ColourOption[ColourOption_No], length(Infilt_SeIni), categorical = true)
-	
+
 						for (iSeIni, iiSeIni) in enumerate(Infilt_SeIni)
 							X4 = Tinfilt[iZ,1:N_Infilt[iZ]] / 60.0
 							Y4 = ∑Infilt_1D_SeIni[iZ,1:N_Infilt[iZ], iSeIni]
@@ -1094,15 +1095,15 @@ module lab
 
 						xlims!(Axis_Infilt_SeIni, (0, maximum(X)))
 						ylims!(Axis_Infilt_SeIni, (0, nothing))
-						
+
 						Legend(Fig[2,2], Axis_Infilt_SeIni, framecolor=(:grey, 0.5), labelsize=labelsize, valign=:top, padding=5, tellheight=true, tellwidt=true, nbanks=1, backgroundcolor=:gray100)
-							
+
 					# General
 						resize_to_layout!(Fig)
 						trim!(Fig.layout)
 						colgap!(Fig.layout, 15)
 						rowgap!(Fig.layout, 15)
-						
+
 						Path₂ = Path * "INFIL_" * string(option.infilt.Model⍰)  *  "_" * string(IdSelect[iZ]) *  ".svg"
 						println("    ~  $(Path₂) ~")
 						save(Path₂, Fig)
@@ -1124,7 +1125,7 @@ module lab
 	# 			Kunsat_Infilt = fill(0.0::Float64, (N_Se))
 	# 			Kunsat_Obs    = fill(0.0::Float64, (N_Se))
 
-	# 			for iZ = param.globalparam.N_iZ_Plot_Start: param.globalparam.N_iZ_Plot_End	
+	# 			for iZ = param.globalparam.N_iZ_Plot_Start: param.globalparam.N_iZ_Plot_End
 	# 				Ψ_θΨobs_Min = 10.0 ^ -2 # [mm]
 
 	# 				Ψ_θΨobs_Max = 200000.0 * 10.0 # [mm]
@@ -1149,9 +1150,9 @@ module lab
 
 	# 						if option.run.HydroLabθΨ⍰ ≠ "No" && "Ks" ∈ optim.ParamOpt
 	# 							Kunsat_Obs[iΨ] = kunsat.KUNSAT_θΨSe(option.infilt, Ψ[iΨ], iZ, hydro)
-	# 						end # "Ks" ∈ optim.ParamOpt		
+	# 						end # "Ks" ∈ optim.ParamOpt
 	# 					end # option.run.HydroLabθΨ⍰ ≠ :No
-	# 				end # iΨ 
+	# 				end # iΨ
 
 	# 				#PLOT 1:  Plot_θ_Ψ
 	# 					# Plot_θ_Ψ: Simulated Infiltration
@@ -1193,7 +1194,7 @@ module lab
 	# 							Plots.ylabel!(L" K (\psi) \ [cm \ h^{-1}]")
 	# 							Plot_K_Ψ = Plots.plot!(xlims = (Ψ_θΨobs_Min*cst.Mm_2_Cm, Ψ_θΨobs_Max*cst.Mm_2_Cm), ylims = (10^-2.0, K_Ψ_Max * cst.MmS_2_CmH), xscale= :log10,  yscale= :log10, legend=:bottomleft, size=(800,400))
 
-	# 					Path₂ = Path * "Infilt_ThetaH_" * string(option.hydro.HydroModel⍰) * "_" *string(IdSelect[iZ]) * ".svg"     
+	# 					Path₂ = Path * "Infilt_ThetaH_" * string(option.hydro.HydroModel⍰) * "_" *string(IdSelect[iZ]) * ".svg"
 	# 					Plot = Plots.plot(Plot_θ_Ψ, Plot_K_Ψ)
 	# 					Plots.savefig(Plot, Path₂)
 	# 					# println("    ~  $(Path₂) ~")
