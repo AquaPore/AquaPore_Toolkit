@@ -293,10 +293,9 @@ module wrc
 				end
 
 				if Ψ₁ > eps(100.0)
+					∂θ∂Ψ_Mat = (θsMacMat - θr) * exp( -((log(Ψ₁ / Ψm)) ^ 2.0) / (2.0 * σ ^ 2.0))  / (Ψ₁ * σ * √(π * 2.0))
 
-					∂θ∂Ψ_Mat = -(θsMacMat - θr) * exp( -((log(Ψ₁ / Ψm)) ^ 2.0) / (2.0 * σ ^ 2.0)) / (Ψ₁ * σ * √(π * 2.0))
-
-					∂θ∂Ψ_Mac = - (θs - θsMacMat) * exp( -((log(Ψ₁ / ΨmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (Ψ₁ * σMac * √(π * 2.0))
+					∂θ∂Ψ_Mac = (θs - θsMacMat) * exp( -((log(Ψ₁ / ΨmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (Ψ₁ * σMac * √(π * 2.0))
 
 					return ∂θ∂Ψ_Mat + ∂θ∂Ψ_Mac
 				else
@@ -346,9 +345,9 @@ module wrc
 			function ∂θ∂R(;R₁, θs, θsMacMat, θr, Rm, σ, RmMac, σMac, KosugiModel_θΨ⍰="Traditional", ΨmacMat_2_σMac_ΨmMac=true)
 
 				if R₁ > eps()
-					∂θ∂R_Mat = -(θsMacMat - θr) * exp( -((log(R₁ / Rm)) ^ 2.0) / (2.0 * σ ^ 2.0)) / (R₁ * σ * √(π * 2.0))
+					∂θ∂R_Mat = ((θsMacMat - θr) * exp( -((log(R₁ / Rm)) ^ 2.0) / (2.0 * σ ^ 2.0))) / (R₁ * σ * √(π * 2.0))
 
-					∂θ∂R_Mac = - (θs - θsMacMat) * exp( -((log(R₁ / RmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0)) / (R₁ * σMac * √(π * 2.0))
+					∂θ∂R_Mac = ((θs - θsMacMat) * exp( -((log(R₁ / RmMac)) ^ 2.0) / (2.0 * σMac ^ 2.0))) / (R₁ * σMac * √(π * 2.0))
 
 					return ∂θ∂R_Mat + ∂θ∂R_Mac
 				else
