@@ -101,18 +101,18 @@ module options
          smap         :: SMAP
          ksModel      :: KSMODEL
 		end # struct OPTION
-	
+
 	#__________________________________________________________________
 	#..................................................................
 
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#		FUNCTION : OPTION
 	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		function OPTIONS(Path_Data, SiteName)	
-			Path = Path_Data * "/ParamOptionPath/" * SiteName * "_Option.toml"
-			@assert isfile(Path)
-		return Configurations.from_toml(OPTION, Path)
-		end  # function: OPTION
+      function OPTIONS(Path_Data, SiteName)
+            Path = Path_Data * "/ParamOptionPath/" * SiteName * "_Option.toml"
+            @assert isfile(Path)
+      return Configurations.from_toml(OPTION, Path)
+      end  # function: OPTION
 
-end # module option 
+end # module option
 # end OPTION

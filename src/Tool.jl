@@ -6,7 +6,7 @@ module tool
 	#		module: normalize
 	# =============================================================
 	module norm
-	
+
 		export ∇NORM_2_PARAMETER
 
 			# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -15,7 +15,7 @@ module tool
 			function ∇NORM_2_PARAMETER(∇P, P_Min, P_Max)
 				return P = ∇P * (P_Max - P_Min) + P_Min
 			end  # function: HYDRO_ADJEUSTMENTS
-		
+
 	end  # module: normalize
 	# ............................................................
 
@@ -34,10 +34,10 @@ module tool
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			function READ_HEADER_FAST(Data, Header, Name)
 				N_X, N_Y = size(Data) # Size of the array
-				
+
 				# Getting the column which matches the name of the header
 				Name = replace(Name, " " => "") # Remove white spaces
-				
+
 				# Data_Output = []
 				# try
 					Header = reshape(Header, N_Y, 1)
@@ -62,7 +62,7 @@ module tool
 				# Read data
 					Data =  DelimitedFiles.readdlm(Path, ',')
 					N_X, N_Y = size(Data) # Size of the array
-					
+
 				# Reading header
 					Header = fill("", N_Y)
 					for i = 1:N_Y
@@ -71,7 +71,7 @@ module tool
 
 				# Getting the column which matches the name of the header
 					Name = replace(Name, " " => "") # Remove white spaces
-	
+
 					try
 						global Data_Output = Data[2:N_X,findfirst(isequal(Name), Header)]
 					catch
@@ -122,7 +122,7 @@ module tool
 				# For all soils in the file
 				iSelect = 1; iPoint = 1
             N_Point = fill(0::Int64, NiZ)
-				
+
 				for i = 1:N_X
 					if Id_Data[i] > IdSelect[iSelect] && iSelect ≠ NiZ
 						error("SoilWater_ToolBox error: READ_ROW_SELECT problem with no matching id:  i= $i IdSelect[iSelect] = $(IdSelect[iSelect]) < Id_Data[i] = $(Id_Data[i])")
@@ -138,8 +138,8 @@ module tool
 							Data_Select[iSelect,iPoint] = Data_Output[i]
 						end
 						N_Point[iSelect] += 1
-		
-						if (i ≤ N_X - 1) && (iSelect ≤ NiZ -1) && (Id_Data[i+1] > Id_Data[i]) 
+
+						if (i ≤ N_X - 1) && (iSelect ≤ NiZ -1) && (Id_Data[i+1] > Id_Data[i])
 							iSelect += 1
 							iPoint = 1
 						else
@@ -165,7 +165,7 @@ module tool
 					# 	end # if:
 					# end # if: i ≤ N_X -1
 				# end # for: i = 1:N_X
-	
+
 		return Data_Select, N_Point
 		end # function READ_ROW_SELECT
 
@@ -200,7 +200,7 @@ module tool
 
 				for iZ=1:NiZ
 					Header_Ψ₂ = deepcopy(Ψheader)
-					
+
 					# Finding Missing data
 						Ψheader_Missing = findall(x->x===missing, Xdata[iZ, 1:length(Header)-1])
 
@@ -217,9 +217,9 @@ module tool
 
 						Ψdata_NoMissing[iZ,1:NΨobs[iZ]] = Header_Ψ₂[1:NΨobs[iZ]]
 
-				end # for iZ=1:NiZ	
+				end # for iZ=1:NiZ
 			return NΨobs, Xdata_NoMissing, Ψdata_NoMissing
-			end  # function: Read_2	
+			end  # function: Read_2
 
 
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -231,7 +231,7 @@ module tool
 				FieldName_String = Array{Symbol}(undef, (N_FieldName))
 				i = 1
 				for FieldNames in fieldnames(Structure)
-					FieldName_String[i] = FieldNames 
+					FieldName_String[i] = FieldNames
 					i += 1
 				end
 
@@ -262,7 +262,7 @@ module tool
 						end
 						i += 1
 					end
-				
+
 				# HEADER
 					FieldName_String = fill(""::String, N_FieldName)
 					i=1
@@ -273,6 +273,7 @@ module tool
 				return Matrix, FieldName_String
 				end # function STRUCT_2_FIELDNAME
 
+				
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#		FUNCTION : READ_STRUCT_SIMPLE
 		# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -281,13 +282,13 @@ module tool
 
 				# Read data
 					Data = CSV.File(Path, header=true)
-				
+
 				# Select data of interest
 					NiZ = size(Data)[1] # Initial
-			
+
 				# Reading the Model data
-				for iFieldname in propertynames(structure)			
-					
+				for iFieldname in propertynames(structure)
+
 					Output_Vector = convert(Vector{Float64}, Tables.getcolumn(Data, iFieldname))
 
 					if typeof(getfield(structure, iFieldname)) == Vector{Float64}
@@ -321,7 +322,7 @@ module tool
 				for iFieldname in propertynames(structure)
 
 					# Putting the values of Output_Vector into structure
-					Output_Vector = fill(0.0::Float64, NiZ)					
+					Output_Vector = fill(0.0::Float64, NiZ)
 					try
 						Output_Vector, Ndata = readWrite.READ_HEADER_FAST(Data, Header, string(iFieldname))
 					catch
@@ -350,7 +351,7 @@ module tool
    #    for iValue in (keys(iValue₀))
    #       if uppercase.(iKey) == (string(typeof(Structure)))
    #          setfield!(Structure, Symbol(iValue), TomlParse[iKey][iValue])
-   #       end 
+   #       end
    #    end
    # end
    # return Structure
